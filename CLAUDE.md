@@ -113,9 +113,13 @@ Use the approved dependency baseline unless a documented architectural decision 
 
 - `app/` — صفحات وراوتر Next.js App Router
 - `lib/` — خدمات مشتركة مثل Supabase client وPBAC وcontext services
+- `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
+- `lib/mock-data/` — بيانات تجريبية ثابتة ومحاكي Supabase (يُفعَّل عند `NEXT_PUBLIC_DEMO_MODE=true`)
 - `components/` — مكونات React
-- `db/migrations/` — ترحيلات قاعدة البيانات
+- `db/migrations/` — ترحيلات قاعدة البيانات (81 ملف: M01–M74 + R00–R12)
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)
+- `.env.example` — قالب متغيرات البيئة الـ9 المطلوبة للمطورين الجدد
+- `vitest.config.ts` + `tests/` — إعداد Vitest (تشغيل: `npm test`)
 
 ---
 
@@ -123,7 +127,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 
 - لا تعدّل ملفات `.env.local` أبداً
 - الترحيلات في `/db/migrations` مرتبة بأرقام تسلسلية
-- نمط الصلاحيات: PBAC في `lib/pbac.ts`
+- نمط الصلاحيات: PBAC في `lib/auth/pbac.ts`
 - لا تستخدم `git push --force` أبداً
 - لغة الكود: English
 - لغة التعليقات: Arabic
