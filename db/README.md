@@ -55,7 +55,7 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260527_layer6_nonconformance_reports` | M55: nonconformance_reports — تقارير عدم المطابقة ISO QF03-1/2 |
 | `20260527_layer6_hr_accountability_tickets` | M53b: hr_accountability_tickets — تذاكر مساءلة HR (5 حالات + مسار قرار) |
 | `20260527_layer6_staff_evaluations` | M56: staff_evaluations — تقويم الأداء الوظيفي + trigger → PDF |
-| `20260527_layer7_bulk_upload_jobs` | M54: bulk_upload_jobs + bulk_upload_validations — رفع مجمَّع (6 أنواع) مع approval workflow |
+| `20260527_layer7_bulk_upload_jobs` | M54: bulk_upload_jobs — رفع مجمَّع (student_enrollment) مع approval workflow |
 | `20260528_student_daily_attendance` | M57: student_daily_attendance — الحضور اليومي للطلاب + trigger إحالة آلية عند 5 غيابات |
 | `20260528_period_attendance` | M58: period_attendance — حضور الطالب على مستوى الحصة مرتبط بـ timetable_slot |
 | `20260529_r00` … `r07` | Security hardening series (ENUM rename, RLS rebuild, full coverage) |
@@ -79,6 +79,8 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260601_analytics_cache` | M72: daily_kpis + class_weekly_summary + student_analytics_cache — طبقة كاش التحليلات |
 | `20260601_ai_layer` | M73: ai_prompt_templates (seed 5 قوالب) + ai_insights — طبقة الذكاء الاصطناعي |
 | `20260601_schools_timezone` | M74: schools.timezone NOT NULL DEFAULT 'Asia/Riyadh' — لحساب generated_date بتوقيت المدرسة |
+| `20260602_gamification_multitenant` | M75: Gamification Metaverse V4 — 19 جدول (student_wallet · transaction_logs · sentinel_flags · seasons · quest_nodes · quest_progress · marketplace_items · inventory · raid_bosses · streaks · loot_chests · corruption_states · phantom_merchant_sessions · auctions · ar_glyphs · student_glyph_finds · student_dorms · dorm_furniture · hall_of_legends) مع school_id NOT NULL + RLS + 2 RPC functions |
+| `20260602_pg_cron_daily_feed` | M76: pg_cron + pg_net — تفعيل الإضافتين + دالة `cron_trigger_daily_feed()` (SECURITY DEFINER) + job يومي 00:00 UTC يستدعي `/api/cron/daily-feed` عبر `net.http_post`. الإعداد بعد النشر: `ALTER DATABASE postgres SET app.cron_site_url = '...'` و `app.cron_secret = '...'` |
 
 Migrations are applied **once, in order**. To fix a mistake: write a new migration. Never edit an already-applied migration.
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, startTransition } from 'react';
 import { supabase } from '@/lib/db/supabase';
 
+type DailyMetrics = Record<string, number>;
 
 export type TeacherScore = {
     id: string;
@@ -35,19 +36,57 @@ export function useTeacherAnalytics() {
         setLoading(true);
         try {
             const today = new Date().toISOString().split('T')[0];
-            const { data: kpi } = await supabase
-                .from('daily_kpis')
-                .select('metrics')
-                .eq('role', 'school_principal')
-                .eq('date', today)
-                .maybeSingle();
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 27); // ~4 أسابيع ماضية
+            const fromDate = weekAgo.toISOString().split('T')[0];
 
-            // Suppress unused variable warning — kpi read is intentional for cache warm-up
-            void kpi;
+            const [{ data: kpi }, { data: weekly }] = await Promise.all([
+                supabase
+                    .from('daily_kpis')
+                    .select('metrics')
+                    .eq('role', 'school_principal')
+                    .eq('date', today)
+                    .maybeSingle(),
+                supabase
+                    .from('class_weekly_summary')
+                    .select('class_id, week_start, total_absences, total_lates, behavior_incidents')
+                    .gte('week_start', fromDate)
+                    .order('week_start', { ascending: false })
+                    .limit(40),
+            ]);
+
+            const m    = (kpi?.metrics as DailyMetrics) ?? {};
+            const rows = weekly ?? [];
+
+            // معدل الحضور المدرسي كخط أساس لحساب درجة كل شعبة
+            const schoolAvg = m.attendance_rate ?? 80;
+
+            // gradeDistribution: أداء الشعب في آخر 4 أسابيع
+            // الدرجة = خط أساس الحضور − جزاء الغياب − جزاء السلوك
+            const seen = new Set<string>();
+            const gradeDistribution = rows
+                .filter((r: Record<string, unknown>) => {
+                    const key = r.class_id as string;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                })
+                .slice(0, 10)
+                .map((r: Record<string, unknown>) => {
+                    const incidents = (r.behavior_incidents as number) ?? 0;
+                    const absences  = (r.total_absences   as number) ?? 0;
+                    const score = Math.max(0, Math.round(schoolAvg - incidents * 3 - absences * 0.5));
+                    return {
+                        name:  (r.week_start as string).slice(5).replace('-', '/'),
+                        score,
+                        type: (score >= 80 ? 'vibrant' : score >= 60 ? 'easy' : 'strict') as
+                              'easy' | 'strict' | 'vibrant',
+                    };
+                });
 
             setStats({
-                teacherList:       [],
-                gradeDistribution: [],
+                teacherList:       [], // يتطلب كاش خاص بالمعلمين — غير متوفر بعد
+                gradeDistribution,
                 heatMap:           [],
                 individual:        null,
             });

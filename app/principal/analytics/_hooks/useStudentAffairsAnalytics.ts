@@ -27,7 +27,7 @@ export function useStudentAffairsAnalytics() {
             monthAgo.setDate(monthAgo.getDate() - 29);
             const fromDate = monthAgo.toISOString().split('T')[0];
 
-            const [{ data: kpi }, { data: history }] = await Promise.all([
+            const [{ data: kpi }, { data: history }, { data: riskRows }] = await Promise.all([
                 supabase
                     .from('daily_kpis')
                     .select('metrics')
@@ -41,15 +41,23 @@ export function useStudentAffairsAnalytics() {
                     .gte('date', fromDate)
                     .lte('date', today)
                     .order('date', { ascending: true }),
+                // عدد الطلاب المُصنَّفين (high/medium risk) من كاش التحليلات
+                supabase
+                    .from('student_analytics_cache')
+                    .select('risk_level')
+                    .in('risk_level', ['high', 'medium']),
             ]);
 
-            const m = (kpi?.metrics as DailyMetrics) ?? {};
+            const m    = (kpi?.metrics as DailyMetrics) ?? {};
             const rows = history ?? [];
 
-            const present  = m.present_today  ?? 0;
-            const absent   = m.absent_today   ?? 0;
-            const late     = m.late_today     ?? 0;
-            const total    = present + absent + late;
+            const highRiskCount = riskRows?.filter(r => r.risk_level === 'high').length   ?? 0;
+            const medRiskCount  = riskRows?.filter(r => r.risk_level === 'medium').length ?? 0;
+
+            const present = m.present_today ?? 0;
+            const absent  = m.absent_today  ?? 0;
+            const late    = m.late_today    ?? 0;
+            const total   = present + absent + late;
 
             const attendanceRate = total > 0 ? Math.round((present / total) * 100) : 0;
             const lateRate       = total > 0 ? Math.round((late / total) * 100) : 0;
@@ -75,7 +83,8 @@ export function useStudentAffairsAnalytics() {
                 attendanceRate,
                 lateRate,
                 disciplineRate: 0,
-                activeEWS:      m.behavioral_refs_new ?? 0,
+                // طلاب في خطر مرتفع أو متوسط من student_analytics_cache
+                activeEWS:      highRiskCount + medRiskCount,
                 attendanceTrend,
                 absenceDistribution,
                 classLateness:  [],
