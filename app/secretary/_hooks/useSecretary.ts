@@ -95,7 +95,7 @@ export function useSecretary() {
                 ...row,
                 employee_name: row.employee?.name
             }));
-            setAttendance(formatted as AttendanceLog[]);
+            setAttendance(formatted as unknown as AttendanceLog[]);
         }
     }, []);
 

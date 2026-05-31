@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { X, Upload, FileText, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/db/supabase";
+import { bulkInsertStudentsDirect } from "../_actions";
 
 interface Props {
     isOpen: boolean;
@@ -25,7 +25,7 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
         }
     };
 
-    const parseCSV = (text: string) => {
+    const parseCSV = (text: string): Record<string, string>[] => {
         const lines = text.split("\n");
         const headers = lines[0].split(",").map(h => h.trim());
 
@@ -33,10 +33,10 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
             const values = line.split(",").map(v => v.trim());
             const obj: Record<string, string> = {};
             headers.forEach((header, i) => {
-                obj[header] = values[i];
+                obj[header] = values[i] ?? '';
             });
             return obj;
-        }).filter(item => item["name"]); // Filter empty rows
+        }).filter(item => item["name"]);
     };
 
     const handleUpload = async () => {
@@ -48,49 +48,48 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
             const text = await file.text();
             const data = parseCSV(text);
 
-            let successCount = 0;
             const errors: string[] = [];
+            const rowsToInsert: {
+                name: string;
+                national_id?: string;
+                class_id: string;
+                grade_level?: number;
+            }[] = [];
 
-            // Identify table name
-            const tryFetch = async (names: string[]): Promise<string> => {
-                for (const n of names) {
-                    const { error } = await supabase.from(n).select("id").limit(1);
-                    if (!error) return n;
-                }
-                return "students";
-            };
-            const tableName = await tryFetch(["student_profiles", "students"]);
-
+            // مطابقة الفصل من اسمه — لا تزال عملية العرض على الخادم
             for (const row of data) {
-                try {
-                    // 1. Find classroom ID
-                    const className = row.classroom || row.class || "4/1"; // Fallback
-                    const classroom = classes.find(c => c.name.includes(className) || className.includes(c.name));
+                const className = row.classroom || row.class || "4/1";
+                const classroom = classes.find(
+                    c => c.name.includes(className) || className.includes(c.name)
+                );
 
-                    if (!classroom) {
-                        errors.push(`الفصل "${className}" غير موجود للطالب ${row.name}`);
-                        continue;
-                    }
-
-                    // 2. Insert Student
-                    const { error } = await supabase.from(tableName).insert([{
-                        name: row.name,
-                        national_id: row.national_id || null,
-                        class_id: classroom.id,
-                        grade_level: 4 // Specifically for 4th Grade as requested
-                    }]);
-
-                    if (error) throw error;
-                    successCount++;
-                } catch (e: unknown) {
-                    errors.push(`خطأ في الطالب ${row["name"]}: ${e instanceof Error ? e.message : String(e)}`);
+                if (!classroom) {
+                    errors.push(`الفصل "${className}" غير موجود للطالب ${row.name}`);
+                    continue;
                 }
+
+                rowsToInsert.push({
+                    name:        row.name,
+                    national_id: row.national_id || undefined,
+                    class_id:    classroom.id,
+                    grade_level: 4, // صف رابع حسب المتطلب المحدد
+                });
             }
 
-            setResults({ success: successCount, errors });
-            if (successCount > 0) onSuccess();
+            // الإدراج عبر Server Action مع school_id تلقائياً من الـ persona
+            if (rowsToInsert.length > 0) {
+                const result = await bulkInsertStudentsDirect(rowsToInsert);
+                errors.push(...result.errors);
+                setResults({ success: result.success, errors });
+                if (result.success > 0) onSuccess();
+            } else {
+                setResults({ success: 0, errors });
+            }
         } catch (e: unknown) {
-            setResults({ success: 0, errors: [e instanceof Error ? e.message : String(e)] });
+            setResults({
+                success: 0,
+                errors: [e instanceof Error ? e.message : String(e)],
+            });
         } finally {
             setLoading(false);
         }
@@ -109,7 +108,11 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
                             <p className="text-xs text-zinc-500 font-bold">لطلاب الصف الرابع</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors" aria-label="إغلاق النافذة">
+                    <button
+                        onClick={onClose}
+                        className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                        aria-label="إغلاق النافذة"
+                    >
                         <X size={20} className="text-zinc-500" />
                     </button>
                 </div>
@@ -141,45 +144,43 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
 
                             <button
                                 onClick={onClose}
-                                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 rounded-2xl border border-zinc-800 transition-all font-bold"
+                                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 rounded-2xl border border-zinc-800 transition-all"
                             >
                                 إغلاق
                             </button>
                         </div>
                     ) : (
-                        <div className="space-y-8">
-                            <div className="border-2 border-dashed border-zinc-800 rounded-3xl p-10 text-center hover:border-[hsla(var(--gold),.50)] transition-all group relative cursor-pointer"
+                        <div className="space-y-6">
+                            <div
                                 onClick={() => fileInputRef.current?.click()}
+                                className="border-2 border-dashed border-zinc-700 rounded-2xl p-8 text-center cursor-pointer hover:border-zinc-500 transition-colors"
                             >
-                                <input
-                                    type="file"
-                                    accept=".csv,.xlsx"
-                                    className="hidden"
-                                    ref={fileInputRef}
-                                    onChange={handleFileChange}
-                                    id="file-upload"
-                                    aria-label="رفع ملف المخالفات"
-                                />
-                                <Upload className={`w-12 h-12 mx-auto mb-4 transition-all ${file ? 'text-[hsl(var(--gold))]' : 'text-zinc-700'}`} />
-                                <h3 className="text-lg font-bold text-zinc-300">{file ? file.name : 'اسحب ملف CSV هنا'}</h3>
-                                <p className="text-xs text-zinc-500 mt-2">يجب أن يحتوي الملف على أعمدة (name, classroom)</p>
+                                <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
+                                <p className="text-zinc-400 font-medium">
+                                    {file ? file.name : "اضغط لاختيار ملف CSV"}
+                                </p>
+                                <p className="text-zinc-600 text-xs mt-1">
+                                    الأعمدة المطلوبة: name, classroom, national_id (اختياري)
+                                </p>
                             </div>
+
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".csv"
+                                className="hidden"
+                                onChange={handleFileChange}
+                            />
 
                             <button
                                 onClick={handleUpload}
                                 disabled={!file || loading}
-                                className="w-full bg-[hsl(var(--gold-strong))] hover:bg-[hsl(var(--gold))] disabled:bg-zinc-800 disabled:text-zinc-600 text-zinc-950 font-bold py-4 rounded-2xl shadow-lg shadow-[hsla(var(--gold),.10)] active:scale-95 transition-all flex items-center justify-center gap-2"
+                                className="w-full bg-[hsl(var(--gold))] hover:opacity-90 text-black font-bold py-3 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {loading ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 animate-spin" />
-                                        جاري المعالجة والرفع...
-                                    </>
+                                    <><Loader2 className="w-4 h-4 animate-spin" /> جاري الاستيراد...</>
                                 ) : (
-                                    <>
-                                        <FileText className="w-5 h-5" />
-                                        بدء عملية الاستيراد
-                                    </>
+                                    <><Upload className="w-4 h-4" /> استيراد الطلاب</>
                                 )}
                             </button>
                         </div>

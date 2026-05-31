@@ -4,12 +4,8 @@ import React, { useState } from "react";
 import { Persona } from "@/app/_context/AuthContext";
 import { getRoleInfo, GLOBAL_ROLES } from "@/lib/auth/roles";
 import { motion } from "framer-motion";
-import { Loader2, ArrowRight, AlertCircle, FlaskConical } from "lucide-react";
+import { Loader2, ArrowRight, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
-
-
 
 interface PortalClientProps {
     personas: Persona[];
@@ -100,16 +96,6 @@ export function PortalClient({ personas, userName }: PortalClientProps) {
     return (
         <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-background font-saudi" dir="rtl">
             <div className="w-full max-w-4xl space-y-8">
-
-                {IS_DEMO && (
-                    <div className="flex items-center justify-center gap-3 px-5 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30">
-                        <FlaskConical className="w-5 h-5 text-amber-500 shrink-0" />
-                        <div className="text-center">
-                            <span className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">وضع تجريبي</span>
-                            <span className="text-xs text-amber-700/70 dark:text-amber-300/70 font-medium"> — جميع البيانات وهمية ومعزولة عن الإنتاج</span>
-                        </div>
-                    </div>
-                )}
 
                 <div className="text-center space-y-4">
                     <h1 className="text-3xl font-black text-foreground">

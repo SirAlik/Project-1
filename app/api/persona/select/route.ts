@@ -8,7 +8,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { signPersonaToken } from '@/lib/auth/context-service';
-import { DEMO_USER_ID, DEMO_SCHOOL_ID } from '@/lib/mock-data';
 
 // ============================================================
 // CONFIGURATION
@@ -88,40 +87,6 @@ export async function POST(request: NextRequest) {
 
         if (!requestedRole || typeof requestedRole !== 'string') {
             return NextResponse.json({ success: false, error: 'Role is required' }, { status: 400 });
-        }
-
-        // وضع العرض التجريبي: تجاوز مصادقة Supabase الحقيقية
-        if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
-            const demoSchoolId = requestedRole !== 'system_owner'
-                ? (normalizedSchoolId ?? DEMO_SCHOOL_ID)
-                : undefined;
-
-            const token = await signPersonaToken({
-                userId:    DEMO_USER_ID,
-                role:      requestedRole,
-                schoolId:  demoSchoolId,
-                timestamp: Date.now(),
-            });
-
-            const redirectPath = redirectTo || getDashboardPath(requestedRole, demoSchoolId);
-
-            if (!redirectPath || redirectPath === '/portal') {
-                return NextResponse.json({
-                    success: false,
-                    error:   'MISSING_DASHBOARD_MAPPING',
-                    message: `لا توجد صفحة للدور: ${requestedRole}`,
-                }, { status: 400 });
-            }
-
-            const demoResponse = NextResponse.json({ success: true, redirectPath });
-            demoResponse.cookies.set('active_persona', token, {
-                httpOnly: true,
-                secure:   process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path:     '/',
-                maxAge:   60 * 60 * 24,
-            });
-            return demoResponse;
         }
 
         // GLOBAL_ROLES: Can activate without schoolId

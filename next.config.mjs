@@ -7,12 +7,6 @@ const nextConfig = {
         ignoreBuildErrors: false,
     },
 
-    // ── Demo Mode ──
-    // يُفعَّل Demo Mode تلقائياً بدون .env.local — لإيقافه أزل هذا السطر
-    env: {
-        NEXT_PUBLIC_DEMO_MODE: 'true',
-    },
-
     // ── Security Headers ──
     async headers() {
         return [

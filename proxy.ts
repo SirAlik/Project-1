@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
 /**
  * FINAL TRUTH: Role Scope Classification
@@ -34,19 +35,6 @@ function redirectWithCookies(sourceResponse: NextResponse, url: URL): NextRespon
 export async function proxy(req: NextRequest) {
     const startTime = performance.now();
     const pathname = req.nextUrl.pathname;
-
-    // --- DEMO MODE ENV BYPASS ---
-    // تخطي كل الفحوصات عند تفعيل وضع العرض التجريبي عبر المتغير البيئي
-    if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
-        return NextResponse.next();
-    }
-
-    // --- PRESENTATION BYPASS ---
-    // If 'demo' query param is present, bypass all auth/RBAC checks
-    if (req.nextUrl.searchParams.has('demo')) {
-        console.log(`[Proxy] Presentation Bypass for: ${pathname}`);
-        return NextResponse.next();
-    }
 
     // 0. EMERGENCY BYPASS FOR ROOT
     if (pathname === '/') {
@@ -133,39 +121,30 @@ export async function proxy(req: NextRequest) {
         return redirectWithCookies(response, new URL('/portal', req.url));
     }
 
-    // فك تشفير الـ JWT وتطبيع الدور
+    // التحقق من توقيع الـ JWT واستخراج الدور
     let canonicalRole: UserRole;
     try {
-        const parts = activePersonaCookie.split('.');
-        if (parts.length !== 3) {
-            console.log('[Proxy] Invalid JWT format. Redirecting to Portal.');
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+            console.log('[Proxy] JWT_SECRET غير مضبوط. إعادة توجيه للبوابة.');
             return redirectWithCookies(response, new URL('/portal', req.url));
         }
 
-        const payloadB64url = parts[1];
-        let base64 = payloadB64url.replace(/-/g, '+').replace(/_/g, '/');
-        const padding = (4 - (base64.length % 4)) % 4;
-        base64 += '='.repeat(padding);
-        const jsonStr = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-                .join('')
-        );
-        const context = JSON.parse(jsonStr);
-        const rawRole: string = context.role ?? '';
+        const secret = new TextEncoder().encode(jwtSecret);
+        const { payload } = await jwtVerify(activePersonaCookie, secret);
+        const rawRole: string = typeof payload.role === 'string' ? payload.role : '';
 
         const resolved: UserRole | undefined =
             ALL_ROLES.has(rawRole as UserRole) ? (rawRole as UserRole) : undefined;
 
         if (!resolved) {
-            console.log(`[Proxy] Unknown role "${rawRole}". Redirecting to Portal.`);
+            console.log(`[Proxy] دور غير معروف "${rawRole}". إعادة توجيه للبوابة.`);
             return redirectWithCookies(response, new URL('/portal', req.url));
         }
 
         canonicalRole = resolved;
     } catch (e) {
-        console.log('[Proxy] JWT decode error:', e);
+        console.log('[Proxy] فشل التحقق من JWT:', e);
         return redirectWithCookies(response, new URL('/portal', req.url));
     }
 
