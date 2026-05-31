@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "vitest run",
     "lint": "eslint",
     "lint:css-vars": "node scripts/lint-css-vars.js",
     "theme:audit": "grep -rE \"bg-white|text-black|zinc-|slate-|bg-\\[#|text-\\[#|rgb\\(|rgba\\(\" app/ components/ | grep -v \"globals.css\" | grep -v \"node_modules\" || true",
@@ -57,6 +58,7 @@
     "eslint-config-next": "^16.2.6",
     "playwright": "^1.60.0",
     "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.7"
   }
 }

@@ -1,0 +1,109 @@
+
+---
+
+## 2) ملف `.codexignore`
+
+```gitignore
+# Dependencies
+node_modules/
+
+# Next.js / build outputs / cache
+.next/
+out/
+build/
+dist/
+coverage/
+.cache/
+.turbo/
+.vercel/
+
+# Package manager / runtime cache
+.pnpm-store/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
+npm-cache/
+.npm/
+.pnp.*
+.pnp.cjs
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and temporary outputs
+logs/
+*.log
+*.txt
+*_output.txt
+*_output_clean.txt
+install_log.txt
+npm_ci_log.txt
+lint_baseline.txt
+build_log.txt
+typecheck_log.txt
+audit_log.txt
+*.tsbuildinfo
+
+# AI / audit / generated scratch files
+scratch/
+backup_scratch/
+_archive_cleanup/
+_scan_*.txt
+admin-*.txt
+admin_*.txt
+codex-*.txt
+codex_*.txt
+claude-*.txt
+claude_*.txt
+ai-*.txt
+ai_*.txt
+
+# Old / archived / generated documentation
+docs/archive/
+docs/reports/
+docs/old/
+docs/generated/
+docs/tmp/
+docs/temp/
+
+# Temporary diagnostic scripts
+check-*-cols.mjs
+diagnostic-*.mjs
+get-full-spec.mjs
+get-rpcs.mjs
+get-spec.mjs
+list-classes.mjs
+migrate-students.mjs
+raw-fetch.mjs
+test-*.mjs
+verify-*.mjs
+debug-*.mjs
+inspect-*.mjs
+scan-*.mjs
+
+# Generated schema dumps / database snapshots
+supa-schema.sql
+schema-dump.sql
+schema_dump.sql
+db-dump.sql
+db_dump.sql
+database-dump.sql
+database_dump.sql
+supabase-schema.sql
+supabase_schema.sql
+
+# Local editor / OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary backups
+*.bak
+*.backup
+*.old
+*.tmp
+*.temp

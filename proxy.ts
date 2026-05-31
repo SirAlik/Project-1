@@ -31,20 +31,20 @@ function redirectWithCookies(sourceResponse: NextResponse, url: URL): NextRespon
     return redirectResponse;
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
     const startTime = performance.now();
     const pathname = req.nextUrl.pathname;
 
     // --- PRESENTATION BYPASS ---
     // If 'demo' query param is present, bypass all auth/RBAC checks
     if (req.nextUrl.searchParams.has('demo')) {
-        console.log(`[Middleware] Presentation Bypass for: ${pathname}`);
+        console.log(`[Proxy] Presentation Bypass for: ${pathname}`);
         return NextResponse.next();
     }
 
     // 0. EMERGENCY BYPASS FOR ROOT
     if (pathname === '/') {
-        console.log(`[Middleware] Path: / | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: root-bypass`);
+        console.log(`[Proxy] Path: / | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: root-bypass`);
         return NextResponse.next();
     }
 
@@ -57,19 +57,19 @@ export async function middleware(req: NextRequest) {
 
     // 1. Static Asset Bypass (BEFORE any auth)
     if (pathname.includes('.') || pathname.startsWith('/_next') || pathname === '/favicon.ico') {
-        console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: static-bypass`);
+        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: static-bypass`);
         return NextResponse.next();
     }
 
     // 2. ZERO-WORK POLICY: /portal and /api/persona/select bypass active_persona checks
     if (pathname === '/portal' || pathname.startsWith('/api/persona/select')) {
-        console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: portal-zero-work`);
+        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: portal-zero-work`);
         return response;
     }
 
     // 3. Public Route Bypass (BEFORE auth call)
     if (PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/auth/')) {
-        console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: public-route`);
+        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: public-route`);
         return response;
     }
 
@@ -95,22 +95,22 @@ export async function middleware(req: NextRequest) {
     // 5. Auth Session Refresh & Verification
     const authStart = performance.now();
     const { data: { user } } = await supabase.auth.getUser();
-    console.log(`[Middleware] Auth check took: ${(performance.now() - authStart).toFixed(2)}ms`);
+    console.log(`[Proxy] Auth check took: ${(performance.now() - authStart).toFixed(2)}ms`);
 
     // 6. SPECIAL /login HANDLING
     if (pathname === '/login') {
         if (user) {
-            console.log(`[Middleware] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-to-portal`);
+            console.log(`[Proxy] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-to-portal`);
             return redirectWithCookies(response, new URL('/portal', req.url));
         } else {
-            console.log(`[Middleware] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-allowed`);
+            console.log(`[Proxy] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-allowed`);
             return response;
         }
     }
 
     // 7. Protected Route Guard (Authentication)
     if (!user) {
-        console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: no-auth-redirect`);
+        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: no-auth-redirect`);
         const redirectUrl = new URL('/login', req.url);
         redirectUrl.searchParams.set('redirect', pathname);
         return redirectWithCookies(response, redirectUrl);
@@ -123,7 +123,7 @@ export async function middleware(req: NextRequest) {
         if (pathname === '/portal') {
             return response;
         }
-        console.log('[Middleware] No active persona found. Redirecting to Portal.');
+        console.log('[Proxy] No active persona found. Redirecting to Portal.');
         return redirectWithCookies(response, new URL('/portal', req.url));
     }
 
@@ -132,7 +132,7 @@ export async function middleware(req: NextRequest) {
     try {
         const parts = activePersonaCookie.split('.');
         if (parts.length !== 3) {
-            console.log('[Middleware] Invalid JWT format. Redirecting to Portal.');
+            console.log('[Proxy] Invalid JWT format. Redirecting to Portal.');
             return redirectWithCookies(response, new URL('/portal', req.url));
         }
 
@@ -153,20 +153,20 @@ export async function middleware(req: NextRequest) {
             ALL_ROLES.has(rawRole as UserRole) ? (rawRole as UserRole) : undefined;
 
         if (!resolved) {
-            console.log(`[Middleware] Unknown role "${rawRole}". Redirecting to Portal.`);
+            console.log(`[Proxy] Unknown role "${rawRole}". Redirecting to Portal.`);
             return redirectWithCookies(response, new URL('/portal', req.url));
         }
 
         canonicalRole = resolved;
     } catch (e) {
-        console.log('[Middleware] JWT decode error:', e);
+        console.log('[Proxy] JWT decode error:', e);
         return redirectWithCookies(response, new URL('/portal', req.url));
     }
 
     // 10. RBAC Check
     // الأدوار العالمية (system_owner) تملك صلاحية وصول كاملة
     if (GLOBAL_ROLES.has(canonicalRole)) {
-        console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: global-role-allow`);
+        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: global-role-allow`);
         return response;
     }
 
@@ -174,11 +174,11 @@ export async function middleware(req: NextRequest) {
     const isAllowed = allowedPrefixes.includes('*') || allowedPrefixes.some((prefix: string) => pathname.startsWith(prefix));
 
     if (!isAllowed) {
-        console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-denied`);
+        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-denied`);
         return NextResponse.rewrite(new URL('/403', req.url));
     }
 
-    console.log(`[Middleware] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-allowed`);
+    console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-allowed`);
     return response;
 }
 
