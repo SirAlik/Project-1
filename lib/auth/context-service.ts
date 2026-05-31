@@ -26,15 +26,39 @@ export interface PersonaContext {
  * 3. Scope Enforcement: System Owners can masquerade (if implemented), others cannot.
  */
 export async function getActivePersona(): Promise<PersonaContext | null> {
-    // وضع العرض التجريبي: إعادة شخصية ثابتة بدون الاتصال بـ Supabase
+    // وضع العرض التجريبي: يقرأ الدور المختار من الـ cookie بدلاً من الاتصال بـ Supabase
     if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        const cookieStore = await cookies();
+        const activePersonaCookie = cookieStore.get('active_persona')?.value;
+
+        let demoRole: UserRole = 'school_principal';
+        let demoSchoolId: string | undefined = DEMO_SCHOOL_ID;
+
+        if (activePersonaCookie) {
+            try {
+                const { jwtVerify } = await import('jose');
+                const secret = getSecretKey();
+                const { payload } = await jwtVerify(activePersonaCookie, secret);
+                if (typeof payload.role === 'string') {
+                    demoRole = payload.role as UserRole;
+                }
+                if (payload.schoolId === null || payload.schoolId === undefined) {
+                    demoSchoolId = undefined;
+                } else if (typeof payload.schoolId === 'string') {
+                    demoSchoolId = payload.schoolId;
+                }
+            } catch {
+                // cookie فاسد أو منتهي — نعود للافتراضي school_principal
+            }
+        }
+
         return {
-            userId:      DEMO_USER_ID,
-            role:        'school_principal' as UserRole,
-            schoolId:    DEMO_SCHOOL_ID,
-            isSystemOwner: false,
-            displayName: 'مدير النظام التجريبي',
-            email:       DEMO_EMAIL,
+            userId:        DEMO_USER_ID,
+            role:          demoRole,
+            schoolId:      demoRole === 'system_owner' ? undefined : demoSchoolId,
+            isSystemOwner: demoRole === 'system_owner',
+            displayName:   'مدير النظام التجريبي',
+            email:         DEMO_EMAIL,
         };
     }
 
@@ -107,7 +131,14 @@ export async function getActivePersona(): Promise<PersonaContext | null> {
 // JWT UTILITIES
 // ============================================================
 
+// سر ثابت للوضع التجريبي فقط — لا يُستخدم في الإنتاج أبداً
+const DEMO_JWT_SECRET = 'demo-mode-only-not-for-production-schoolos-2026';
+
 function getSecretKey(): Uint8Array {
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        // في Demo Mode نقبل JWT_SECRET من البيئة إذا كان موجوداً، وإلا نستخدم السر الثابت
+        return new TextEncoder().encode(process.env.JWT_SECRET ?? DEMO_JWT_SECRET);
+    }
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new Error('JWT_SECRET environment variable is required');
     return new TextEncoder().encode(secret);

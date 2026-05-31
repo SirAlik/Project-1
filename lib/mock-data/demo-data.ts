@@ -152,26 +152,32 @@ export const DEMO_DATA: DemoDataMap = {
         {
             id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID,
             full_name: 'مدير النظام التجريبي', email: DEMO_EMAIL,
-            system_role: 'school_principal', created_at: now,
+            system_role: null, created_at: now,
         },
         {
             id: DEMO_TEACHER_ID, school_id: DEMO_SCHOOL_ID,
             full_name: 'سعاد المعلم', email: 'teacher@school-os.example',
-            system_role: 'teacher', created_at: now,
+            system_role: null, created_at: now,
         },
     ],
 
+    // 13 دوراً تجريبياً لـ DEMO_USER_ID — schools مُضمَّنة لمحاكاة JOIN
     user_personas: [
-        {
-            id: 'd0000000-0000-0000-000a-000000000001',
-            user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID,
-            role: 'school_principal', is_active: true, created_at: now,
-        },
-        {
-            id: 'd0000000-0000-0000-000a-000000000002',
-            user_id: DEMO_TEACHER_ID, school_id: DEMO_SCHOOL_ID,
-            role: 'teacher', is_active: true, created_at: now,
-        },
+        { id: 'd0000000-0000-0000-000a-000000000001', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'school_principal',    is_primary: true,  job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000002', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'student_affairs_vp', is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000003', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'academic_vp',         is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000004', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'school_librarian',    is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000005', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'school_secretary',    is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000006', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'activity_leader',     is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000007', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'student_counselor',   is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000008', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'health_coordinator',  is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000009', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'quality_coordinator', is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000010', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'lab_technician',      is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000011', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'teacher',             is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000012', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'student',             is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        { id: 'd0000000-0000-0000-000a-000000000013', user_id: DEMO_USER_ID, school_id: DEMO_SCHOOL_ID, role: 'parent',              is_primary: false, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
+        // معلم منفصل لـ DEMO_TEACHER_ID (مُستخدم في timetable_slots)
+        { id: 'd0000000-0000-0000-000a-000000000014', user_id: DEMO_TEACHER_ID, school_id: DEMO_SCHOOL_ID, role: 'teacher', is_primary: true, job_title: null, is_active: true, created_at: now, schools: { name: 'مدرسة الأمل النموذجية' } },
     ],
 
     timetable_slots: [

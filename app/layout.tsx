@@ -40,6 +40,13 @@ export default function RootLayout({
           <AntigravityParticlesCanvas />
           <ThemeTransition />
           {process.env.NODE_ENV === "development" && <DevTokenStrip />}
+          {process.env.NEXT_PUBLIC_DEMO_MODE === 'true' && (
+            <div className="fixed top-0 inset-x-0 z-[200] flex items-center justify-center gap-2 py-1 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest">
+              <span>⚗</span>
+              <span>وضع عرض تجريبي — بيانات وهمية</span>
+              <span>⚗</span>
+            </div>
+          )}
           <ClientOverlays />
           <Providers>
             <div className="relative z-10">

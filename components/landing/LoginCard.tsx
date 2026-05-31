@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/_context/AuthContext";
-import { UserCircle, Shield, Lock, KeyRound, ArrowRight, Loader2 } from "lucide-react";
+import { UserCircle, Shield, Lock, KeyRound, ArrowRight, Loader2, FlaskConical } from "lucide-react";
+import { DEMO_EMAIL } from "@/lib/mock-data";
+
+const IS_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
 
 export function LoginCard() {
     const router = useRouter();
@@ -14,6 +17,24 @@ export function LoginCard() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+
+    const handleDemoLogin = async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const { data: { session }, error: authError } =
+                await supabase.auth.signInWithPassword({ email: DEMO_EMAIL, password: 'demo' });
+            if (authError) throw authError;
+            if (!session) throw new Error("لم يُنشأ جلسة تجريبية");
+            document.cookie = "active_persona=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+            try { localStorage.removeItem("active_persona"); localStorage.removeItem("active_role"); } catch { }
+            router.replace("/portal");
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "خطأ غير معروف");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleLogin = async (e: { preventDefault(): void }) => {
         e.preventDefault();
@@ -66,6 +87,28 @@ export function LoginCard() {
             <div className="absolute -inset-4 bg-primary/20 blur-3xl opacity-30 group-hover:opacity-100 transition-opacity duration-1000" />
 
             <div className="bg-glass p-8 md:p-10 rounded-[2.5rem] border border-glass shadow-panel relative z-10 w-full max-w-md mx-auto">
+
+                {IS_DEMO && (
+                    <div className="mb-8 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center space-y-3">
+                        <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+                            <FlaskConical className="w-4 h-4" />
+                            <span className="text-xs font-black uppercase tracking-widest">وضع العرض التجريبي</span>
+                        </div>
+                        <p className="text-[11px] text-amber-700 dark:text-amber-300 font-medium leading-relaxed">
+                            بيانات وهمية — لا اتصال حقيقي بقاعدة البيانات
+                        </p>
+                        <button
+                            type="button"
+                            disabled={loading}
+                            onClick={handleDemoLogin}
+                            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-black transition-all disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <FlaskConical className="w-4 h-4" />}
+                            دخول تجريبي فوري — اختر دورك في البوابة
+                        </button>
+                    </div>
+                )}
+
                 <div className="text-center mb-10">
                     <h2 className="text-2xl font-black tracking-tight mb-2 text-foreground">
                         تسجيل الدخول
