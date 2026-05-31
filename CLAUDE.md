@@ -114,7 +114,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 - `app/` — صفحات وراوتر Next.js App Router
 - `lib/` — خدمات مشتركة مثل Supabase client وPBAC وcontext services
 - `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
-- `lib/mock-data/` — بيانات تجريبية ثابتة ومحاكي Supabase (يُفعَّل عند `NEXT_PUBLIC_DEMO_MODE=true`)
+- `lib/mock-data/` — 3 ملفات موحَّدة: `demo-data.ts` (بيانات ثابتة) · `mock-client.ts` (MockQueryBuilder يحاكي Supabase) · `index.ts` (re-exports) — يُفعَّل عند `NEXT_PUBLIC_DEMO_MODE=true`
 - `components/` — مكونات React
 - `db/migrations/` — ترحيلات قاعدة البيانات (77 ملف: M01–M74 + R00–R12)
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)

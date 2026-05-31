@@ -8,7 +8,7 @@ There are **zero real users** and **zero live data**.
 Do NOT treat this codebase as a running system.
 All destructive operations (DROP, TRUNCATE, ALTER, DELETE) are **fully permitted and expected**.
 
-**Code Quality:** `npm run build` → 61/61 pages, zero TypeScript errors. `npm run lint` → **zero errors, zero warnings**. All lint phases (1–5) complete: `no-unused-vars`, `no-explicit-any`, `no-unescaped-entities`, `set-state-in-effect`, and `exhaustive-deps` fully resolved. **Demo mode:** `NEXT_PUBLIC_DEMO_MODE=true` → `lib/mock-data/` MockQueryBuilder routes all Supabase calls to static fixtures. **Tests:** `npm test` runs Vitest (config: `vitest.config.ts`). **Env bootstrap:** copy `.env.example` → `.env.local` and fill in the 9 required variables.
+**Code Quality:** `npm run build` → 61/61 pages, zero TypeScript errors. `npm run lint` → **zero errors, zero warnings**. All lint phases (1–5) complete: `no-unused-vars`, `no-explicit-any`, `no-unescaped-entities`, `set-state-in-effect`, and `exhaustive-deps` fully resolved. **Demo mode:** `NEXT_PUBLIC_DEMO_MODE=true` → `lib/mock-data/` (3 files: `demo-data.ts` · `mock-client.ts` · `index.ts`) — MockQueryBuilder routes all Supabase calls to static fixtures. **Tests:** `npm test` runs Vitest (config: `vitest.config.ts`). **Env bootstrap:** copy `.env.example` → `.env.local` and fill in the 9 required variables.
 
 ---
 

@@ -143,7 +143,7 @@ components/
 lib/
 ├── auth/                    — خدمات الصلاحيات والأمان (pbac.ts · roles.ts · context-service.ts)
 ├── db/                      — إعدادات الاتصال بقاعدة البيانات (supabase-browser.ts · supabase-admin.ts)
-├── mock-data/               — بيانات تجريبية ثابتة ومحاكي Supabase (يُفعَّل عند NEXT_PUBLIC_DEMO_MODE=true)
+├── mock-data/               — 3 ملفات: demo-data.ts (بيانات ثابتة) · mock-client.ts (MockQueryBuilder) · index.ts — يُفعَّل عند NEXT_PUBLIC_DEMO_MODE=true
 ├── services/                — الخدمات المشتركة (audit-service.ts لتدقيق الحسابات · dashboard-data.ts لجلب التحليلات)
 ├── jobs/                    — المهام المجدولة والتشغيل التلقائي الخلفي (مثل ملف التغذية اليومي daily-feed)
 └── types/                   — ملفات تعريف الأنواع والـ TypeScript (academic · lrc · health · qa · ai ...)
