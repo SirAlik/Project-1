@@ -1,0 +1,17 @@
+# Supabase local development state
+.branches/
+.temp/
+.cache/
+
+# Supabase functions cache
+functions/.cache/
+
+# Local environment / dotenvx secrets
+.env.keys
+.env.local
+.env.*.local
+
+# Keep these committed:
+# migrations/
+# functions/
+# config.toml

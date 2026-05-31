@@ -1,0 +1,70 @@
+import type { Metadata }     from 'next';
+import Link                  from 'next/link';
+import { redirect }          from 'next/navigation';
+import { ClipboardList }     from 'lucide-react';
+import { getActivePersona }  from '@/lib/auth/context-service';
+import { getClassesForAttendance } from '@/lib/services/student-attendance-service';
+import { AttendanceSheet }   from './AttendanceSheet';
+
+export const metadata: Metadata = { title: 'تسجيل الحضور — Sidra OS' };
+
+const ALLOWED = [
+  'student_affairs_vp', 'school_affairs_vp',
+  'school_principal', 'school_admin', 'teacher',
+];
+
+function getTodayISO(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+export default async function AttendancePage() {
+  const persona = await getActivePersona();
+  if (!persona || !persona.schoolId) redirect('/portal');
+  if (!ALLOWED.includes(persona.role) && !persona.isSystemOwner) redirect('/portal');
+
+  const classesResult = await getClassesForAttendance();
+  const classes = classesResult.ok ? classesResult.data : [];
+  const today = getTodayISO();
+
+  return (
+    <div className="min-h-screen bg-background p-6 md:p-8" dir="rtl">
+      <div className="mx-auto max-w-3xl space-y-6">
+
+        {/* Header */}
+        <div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+            <Link href="/student-affairs" className="hover:text-foreground transition-colors">
+              شؤون الطلاب
+            </Link>
+            <span>/</span>
+            <span>تسجيل الحضور</span>
+          </div>
+          <h1 className="text-2xl font-black text-foreground flex items-center gap-2">
+            <ClipboardList className="w-6 h-6 text-blue-500" />
+            الحضور اليومي للطلاب
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            تسجيل وتتبع حضور الطلاب — عند تجاوز 3 غيابات غير مبررة تُنشأ إحالة آلية للموجه
+          </p>
+        </div>
+
+        {classes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 space-y-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-muted/60 flex items-center justify-center">
+              <ClipboardList className="w-8 h-8 text-muted-foreground/40" />
+            </div>
+            <div>
+              <p className="font-bold text-foreground">لا توجد فصول دراسية</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                يجب إضافة الفصول الدراسية وتسجيل الطلاب قبل تسجيل الحضور
+              </p>
+            </div>
+          </div>
+        ) : (
+          <AttendanceSheet classes={classes} today={today} />
+        )}
+
+      </div>
+    </div>
+  );
+}

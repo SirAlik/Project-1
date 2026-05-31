@@ -1,0 +1,169 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# ------------------------------------------------
+# Dependencies
+# ------------------------------------------------
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ------------------------------------------------
+# Testing
+# ------------------------------------------------
+/coverage
+
+# ------------------------------------------------
+# Next.js
+# ------------------------------------------------
+/.next/
+/out/
+
+# ------------------------------------------------
+# Production builds
+# ------------------------------------------------
+/build
+/dist/
+
+# ------------------------------------------------
+# Local caches / generated outputs
+# ------------------------------------------------
+.cache/
+.turbo/
+
+# ------------------------------------------------
+# Misc
+# ------------------------------------------------
+.DS_Store
+Thumbs.db
+*.pem
+*.sqlite
+*.db
+
+# ------------------------------------------------
+# Debug logs
+# ------------------------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# ------------------------------------------------
+# Environment files
+# ------------------------------------------------
+.env*
+!.env.example
+
+# ------------------------------------------------
+# Vercel
+# ------------------------------------------------
+.vercel
+
+# ------------------------------------------------
+# TypeScript
+# ------------------------------------------------
+*.tsbuildinfo
+next-env.d.ts
+
+# ------------------------------------------------
+# Diagnostic & log artifacts
+# ------------------------------------------------
+/logs/
+/docs/reports/
+/docs/archive/
+/docs/old/
+/docs/generated/
+
+# ------------------------------------------------
+# AI / scratch / temporary audit files
+# ------------------------------------------------
+/scratch/
+/backup_scratch/
+/_archive_cleanup/
+
+# ------------------------------------------------
+# Old archives / scans
+# ------------------------------------------------
+/Archive_old_Scans/
+/archive/
+/archives/
+/old/
+/backup/
+/backups/
+
+# ------------------------------------------------
+# Local diagnostic scripts and outputs
+# ------------------------------------------------
+*_output.txt
+*_output_clean.txt
+install_log.txt
+npm_ci_log.txt
+lint_baseline.txt
+tsc_output.txt
+tsc_output_clean.txt
+_scan_*.txt
+admin-*.txt
+admin_*.txt
+reinstall-check.txt
+check-output.txt
+build-output.txt
+lint-output.txt
+
+# ------------------------------------------------
+# Temporary diagnostic scripts
+# ------------------------------------------------
+check-*-cols.mjs
+diagnostic-*.mjs
+get-full-spec.mjs
+get-rpcs.mjs
+get-spec.mjs
+list-classes.mjs
+migrate-students.mjs
+raw-fetch.mjs
+test-*.mjs
+verify-*.mjs
+
+# ------------------------------------------------
+# Generated schema dumps / audit exports
+# ------------------------------------------------
+supa-schema.sql
+*.csv
+*.xlsx
+*.xls
+
+# ------------------------------------------------
+# Supabase local dev noise
+# ------------------------------------------------
+supabase/.branches/
+supabase/.temp/
+supabase/functions/.cache/
+
+# ------------------------------------------------
+# Package manager lock files
+# ------------------------------------------------
+# This project uses npm, so package-lock.json MUST stay committed.
+# Do not ignore package-lock.json.
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# ------------------------------------------------
+# Static assets
+# ------------------------------------------------
+# Do NOT ignore /public because it may contain required app assets.
+# Ignore only temporary/generated assets outside public if needed.
+*.tmp.png
+*.tmp.jpg
+*.tmp.jpeg
+*.tmp.webp
+*.tmp.svg
+
+# ------------------------------------------------
+# Source maps
+# ------------------------------------------------
+*.map

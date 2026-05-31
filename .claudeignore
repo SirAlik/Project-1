@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+
+# Next.js / build outputs / cache
+.next/
+out/
+build/
+dist/
+coverage/
+.cache/
+.turbo/
+.vercel/
+
+# Environment and secrets
+.env*
+
+# Logs and temporary outputs
+logs/
+*.log
+*.txt
+*_output.txt
+*_output_clean.txt
+install_log.txt
+npm_ci_log.txt
+lint_baseline.txt
+*.tsbuildinfo
+
+# AI / audit / generated scratch files
+scratch/
+backup_scratch/
+_archive_cleanup/
+_scan_*.txt
+admin-*.txt
+admin_*.txt
+
+# Old / archived documentation
+docs/archive/
+docs/reports/
+docs/old/
+docs/generated/
+
+# Temporary diagnostic scripts
+check-*-cols.mjs
+diagnostic-*.mjs
+get-full-spec.mjs
+get-rpcs.mjs
+get-spec.mjs
+list-classes.mjs
+migrate-students.mjs
+raw-fetch.mjs
+test-*.mjs
+verify-*.mjs
+
+# Generated schema dumps
+supa-schema.sql

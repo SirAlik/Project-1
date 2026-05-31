@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git branch*)",
+      "Bash(npm run lint*)",
+      "Bash(npm run build*)",
+      "Bash(npx tsc*)",
+      "Bash(Get-ChildItem*)",
+      "Bash(Get-Content*)",
+      "Bash(Select-String*)",
+      "Bash(node --version)",
+      "Bash(npm --version)"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(Remove-Item -Recurse*)",
+      "Bash(rm -rf*)",
+      "Bash(npx supabase db push*)",
+      "Bash(supabase db push*)",
+      "Bash(supabase migration up*)",
+      "Bash(psql*)"
+    ]
+  }
+}
