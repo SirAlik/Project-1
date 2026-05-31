@@ -116,7 +116,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 - `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
 - `lib/mock-data/` — بيانات تجريبية ثابتة ومحاكي Supabase (يُفعَّل عند `NEXT_PUBLIC_DEMO_MODE=true`)
 - `components/` — مكونات React
-- `db/migrations/` — ترحيلات قاعدة البيانات (81 ملف: M01–M74 + R00–R12)
+- `db/migrations/` — ترحيلات قاعدة البيانات (77 ملف: M01–M74 + R00–R12)
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)
 - `.env.example` — قالب متغيرات البيئة الـ9 المطلوبة للمطورين الجدد
 - `vitest.config.ts` + `tests/` — إعداد Vitest (تشغيل: `npm test`)
