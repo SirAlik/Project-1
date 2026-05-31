@@ -44,7 +44,7 @@ export function useSecretaryAnalytics() {
             const m = (kpi?.metrics as DailyMetrics) ?? {};
             const rows = history ?? [];
 
-            const correspondenceTrend = rows.slice(-6).map(r => ({
+            const correspondenceTrend = rows.slice(-6).map((r: Record<string, unknown>) => ({
                 month:    (r.date as string).slice(5).replace('-', '/'),
                 incoming: ((r.metrics as DailyMetrics) ?? {}).absent_count ?? 0,
                 outgoing: ((r.metrics as DailyMetrics) ?? {}).late_count   ?? 0,

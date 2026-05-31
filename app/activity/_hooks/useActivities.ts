@@ -261,7 +261,7 @@ export function useActivities() {
                 .in("class_id", trip.target_classes);
 
             if (studentsInClasses && studentsInClasses.length > 0) {
-                const newConsents = studentsInClasses.map(s => ({
+                const newConsents = studentsInClasses.map((s: { id: string }) => ({
                     trip_id: data.id,
                     student_id: s.id,
                     unique_link: crypto.randomUUID(),

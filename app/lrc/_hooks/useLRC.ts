@@ -44,7 +44,7 @@ export function useLRC() {
             setStudents((sRes.data ?? []) as { id: string; name: string; class_id?: string }[]);
 
             // Map full_name to name for teachers if needed by UI
-            setTeachers((tRes.data || []).map(p => ({ id: p.id, name: p.full_name || "معلم" })));
+            setTeachers((tRes.data || []).map((p: { id: string; full_name?: string | null }) => ({ id: p.id, name: p.full_name || "معلم" })));
 
         } catch (e: unknown) {
             setMsg(`⚠️ فشل تحميل بيانات المصادر: ${e instanceof Error ? e.message : String(e)}`);
@@ -150,7 +150,7 @@ export function useLRC() {
         const { data: classStudents } = await supabase.from("student_profiles").select("id, name").eq("class_id", classId);
 
         if (classStudents && classStudents.length > 0) {
-            const attendanceRows = classStudents.map(s => ({
+            const attendanceRows = classStudents.map((s: { id: string; name: string }) => ({
                 visit_id: visit.id,
                 student_id: s.id,
                 student_name: s.name,

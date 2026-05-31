@@ -40,7 +40,7 @@ export default function ClassroomSelectionPage() {
         .eq('teacher_id', user.id)
         .eq('day', currentDay);
 
-      const liveSlot = (todaySlots ?? []).find(s => {
+      const liveSlot = (todaySlots ?? []).find((s: { period: unknown }) => {
         const p = s.period as { start_time: string; end_time: string } | null;
         return p?.start_time && p?.end_time &&
           p.start_time <= currentTime && p.end_time > currentTime;

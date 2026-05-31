@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { SignJWT } from 'jose';
 import { createSupabaseServerClient, getPrivateUser } from '../db/supabase-server';
 import { UserRole } from './roles';
+import { DEMO_USER_ID, DEMO_SCHOOL_ID, DEMO_EMAIL } from '@/lib/mock-data';
 
 /**
  * Persona Context - The Verified Identity
@@ -25,6 +26,18 @@ export interface PersonaContext {
  * 3. Scope Enforcement: System Owners can masquerade (if implemented), others cannot.
  */
 export async function getActivePersona(): Promise<PersonaContext | null> {
+    // وضع العرض التجريبي: إعادة شخصية ثابتة بدون الاتصال بـ Supabase
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        return {
+            userId:      DEMO_USER_ID,
+            role:        'school_principal' as UserRole,
+            schoolId:    DEMO_SCHOOL_ID,
+            isSystemOwner: false,
+            displayName: 'مدير النظام التجريبي',
+            email:       DEMO_EMAIL,
+        };
+    }
+
     const supabase = await createSupabaseServerClient();
 
     // 1. Fetch Safe User (Checks app_metadata existence)

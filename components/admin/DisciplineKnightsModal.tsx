@@ -58,7 +58,7 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
 
             // Fetch classes in bulk
             const { data: classesData } = await supabase.from("classes").select("id, name");
-            const classMap = new Map((classesData || []).map(c => [c.id, c.name]));
+            const classMap = new Map((classesData || []).map((c: { id: string; name: string }) => [c.id, c.name]));
 
             // 2. Fetch all events for the current month
             const startOfMonth = new Date();
@@ -77,7 +77,8 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
 
             // Map students to their event counts
             for (const s of studentsData) {
-                const sEvs = (events || []).filter(e => e.student_id === s.id);
+                type EvRow = { student_id: string; type: string };
+                const sEvs = ((events || []) as EvRow[]).filter(e => e.student_id === s.id);
                 const abs = sEvs.filter(e => e.type === "غياب").length;
                 const lates = sEvs.filter(e => e.type === "تأخر").length;
                 const infr = sEvs.filter(e => e.type === "مخالفة").length;
@@ -86,7 +87,7 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                     knightsList.push({
                         id: s.id,
                         name: s.name,
-                        class: classMap.get(s.class_id) || "بدون فصل",
+                        class: (classMap.get(s.class_id) || "بدون فصل") as string,
                         absences: 0,
                         infractions: 0,
                         lates: 0,

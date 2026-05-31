@@ -35,6 +35,12 @@ export async function proxy(req: NextRequest) {
     const startTime = performance.now();
     const pathname = req.nextUrl.pathname;
 
+    // --- DEMO MODE ENV BYPASS ---
+    // تخطي كل الفحوصات عند تفعيل وضع العرض التجريبي عبر المتغير البيئي
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === 'true') {
+        return NextResponse.next();
+    }
+
     // --- PRESENTATION BYPASS ---
     // If 'demo' query param is present, bypass all auth/RBAC checks
     if (req.nextUrl.searchParams.has('demo')) {

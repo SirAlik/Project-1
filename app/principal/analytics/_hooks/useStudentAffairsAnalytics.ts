@@ -54,7 +54,7 @@ export function useStudentAffairsAnalytics() {
             const attendanceRate = total > 0 ? Math.round((present / total) * 100) : 0;
             const lateRate       = total > 0 ? Math.round((late / total) * 100) : 0;
 
-            const attendanceTrend = rows.slice(-7).map(r => {
+            const attendanceTrend = rows.slice(-7).map((r: Record<string, unknown>) => {
                 const rm = (r.metrics as DailyMetrics) ?? {};
                 return {
                     date:    r.date as string,

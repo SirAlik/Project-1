@@ -44,7 +44,7 @@ export function useActivityAnalytics() {
             const m = (kpi?.metrics as DailyMetrics) ?? {};
             const rows = history ?? [];
 
-            const studentEngagementTrend = rows.slice(-6).map(r => ({
+            const studentEngagementTrend = rows.slice(-6).map((r: Record<string, unknown>) => ({
                 month: (r.date as string).slice(5).replace('-', '/'),
                 rate:  ((r.metrics as DailyMetrics) ?? {}).attendance_rate ?? 0,
             }));

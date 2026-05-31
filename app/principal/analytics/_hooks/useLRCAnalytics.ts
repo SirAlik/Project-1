@@ -46,11 +46,11 @@ export function useLRCAnalytics() {
             const rows = history ?? [];
 
             const totalLoansMonth = rows.reduce(
-                (sum, r) => sum + (((r.metrics as DailyMetrics) ?? {}).loans_active ?? 0),
+                (sum: number, r: Record<string, unknown>) => sum + (((r.metrics as DailyMetrics) ?? {}).loans_active ?? 0),
                 0,
             );
             const totalOverdueMonth = rows.reduce(
-                (sum, r) => sum + (((r.metrics as DailyMetrics) ?? {}).overdue_count ?? 0),
+                (sum: number, r: Record<string, unknown>) => sum + (((r.metrics as DailyMetrics) ?? {}).overdue_count ?? 0),
                 0,
             );
             const returnRate = totalLoansMonth > 0

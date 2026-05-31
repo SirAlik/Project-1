@@ -91,7 +91,7 @@ export function useSecretary() {
             .eq("log_date", date);
         if (error) setMsg(error.message);
         else {
-            const formatted = (data || []).map(row => ({
+            const formatted = (data || []).map((row: Record<string, unknown> & { employee?: { name?: string } | null }) => ({
                 ...row,
                 employee_name: row.employee?.name
             }));

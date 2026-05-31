@@ -46,11 +46,11 @@ export function useCounselorAnalytics() {
             const rows = history ?? [];
 
             const sessionsThisMonth = rows.reduce(
-                (sum, r) => sum + (((r.metrics as DailyMetrics) ?? {}).sessions_today ?? 0),
+                (sum: number, r: Record<string, unknown>) => sum + (((r.metrics as DailyMetrics) ?? {}).sessions_today ?? 0),
                 0,
             );
 
-            const monthlySessions = rows.slice(-6).map(r => ({
+            const monthlySessions = rows.slice(-6).map((r: Record<string, unknown>) => ({
                 month: (r.date as string).slice(5).replace('-', '/'),
                 count: ((r.metrics as DailyMetrics) ?? {}).sessions_today ?? 0,
             }));

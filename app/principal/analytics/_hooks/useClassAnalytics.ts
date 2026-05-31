@@ -46,8 +46,8 @@ export function useClassAnalytics(classId?: string) {
             const disciplineScore = Math.max(0, Math.round(100 - incidents * 2 - absences * 0.5));
 
             const massAttendance = rows
-                .filter(r => (r.total_absences ?? 0) > 5)
-                .map(r => ({ date: r.week_start as string, count: r.total_absences as number }));
+                .filter((r: Record<string, unknown>) => ((r.total_absences as number | null | undefined) ?? 0) > 5)
+                .map((r: Record<string, unknown>) => ({ date: r.week_start as string, count: r.total_absences as number }));
 
             setStats({
                 disciplineScore,

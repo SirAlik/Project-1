@@ -39,12 +39,13 @@ export function SentinelDashboard() {
 
             if (error) throw error;
 
-            const formatted = data.map(f => ({
+            type FlagRow = { severity: string; student_profiles?: { name?: string | null } | null } & Record<string, unknown>;
+            const formatted = (data as unknown as FlagRow[]).map(f => ({
                 ...f,
                 student_name: f.student_profiles?.name || 'Unknown student'
             }));
 
-            setFlags(formatted);
+            setFlags(formatted as unknown as SentinelFlag[]);
 
             // Calculate stats
             const crit = formatted.filter(f => f.severity === 'critical').length;

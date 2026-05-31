@@ -45,11 +45,11 @@ export function useHealthAnalytics() {
             const rows = history ?? [];
 
             const totalVisitsMonth = rows.reduce(
-                (sum, r) => sum + (((r.metrics as DailyMetrics) ?? {}).visits_today ?? 0),
+                (sum: number, r: Record<string, unknown>) => sum + (((r.metrics as DailyMetrics) ?? {}).visits_today ?? 0),
                 0,
             );
 
-            const visitTrend = rows.slice(-7).map(r => ({
+            const visitTrend = rows.slice(-7).map((r: Record<string, unknown>) => ({
                 day: (r.date as string).slice(5).replace('-', '/'),
                 count: ((r.metrics as DailyMetrics) ?? {}).visits_today ?? 0,
             }));
