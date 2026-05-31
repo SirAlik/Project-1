@@ -114,11 +114,10 @@ Use the approved dependency baseline unless a documented architectural decision 
 - `app/` — صفحات وراوتر Next.js App Router
 - `lib/` — خدمات مشتركة مثل Supabase client وPBAC وcontext services
 - `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
-- `lib/mock-data/` — 3 ملفات موحَّدة: `demo-data.ts` (بيانات ثابتة) · `mock-client.ts` (MockQueryBuilder يحاكي Supabase) · `index.ts` (re-exports) — يُفعَّل عند `NEXT_PUBLIC_DEMO_MODE=true`
 - `components/` — مكونات React
 - `db/migrations/` — ترحيلات قاعدة البيانات (77 ملف: M01–M74 + R00–R12)
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)
-- `.env.example` — قالب متغيرات البيئة الـ9 المطلوبة للمطورين الجدد
+- `.env.example` — قالب متغيرات البيئة الـ8 المطلوبة للمطورين الجدد
 - `vitest.config.ts` + `tests/` — إعداد Vitest (تشغيل: `npm test`)
 
 ---
@@ -138,7 +137,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 
 ## حالة تنظيف الكود (Lint Cleanup Phases)
 
-> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة بالكامل. `npm run lint` يعطي **صفر أخطاء وصفر تحذيرات**. `npm run build` ينجح بـ **61/61 صفحة** بدون أي خطأ TypeScript أو تحذيرات. اصطلاح `proxy.ts` مُطبَّق. تحذير Recharts مُصلَح معمارياً.
+> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة بالكامل. `npm run lint` يعطي **صفر أخطاء وصفر تحذيرات**. `npm run build` ينجح بـ **61/61 صفحة** بدون أي خطأ TypeScript أو تحذيرات. اصطلاح `proxy.ts` مُطبَّق وفعّال كـ Middleware في Next.js 16. تحذير Recharts مُصلَح معمارياً. **Demo Mode مُحذوف بالكامل** — لا `lib/mock-data/`، لا `NEXT_PUBLIC_DEMO_MODE`. JWT verification في `proxy.ts` مُصلَح بـ `jose.jwtVerify`. `BulkUploadModal` يستخدم Server Action مع `school_id`.
 
 ### ✅ المرحلة الأولى — مكتملة
 
