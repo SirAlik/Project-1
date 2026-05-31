@@ -115,7 +115,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 - `lib/` — خدمات مشتركة مثل Supabase client وPBAC وcontext services
 - `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
 - `components/` — مكونات React
-- `db/migrations/` — ترحيلات قاعدة البيانات (77 ملف: M01–M74 + R00–R12)
+- `db/migrations/` — ترحيلات قاعدة البيانات (79 ملف: M01–M76 + R00–R12)
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)
 - `.env.example` — قالب متغيرات البيئة الـ8 المطلوبة للمطورين الجدد
 - `vitest.config.ts` + `tests/` — إعداد Vitest (تشغيل: `npm test`)
