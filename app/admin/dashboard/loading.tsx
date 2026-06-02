@@ -9,7 +9,7 @@ import { GlassSkeleton } from "@/components/ui/GlassSkeleton";
  */
 export default function SystemOwnerDashboardLoading() {
     return (
-        <div className="min-h-screen bg-black text-white p-6 lg:p-10" dir="rtl">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6 lg:p-10" dir="rtl">
             <div className="max-w-7xl mx-auto space-y-10">
                 {/* Context Banner Skeleton - matches IdentityStrip */}
                 <div className="p-4 rounded-2xl bg-[hsla(var(--gold),.10)] border border-[hsla(var(--gold),.20)] flex items-center justify-between min-h-[56px]">
@@ -40,10 +40,10 @@ export default function SystemOwnerDashboardLoading() {
                     {[1, 2, 3, 4].map((i) => (
                         <div
                             key={i}
-                            className="glass-card p-6 rounded-[2rem] border border-white/10 relative overflow-hidden min-h-[140px]"
+                            className="glass-card p-6 rounded-[2rem] border border-slate-200 relative overflow-hidden min-h-[140px]"
                         >
                             <div className="flex justify-between items-start mb-4">
-                                <div className="p-3 rounded-lg bg-white/5">
+                                <div className="p-3 rounded-lg bg-slate-100">
                                     <GlassSkeleton variant="circle" className="w-6 h-6" />
                                 </div>
                             </div>
@@ -56,11 +56,11 @@ export default function SystemOwnerDashboardLoading() {
                 {/* System Health & Usage Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* System Health */}
-                    <div className="glass-card p-6 rounded-2xl border border-white/10 min-h-[280px]">
+                    <div className="glass-card p-6 rounded-2xl border border-slate-200 min-h-[280px]">
                         <GlassSkeleton variant="text" className="w-48 h-5 mb-4" />
                         <div className="grid grid-cols-2 gap-4 mt-4">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5">
+                                <div key={i} className="p-4 rounded-xl bg-slate-100 border border-slate-200">
                                     <div className="flex items-center gap-2 mb-2">
                                         <GlassSkeleton variant="circle" className="w-4 h-4" />
                                         <GlassSkeleton variant="text" className="w-16 h-3" />
@@ -72,9 +72,9 @@ export default function SystemOwnerDashboardLoading() {
                     </div>
 
                     {/* Usage Chart */}
-                    <div className="glass-card p-6 rounded-2xl border border-white/10 lg:col-span-2 min-h-[280px]">
+                    <div className="glass-card p-6 rounded-2xl border border-slate-200 lg:col-span-2 min-h-[280px]">
                         <GlassSkeleton variant="text" className="w-40 h-5 mb-4" />
-                        <div className="h-[200px] mt-4 flex items-center justify-center rounded-xl bg-white/5 border border-dashed border-white/10">
+                        <div className="h-[200px] mt-4 flex items-center justify-center rounded-xl bg-slate-100 border border-dashed border-slate-300">
                             <GlassSkeleton variant="circle" className="w-10 h-10" />
                         </div>
                     </div>
@@ -85,12 +85,12 @@ export default function SystemOwnerDashboardLoading() {
                     {[1, 2, 3].map((i) => (
                         <div
                             key={i}
-                            className={`glass-card p-6 rounded-2xl border border-white/10 min-h-[160px] ${i === 1 ? "border-l-4 border-l-[hsl(var(--gold))]" : ""
+                            className={`glass-card p-6 rounded-2xl border border-slate-200 min-h-[160px] ${i === 1 ? "border-l-4 border-l-[hsl(var(--gold))]" : ""
                                 }`}
                         >
                             <GlassSkeleton variant="text" className="w-32 h-5 mb-4" />
                             <div className="space-y-4 mt-2">
-                                <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5">
+                                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-100">
                                     <GlassSkeleton variant="circle" className="w-4 h-4 mt-1" />
                                     <div className="flex-1">
                                         <GlassSkeleton variant="text" className="w-full h-4 mb-1" />
@@ -103,8 +103,8 @@ export default function SystemOwnerDashboardLoading() {
                 </div>
 
                 {/* Schools Table */}
-                <div className="glass-card rounded-2xl border border-white/10 overflow-hidden min-h-[400px]">
-                    <div className="p-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="glass-card rounded-2xl border border-slate-200 overflow-hidden min-h-[400px]">
+                    <div className="p-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="flex items-center gap-3">
                             <div className="p-2 rounded-lg bg-primary/10">
                                 <GlassSkeleton variant="circle" className="w-5 h-5" />
@@ -118,7 +118,7 @@ export default function SystemOwnerDashboardLoading() {
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-right">
-                            <thead className="bg-white/5">
+                            <thead className="bg-slate-100">
                                 <tr>
                                     {["اسم المدرسة", "المعرف", "النوع", "تاريخ التسجيل", "الحالة", "إجراءات"].map((h, i) => (
                                         <th key={i} className="px-6 py-4">
@@ -130,7 +130,7 @@ export default function SystemOwnerDashboardLoading() {
 
                             <tbody className="divide-y divide-white/5">
                                 {[1, 2, 3, 4, 5].map((i) => (
-                                    <tr key={i} className="hover:bg-white/[0.02]">
+                                    <tr key={i} className="hover:bg-slate-50">
                                         <td className="px-6 py-4">
                                             <GlassSkeleton variant="text" className="w-32 h-4" />
                                         </td>

@@ -50,7 +50,7 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
     return (
         <div className="space-y-6">
             {/* Sub-Tabs */}
-            <div className="flex gap-2 p-1 bg-zinc-950 rounded-2xl border border-zinc-800 self-start">
+            <div className="flex gap-2 p-1 bg-white rounded-2xl border border-stone-200 self-start">
                 {[
                     { id: "hygiene", label: "فحص النظافة", icon: ClipboardCheck },
                     { id: "canteen", label: "فحص المقصف", icon: Utensils },
@@ -59,7 +59,7 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as "hygiene" | "canteen" | "history")}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? "bg-emerald-500/20 text-emerald-400 shadow-inner" : "text-zinc-500 hover:text-zinc-300"
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? "bg-emerald-500/20 text-emerald-400 shadow-inner" : "text-stone-500 hover:text-stone-600"
                             }`}
                     >
                         <tab.icon className="w-3.5 h-3.5" />
@@ -72,9 +72,9 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                 <form onSubmit={handleHygieneSubmit} className="space-y-4 animate-in fade-in duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 mr-2">الصف الدراسي</label>
+                            <label className="text-xs font-bold text-stone-500 mr-2">الصف الدراسي</label>
                             <select
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 outline-none"
+                                className="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 outline-none"
                                 value={hygieneForm.class_id}
                                 onChange={(e) => setHygieneForm({ ...hygieneForm, class_id: e.target.value })}
                                 aria-label="اختر الصف الدراسي"
@@ -84,10 +84,10 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-zinc-500 mr-2">تاريخ الفحص</label>
+                            <label className="text-xs font-bold text-stone-500 mr-2">تاريخ الفحص</label>
                             <input
                                 type="date"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 outline-none"
+                                className="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 outline-none"
                                 value={hygieneForm.check_date}
                                 onChange={(e) => setHygieneForm({ ...hygieneForm, check_date: e.target.value })}
                                 aria-label="تاريخ فحص النظافة"
@@ -95,9 +95,9 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 mr-2">الملاحظات (أطوال الشعر، الأظافر، الزي)</label>
+                        <label className="text-xs font-bold text-stone-500 mr-2">الملاحظات (أطوال الشعر، الأظافر، الزي)</label>
                         <textarea
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:border-emerald-500 outline-none min-h-[100px]"
+                            className="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-emerald-500 outline-none min-h-[100px]"
                             placeholder="اكتب الملاحظات التفصيلية هنا..."
                             value={hygieneForm.notes}
                             onChange={(e) => setHygieneForm({ ...hygieneForm, notes: e.target.value })}
@@ -114,7 +114,7 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                 <form onSubmit={handleCanteenSubmit} className="space-y-6 animate-in fade-in duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
-                            <label className="text-xs font-bold text-zinc-500 flex items-center gap-2">
+                            <label className="text-xs font-bold text-stone-500 flex items-center gap-2">
                                 <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--gold))]" /> مستوى النظافة والتعقيم (1-5)
                             </label>
                             <input
@@ -124,13 +124,13 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                                 onChange={(e) => setCanteenForm({ ...canteenForm, cleanliness_score: parseInt(e.target.value) })}
                                 aria-label="مستوى النظافة والتعقيم"
                             />
-                            <div className="flex justify-between text-[10px] text-zinc-600 font-bold px-1">
+                            <div className="flex justify-between text-[10px] text-stone-500 font-bold px-1">
                                 <span>ضعيف</span>
                                 <span>ممتاز</span>
                             </div>
                         </div>
                         <div className="space-y-4">
-                            <label className="text-xs font-bold text-zinc-500 flex items-center gap-2">
+                            <label className="text-xs font-bold text-stone-500 flex items-center gap-2">
                                 <Utensils className="w-3.5 h-3.5 text-blue-500" /> توافر الأصناف الصحية (1-5)
                             </label>
                             <input
@@ -140,16 +140,16 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                                 onChange={(e) => setCanteenForm({ ...canteenForm, food_variety_score: parseInt(e.target.value) })}
                                 aria-label="توافر الأصناف الصحية"
                             />
-                            <div className="flex justify-between text-[10px] text-zinc-600 font-bold px-1">
+                            <div className="flex justify-between text-[10px] text-stone-500 font-bold px-1">
                                 <span>ضعيف</span>
                                 <span>ممتاز</span>
                             </div>
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-500 mr-2">ملاحظات إضافية (جودة الطعام، التخزين)</label>
+                        <label className="text-xs font-bold text-stone-500 mr-2">ملاحظات إضافية (جودة الطعام، التخزين)</label>
                         <textarea
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm focus:border-emerald-500 outline-none min-h-[100px]"
+                            className="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-emerald-500 outline-none min-h-[100px]"
                             placeholder="اكتب ملاحظات فحص المقصف..."
                             value={canteenForm.notes}
                             onChange={(e) => setCanteenForm({ ...canteenForm, notes: e.target.value })}
@@ -164,7 +164,7 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
 
             {activeTab === "history" && (
                 <div className="space-y-4 animate-in fade-in duration-300">
-                    <h4 className="text-sm font-bold text-zinc-400">آخر التقارير المسجلة</h4>
+                    <h4 className="text-sm font-bold text-stone-500">آخر التقارير المسجلة</h4>
                     <div className="space-y-2">
                         {([...hygieneLogs, ...canteenChecks] as (HygieneLog | CanteenCheck)[])
                             .sort((a, b) => new Date(b.created_at || b.check_date).getTime() - new Date(a.created_at || a.check_date).getTime())
@@ -172,23 +172,23 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                             .map((log, i) => {
                                 const isHygiene = "class_id" in log;
                                 return (
-                                    <div key={i} className="p-3 rounded-xl bg-zinc-900/30 border border-zinc-800/50 flex items-center justify-between">
+                                    <div key={i} className="p-3 rounded-xl bg-white/80 border border-stone-200 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className={`p-2 rounded-lg ${isHygiene ? "bg-emerald-500/10 text-emerald-500" : "bg-[hsla(var(--gold),.10)] text-[hsl(var(--gold))]"}`}>
                                                 {isHygiene ? <ClipboardCheck className="w-4 h-4" /> : <Utensils className="w-4 h-4" />}
                                             </div>
                                             <div>
-                                                <p className="text-xs font-bold text-zinc-200">
+                                                <p className="text-xs font-bold text-stone-700">
                                                     {isHygiene
                                                         ? `فحص نظافة: ${classes.find(c => c.id === (log as HygieneLog).class_id)?.name || "صف غير معروف"}`
                                                         : "فحص المقصف المدرسي"}
                                                 </p>
-                                                <p className="text-[10px] text-zinc-600">{log.check_date}</p>
+                                                <p className="text-[10px] text-stone-500">{log.check_date}</p>
                                             </div>
                                         </div>
                                         {!isHygiene && (
                                             <div className="flex gap-1">
-                                                <span className="text-[10px] bg-zinc-800 px-2 py-0.5 rounded-full text-zinc-400">نظافة {(log as CanteenCheck).hygiene_score}/5</span>
+                                                <span className="text-[10px] bg-stone-200 px-2 py-0.5 rounded-full text-stone-500">نظافة {(log as CanteenCheck).hygiene_score}/5</span>
                                             </div>
                                         )}
                                     </div>

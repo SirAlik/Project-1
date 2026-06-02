@@ -29,11 +29,11 @@ export default async function SchoolCoordinatorDashboard({ params }: PageProps) 
     const stats = await getCachedSchoolStats(schoolId);
 
     const quickActions = [
-        { label: "استيراد البيانات", icon: <Upload size={20} />, href: `/school/${schoolId}/setup`, color: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20" },
-        { label: "إضافة طالب", icon: <UserPlus size={20} />, href: `/school/${schoolId}/students/new`, color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" },
-        { label: "إضافة موظف", icon: <GraduationCap size={20} />, href: `/school/${schoolId}/staff/new`, color: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20" },
-        { label: "إعادة تعيين كلمات المرور", icon: <KeyRound size={20} />, href: `/school/${schoolId}/reset-passwords`, color: "bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] dark:text-[hsl(var(--gold))] border-[hsla(var(--gold),.25)]" },
-        { label: "إدارة الفصول", icon: <Layers size={20} />, href: `/school/${schoolId}/classroom`, color: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20" },
+        { label: "استيراد البيانات", icon: <Upload size={20} />, href: `/school/${schoolId}/setup`, color: "bg-cyan-500/10 text-cyan-600 border-cyan-500/20" },
+        { label: "إضافة طالب", icon: <UserPlus size={20} />, href: `/school/${schoolId}/students/new`, color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+        { label: "إضافة موظف", icon: <GraduationCap size={20} />, href: `/school/${schoolId}/staff/new`, color: "bg-blue-500/10 text-blue-600 border-blue-500/20" },
+        { label: "إعادة تعيين كلمات المرور", icon: <KeyRound size={20} />, href: `/school/${schoolId}/reset-passwords`, color: "bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] border-[hsla(var(--gold),.25)]" },
+        { label: "إدارة الفصول", icon: <Layers size={20} />, href: `/school/${schoolId}/classroom`, color: "bg-purple-500/10 text-purple-600 border-purple-500/20" },
     ];
 
     return (
@@ -127,22 +127,22 @@ export default async function SchoolCoordinatorDashboard({ params }: PageProps) 
                     </h3>
                     <div className="space-y-3">
                         {stats.totalStudents === 0 && stats.totalTeachers === 0 ? (
-                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-blue-500/10 text-blue-600 border border-blue-500/20">
                                 <Inbox size={14} className="mt-0.5 flex-shrink-0" />
                                 لا توجد بيانات مسجلة بعد. ابدأ بإضافة المعلمين والطلاب.
                             </div>
                         ) : stats.totalTeachers === 0 ? (
-                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] dark:text-[hsl(var(--gold))] border border-[hsla(var(--gold),.25)]">
+                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] border border-[hsla(var(--gold),.25)]">
                                 <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
                                 لا يوجد معلمون مسجلون في هذه المدرسة
                             </div>
                         ) : stats.totalStudents === 0 ? (
-                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] dark:text-[hsl(var(--gold))] border border-[hsla(var(--gold),.25)]">
+                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] border border-[hsla(var(--gold),.25)]">
                                 <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" />
                                 لا يوجد طلاب مسجلون في هذه المدرسة
                             </div>
                         ) : (
-                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                            <div className="p-3 rounded-xl text-sm font-medium flex items-start gap-2 bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
                                 <CalendarCheck size={14} className="mt-0.5 flex-shrink-0" />
                                 لا توجد تنبيهات حالياً
                             </div>
@@ -159,15 +159,15 @@ export default async function SchoolCoordinatorDashboard({ params }: PageProps) 
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                        <p className="text-2xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{stats.totalStudents}</p>
+                        <p className="text-2xl font-black text-blue-600 tabular-nums">{stats.totalStudents}</p>
                         <p className="text-xs font-bold opacity-60 text-muted-foreground">طالب مسجل</p>
                     </div>
                     <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                        <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{stats.totalTeachers}</p>
+                        <p className="text-2xl font-black text-emerald-600 tabular-nums">{stats.totalTeachers}</p>
                         <p className="text-xs font-bold opacity-60 text-muted-foreground">معلم مسجل</p>
                     </div>
                     <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                        <p className="text-2xl font-black text-purple-600 dark:text-purple-400 tabular-nums">{stats.totalStaff}</p>
+                        <p className="text-2xl font-black text-purple-600 tabular-nums">{stats.totalStaff}</p>
                         <p className="text-xs font-bold opacity-60 text-muted-foreground">موظف إداري</p>
                     </div>
                 </div>

@@ -243,6 +243,7 @@ export async function recordPeriodAttendanceBulk(
   const { data: yearRow } = await supabase
     .from('academic_years')
     .select('id')
+    .eq('school_id', persona.schoolId)
     .eq('is_active', true)
     .limit(1)
     .maybeSingle();

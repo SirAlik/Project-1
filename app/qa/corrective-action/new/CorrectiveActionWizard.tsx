@@ -144,11 +144,11 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
               transition-all
               ${i < step  ? 'bg-sky-500 text-white' : ''}
               ${i === step ? 'bg-sky-500/20 text-sky-400 ring-2 ring-sky-500/40' : ''}
-              ${i > step  ? 'bg-white/5 text-white/30' : ''}
+              ${i > step  ? 'bg-white/5 text-stone-400' : ''}
             `}>
               {i < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
             </div>
-            <span className={`text-[11px] font-bold transition-colors ${i === step ? 'text-sky-400' : 'text-white/30'}`}>
+            <span className={`text-[11px] font-bold transition-colors ${i === step ? 'text-sky-400' : 'text-stone-400'}`}>
               {label}
             </span>
             {i < STEPS.length - 1 && (
@@ -170,7 +170,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
               <select
                 value={data.target_role}
                 onChange={(e) => handleRoleChange(e.target.value)}
-                className="w-full glass-panel rounded-xl px-4 py-3 text-sm bg-transparent border border-white/10 focus:border-sky-500/50 outline-none"
+                className="w-full glass-panel rounded-xl px-4 py-3 text-sm bg-transparent border border-stone-200 focus:border-sky-500/50 outline-none"
               >
                 <option value="">— اختر الدور —</option>
                 {TARGET_ROLES.map((r) => (
@@ -198,7 +198,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                           w-full text-right px-4 py-3 rounded-xl border text-sm transition-all
                           ${data.target_persona_id === emp.persona_id
                             ? 'border-sky-500/50 bg-sky-500/10 text-sky-300'
-                            : 'border-white/10 bg-white/3 hover:border-white/20'}
+                            : 'border-stone-200 bg-white/3 hover:border-stone-200'}
                         `}
                       >
                         <span className="font-bold">{emp.full_name}</span>
@@ -227,7 +227,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                     w-full text-right px-4 py-3 rounded-xl border transition-all
                     ${data.reason_code === rc.code
                       ? 'border-sky-500/50 bg-sky-500/10'
-                      : 'border-white/10 bg-white/3 hover:border-white/20'}
+                      : 'border-stone-200 bg-white/3 hover:border-stone-200'}
                   `}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -268,7 +268,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                 <select
                   value={data.source}
                   onChange={(e) => setData((d) => ({ ...d, source: e.target.value as SubmitCorrectiveActionInput['source'] }))}
-                  className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-white/10 focus:border-sky-500/50 outline-none"
+                  className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-stone-200 focus:border-sky-500/50 outline-none"
                 >
                   {Object.entries(SOURCE_LABELS).map(([v, l]) => (
                     <option key={v} value={v}>{l}</option>
@@ -283,7 +283,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                   value={data.due_date}
                   min={new Date().toISOString().split('T')[0]}
                   onChange={(e) => setData((d) => ({ ...d, due_date: e.target.value }))}
-                  className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-white/10 focus:border-sky-500/50 outline-none"
+                  className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-stone-200 focus:border-sky-500/50 outline-none"
                 />
               </div>
             </div>
@@ -295,7 +295,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                 value={data.iso_clause}
                 placeholder="مثال: 10.2.1"
                 onChange={(e) => setData((d) => ({ ...d, iso_clause: e.target.value }))}
-                className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-white/10 focus:border-sky-500/50 outline-none"
+                className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-stone-200 focus:border-sky-500/50 outline-none"
               />
             </div>
 
@@ -306,7 +306,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                 onChange={(e) => setData((d) => ({ ...d, description: e.target.value }))}
                 rows={3}
                 placeholder="صف بدقة ما تم اكتشافه..."
-                className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-white/10 focus:border-sky-500/50 outline-none resize-none"
+                className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-stone-200 focus:border-sky-500/50 outline-none resize-none"
               />
             </div>
 
@@ -317,7 +317,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
                 onChange={(e) => setData((d) => ({ ...d, corrective_action_plan: e.target.value }))}
                 rows={2}
                 placeholder="وصف الإجراء التصحيحي المطلوب..."
-                className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-white/10 focus:border-sky-500/50 outline-none resize-none"
+                className="w-full glass-panel rounded-xl px-3 py-2.5 text-sm bg-transparent border border-stone-200 focus:border-sky-500/50 outline-none resize-none"
               />
             </div>
           </div>
@@ -369,7 +369,7 @@ export function CorrectiveActionWizard({ initialReasonCodes }: Props) {
         <button
           onClick={() => { setError(null); setStep((s) => s - 1); }}
           disabled={step === 0}
-          className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl glass-panel border border-white/10 hover:border-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-xl glass-panel border border-stone-200 hover:border-stone-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         >
           <ChevronRight className="w-3.5 h-3.5" /> السابق
         </button>

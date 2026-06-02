@@ -62,7 +62,7 @@ export default function CounselorPage() {
           </div>
 
           {msg && (
-            <div className="mt-6 p-4 rounded-xl glass-panel border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-sm animate-in fade-in slide-in-from-top-2">
+            <div className="mt-6 p-4 rounded-xl glass-panel border-emerald-500/20 bg-emerald-500/10 text-emerald-600 text-sm animate-in fade-in slide-in-from-top-2">
               {msg}
             </div>
           )}

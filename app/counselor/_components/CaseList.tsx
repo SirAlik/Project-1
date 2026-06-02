@@ -63,33 +63,33 @@ export function CaseList({
     return (
         <section className="mt-4 grid gap-4 lg:grid-cols-12">
             {/* Form */}
-            <div className="lg:col-span-4 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5">
+            <div className="lg:col-span-4 rounded-2xl border border-stone-200 bg-white/80 p-5">
                 <h3 className="text-lg font-semibold">فتح معاملة جديدة (بدون بلاغ)</h3>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-stone-500">
                     زيارة/حالة نفسية/حالة صحية/اجتماعية… (تحفظ كسجل معاملات + إجراءات).
                 </p>
 
-                <label className="mt-3 block text-sm text-zinc-300">عنوان المعاملة</label>
+                <label className="mt-3 block text-sm text-stone-600">عنوان المعاملة</label>
                 <input
                     value={newCaseTitle}
                     onChange={(e) => setNewCaseTitle(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-zinc-800 bg-black/40 px-3 py-2 text-sm outline-none"
+                    className="mt-2 w-full rounded-xl border border-stone-200 bg-stone-200/70 px-3 py-2 text-sm outline-none"
                     placeholder="مثال: حالة قلق / متابعة غياب / مشكلة سلوكية"
                 />
 
-                <label className="mt-3 block text-sm text-zinc-300">التصنيف (اختياري)</label>
+                <label className="mt-3 block text-sm text-stone-600">التصنيف (اختياري)</label>
                 <input
                     value={newCaseCategory}
                     onChange={(e) => setNewCaseCategory(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-zinc-800 bg-black/40 px-3 py-2 text-sm outline-none"
+                    className="mt-2 w-full rounded-xl border border-stone-200 bg-stone-200/70 px-3 py-2 text-sm outline-none"
                     placeholder="مثال: حالة نفسية / حالة صحية / مشكلة سلوكية"
                 />
 
-                <label className="mt-3 block text-sm text-zinc-300">الطالب (اختياري)</label>
+                <label className="mt-3 block text-sm text-stone-600">الطالب (اختياري)</label>
                 <select
                     value={newCaseStudentId}
                     onChange={(e) => setNewCaseStudentId(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-zinc-800 bg-black/40 px-3 py-2 text-sm outline-none"
+                    className="mt-2 w-full rounded-xl border border-stone-200 bg-stone-200/70 px-3 py-2 text-sm outline-none"
                     aria-label="اختر الطالب"
                 >
                     <option value="">— بدون تحديد —</option>
@@ -100,11 +100,11 @@ export function CaseList({
                     ))}
                 </select>
 
-                <label className="mt-3 block text-sm text-zinc-300">الفصل (اختياري)</label>
+                <label className="mt-3 block text-sm text-stone-600">الفصل (اختياري)</label>
                 <select
                     value={newCaseClassId}
                     onChange={(e) => setNewCaseClassId(e.target.value)}
-                    className="mt-2 w-full rounded-xl border border-zinc-800 bg-black/40 px-3 py-2 text-sm outline-none"
+                    className="mt-2 w-full rounded-xl border border-stone-200 bg-stone-200/70 px-3 py-2 text-sm outline-none"
                     aria-label="اختر الفصل"
                 >
                     <option value="">— بدون تحديد —</option>
@@ -124,42 +124,42 @@ export function CaseList({
             </div>
 
             {/* List */}
-            <div className="lg:col-span-8 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5">
+            <div className="lg:col-span-8 rounded-2xl border border-stone-200 bg-white/80 p-5">
                 <div className="flex flex-wrap gap-2 mb-4">
                     <input
                         value={studentQuery} onChange={e => setStudentQuery(e.target.value)}
                         placeholder="بحث بالطالب..."
-                        className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none"
+                        className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm outline-none"
                         aria-label="بحث عن معاملات طالب"
                     />
                 </div>
 
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold">قائمة المعاملات</h2>
-                    <div className="text-xs text-zinc-400">عدد: {filtered.length}</div>
+                    <div className="text-xs text-stone-500">عدد: {filtered.length}</div>
                 </div>
 
                 <div className="mt-4 space-y-2">
                     {filtered.length === 0 ? (
-                        <div className="text-sm text-zinc-400">لا توجد معاملات.</div>
+                        <div className="text-sm text-stone-500">لا توجد معاملات.</div>
                     ) : (
                         filtered.map((c) => (
-                            <div key={c.id} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
+                            <div key={c.id} className="rounded-xl border border-stone-200 bg-white/80 p-4">
                                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                                     <div className="text-sm">
                                         <span className="font-semibold">{c.title || "بدون عنوان"}</span>
-                                        <span className="text-zinc-400"> — </span>
-                                        <span className="text-zinc-300">{c.status}</span>
+                                        <span className="text-stone-500"> — </span>
+                                        <span className="text-stone-600">{c.status}</span>
                                     </div>
-                                    <div className="text-xs text-zinc-400">{fmtDateTime(c.created_at)}</div>
+                                    <div className="text-xs text-stone-500">{fmtDateTime(c.created_at)}</div>
                                 </div>
 
-                                <div className="mt-2 text-xs text-zinc-400">
+                                <div className="mt-2 text-xs text-stone-500">
                                     التصنيف: {c.category ?? "—"} • الطالب: {studentNameById(c.student_id)} • الفصل:{" "}
                                     {classNameById(c.class_id)}
                                 </div>
 
-                                <div className="mt-2 text-xs text-zinc-500">
+                                <div className="mt-2 text-xs text-stone-500">
                                     opened_by: {c.opened_by_name ?? "—"} / {c.opened_by_role ?? "—"} • assigned_to:{" "}
                                     {c.assigned_to_role ?? "—"}
                                 </div>

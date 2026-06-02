@@ -23,16 +23,16 @@ export function ClassSelector({ classes, selectedClassId, onSelect }: ClassSelec
                         <Layers className="w-4 h-4 text-emerald-400" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-zinc-100 italic">اختيار الفصل الدراسي</h3>
-                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Select Grade & Section</p>
+                        <h3 className="font-bold text-stone-800 italic">اختيار الفصل الدراسي</h3>
+                        <p className="text-[10px] text-stone-500 uppercase tracking-widest">Select Grade & Section</p>
                     </div>
                 </div>
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="p-2 hover:bg-zinc-800 rounded-lg transition-colors"
+                    className="p-2 hover:bg-stone-200 rounded-lg transition-colors"
                     aria-label={isExpanded ? "طي القائمة" : "توسيع القائمة"}
                 >
-                    <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`w-4 h-4 text-stone-500 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
                 </button>
             </div>
 
@@ -44,12 +44,12 @@ export function ClassSelector({ classes, selectedClassId, onSelect }: ClassSelec
                             onClick={() => onSelect(cls.id)}
                             className={`group relative p-3 rounded-2xl border transition-all overflow-hidden ${selectedClassId === cls.id
                                 ? "bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
-                                : "bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50"
+                                : "bg-white/80 border-stone-200 hover:border-stone-300 hover:bg-stone-100/80"
                                 }`}
                             aria-label={`اختر الفصل ${cls.name}`}
                         >
                             <div className="relative z-10">
-                                <span className={`text-xs font-bold block transition-colors ${selectedClassId === cls.id ? "text-emerald-300" : "text-zinc-500 group-hover:text-zinc-300"
+                                <span className={`text-xs font-bold block transition-colors ${selectedClassId === cls.id ? "text-emerald-300" : "text-stone-500 group-hover:text-stone-600"
                                     }`}>
                                     {cls.name}
                                 </span>
@@ -60,7 +60,7 @@ export function ClassSelector({ classes, selectedClassId, onSelect }: ClassSelec
                         </button>
                     ))}
                     {classes.length === 0 && (
-                        <p className="col-span-full text-center py-6 text-zinc-600 text-xs italic">
+                        <p className="col-span-full text-center py-6 text-stone-500 text-xs italic">
                             ... لا توجد فصول دراسية متاحة حالياً
                         </p>
                     )}

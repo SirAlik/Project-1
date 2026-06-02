@@ -82,8 +82,8 @@ export function SentinelDashboard() {
 
     const severityColors = {
         low: 'text-primary bg-primary/10 border-primary/20',
-        medium: 'text-[hsl(var(--gold-strong))] dark:text-[hsl(var(--gold))] bg-[hsla(var(--gold),.10)] border-[hsla(var(--gold),.20)]',
-        high: 'text-[hsl(var(--gold-strong))] dark:text-[hsl(var(--gold))] bg-[hsla(var(--gold),.15)] border-[hsla(var(--gold),.25)]',
+        medium: 'text-[hsl(var(--gold-strong))] bg-[hsla(var(--gold),.10)] border-[hsla(var(--gold),.20)]',
+        high: 'text-[hsl(var(--gold-strong))] bg-[hsla(var(--gold),.15)] border-[hsla(var(--gold),.25)]',
         critical: 'text-destructive bg-destructive/10 border-destructive/20 animate-pulse'
     };
 

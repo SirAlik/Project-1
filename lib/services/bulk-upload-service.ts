@@ -68,6 +68,11 @@ export async function createJob(input: {
     return { ok: false, error: 'ليس لديك صلاحية إنشاء مهام رفع' };
   }
 
+  const MAX_ROWS = 10_000;
+  if (input.parsed_rows.length > MAX_ROWS) {
+    return { ok: false, error: `الحد الأقصى للرفع ${MAX_ROWS.toLocaleString('ar-SA')} صف — الملف يحتوي ${input.parsed_rows.length.toLocaleString('ar-SA')} صف` };
+  }
+
   const supabase = await createSupabaseServerClient();
 
   // جلب persona_id

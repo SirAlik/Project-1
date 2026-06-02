@@ -102,7 +102,7 @@ export default function NewClassroomPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 lg:p-12 flex items-center justify-center font-sans" dir="rtl">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6 lg:p-12 flex items-center justify-center font-sans" dir="rtl">
             <div className="max-w-2xl w-full">
                 <div className="mb-8 text-center">
                     <motion.div
@@ -119,7 +119,7 @@ export default function NewClassroomPage() {
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="glass-panel p-8 rounded-[2rem] border border-white/10"
+                    className="glass-panel p-8 rounded-[2rem] border border-stone-200"
                 >
                     <form onSubmit={handleSubmit} className="space-y-6">
 
@@ -136,13 +136,13 @@ export default function NewClassroomPage() {
                                     <BookOpen size={18} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none" />
                                     <select
                                         required
-                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-10 appearance-none focus:border-[var(--primary)] focus:bg-[var(--primary)]/5 transition-colors outline-none font-bold text-sm"
+                                        className="w-full bg-white/5 border border-stone-200 rounded-xl px-4 py-3 pr-10 appearance-none focus:border-[var(--primary)] focus:bg-[var(--primary)]/5 transition-colors outline-none font-bold text-sm"
                                         value={formData.stageId}
                                         onChange={e => setFormData(prev => ({ ...prev, stageId: e.target.value }))}
                                     >
-                                        <option value="" disabled className="bg-zinc-900">اختر المرحلة...</option>
+                                        <option value="" disabled className="bg-stone-100">اختر المرحلة...</option>
                                         {stages.map(s => (
-                                            <option key={s.id} value={s.id} className="bg-zinc-900">{s.name}</option>
+                                            <option key={s.id} value={s.id} className="bg-stone-100">{s.name}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -158,7 +158,7 @@ export default function NewClassroomPage() {
                                     type="text"
                                     placeholder="مثال: رابع أول، خامس ب..."
                                     className={`w-full bg-white/5 border rounded-xl px-4 py-3 focus:outline-none focus:bg-[var(--primary)]/5 transition-colors font-bold pl-10
-                                    ${nameStatus === 'available' ? 'border-green-500/50' : nameStatus === 'taken' ? 'border-red-500/50' : 'border-white/10 focus:border-[var(--primary)]'}`}
+                                    ${nameStatus === 'available' ? 'border-green-500/50' : nameStatus === 'taken' ? 'border-red-500/50' : 'border-stone-200 focus:border-[var(--primary)]'}`}
                                     value={formData.name}
                                     onChange={handleNameChange}
                                 />
@@ -181,13 +181,13 @@ export default function NewClassroomPage() {
                                 <select
                                     required
                                     aria-label="الصف الدراسي"
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pr-10 appearance-none focus:border-[var(--primary)] focus:bg-[var(--primary)]/5 transition-colors outline-none font-bold text-sm"
+                                    className="w-full bg-white/5 border border-stone-200 rounded-xl px-4 py-3 pr-10 appearance-none focus:border-[var(--primary)] focus:bg-[var(--primary)]/5 transition-colors outline-none font-bold text-sm"
                                     value={formData.gradeLevel}
                                     onChange={e => setFormData(prev => ({ ...prev, gradeLevel: e.target.value }))}
                                 >
-                                    <option value="" disabled className="bg-zinc-900">اختر الصف...</option>
+                                    <option value="" disabled className="bg-stone-100">اختر الصف...</option>
                                     {grades.map(grade => (
-                                        <option key={grade} value={grade} className="bg-zinc-900">{grade}</option>
+                                        <option key={grade} value={grade} className="bg-stone-100">{grade}</option>
                                     ))}
                                 </select>
                             </div>
@@ -209,7 +209,7 @@ export default function NewClassroomPage() {
                                         className={`p-3 rounded-xl border text-sm font-bold transition-all ${
                                             formData.gender === option.id
                                                 ? 'bg-[var(--primary)] text-black border-[var(--primary)]'
-                                                : 'bg-white/5 border-white/5 hover:bg-white/10'
+                                                : 'bg-white/5 border-stone-200 hover:bg-white/10'
                                         }`}
                                     >
                                         {option.label}
@@ -225,7 +225,7 @@ export default function NewClassroomPage() {
                             </div>
                         )}
 
-                        <div className="pt-6 flex items-center justify-between border-t border-white/5">
+                        <div className="pt-6 flex items-center justify-between border-t border-stone-200">
                             <button
                                 type="button"
                                 onClick={() => router.back()}

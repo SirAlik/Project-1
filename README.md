@@ -29,7 +29,7 @@
 
 * **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — البنية التحتية والأساسية للنظام مكتملة تماماً.
 * **المستخدمون:** لا يوجد مستخدمون حقيقيون حالياً، ولا توجد بيانات إنتاجية (Production Data) نشطة.
-* **قاعدة البيانات:** ترحيلات من (`M01–M76 + R00–R12`) بإجمالي **79 ترحيل** — بنية البيانات مكتملة.
+* **قاعدة البيانات:** ترحيلات من (`M01–M77 + R00–R12`) بإجمالي **80 ترحيل** — بنية البيانات مكتملة.
 * **واجهات المستخدم (UI):** قيد المراجعة والاستكمال النهائي.
 * **جودة الكود:** اكتملت مراحل تنظيف الكود الأساسية 1–5 — راجع القسم أدناه.
 
@@ -37,7 +37,7 @@
 
 ## 🧹 حالة جودة الكود (Code Quality Status)
 
-> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **61/61 صفحة** بدون أي خطأ TypeScript.
+> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **61/61 صفحة** بدون أي خطأ TypeScript. **Virtual-Swimming-Wave (2026-06-03):** تأمين 9 نقاط أمنية + M77 compound unique + 3 layout guards جديدة.
 
 ### ✅ المرحلة الأولى — مكتملة
 
@@ -103,6 +103,29 @@
 8. **إعادة الاستخدام قبل الإنشاء:** ابحث دائماً في المكونات المشتركة الحالية وأعد استخدامها قبل الشروع في بناء مكون جديد لمنع تكرار الكود.
 9. **ترشيد الحزم:** يُمنع تماماً إضافة أي مكتبات واجهة، أو أيقونات، أو جداول، أو أدوات تحريك جديدة إلا بوجود مبرر تقني وعملي صارم وموافقة الفريق.
 
+### قواعد الواجهة المعتمدة
+
+- الواجهة المعتمدة هي **Light UI فقط**.
+- يمنع استخدام `dark:` أو بناء صفحات حول خلفيات داكنة قسرية.
+- يمنع استخدام `bg-black` أو `bg-zinc-950` أو `bg-slate-950` أو `bg-neutral-950` في مسارات الإنتاج.
+- استخدم خلفيات دافئة ناعمة، بطاقات بيضاء أو off-white، حدوداً خفيفة، ونصوصاً محايدة مقروءة.
+- لا تضف مكتبات UI جديدة دون موافقة معمارية صريحة.
+
+### قواعد البيانات التجريبية والـ Sandbox
+
+- يمنع وجود mock/demo/fake data داخل مسارات الإنتاج.
+- يمنع إبقاء ملفات `.bak` داخل `app/`.
+- لا توضع مسارات sandbox أو demo داخل production app routes إلا إذا كانت معزولة ومذكورة صراحة في الوثائق.
+- إذا لم تكن الميزة متصلة ببيانات حقيقية، اعرض حالة فارغة واضحة ولا تعرض مؤشرات تبدو إنتاجية.
+
+### قواعد المعمارية والتنفيذ
+
+- لا تقبل `schoolId` من العميل للعمليات الحساسة؛ مصدر tenant يجب أن يكون server-side persona/context.
+- يمنع استخدام Supabase browser client للكتابة على بيانات محمية.
+- يمنع استخدام `supabaseAdmin` أو `service_role` في user-facing flows.
+- يجب أن تستخدم Server Actions تحقق مدخلات وصلاحيات قبل أي mutation.
+- بعد أي تنظيف أو تعديل تشغيلي، شغّل `npm run lint` ثم `npm run build`.
+
 ---
 
 ## 📁 بنية ومجلدات المشروع (Project Architecture)
@@ -147,7 +170,7 @@ lib/
 └── types/                   — ملفات تعريف الأنواع والـ TypeScript (academic · lrc · health · qa · ai ...)
 
 db/
-└── migrations/              — السجل التاريخي والترجيلات الخاصة بقاعدة البيانات (M01–M76 + R00–R12 بإجمالي 79 ترحيل)
+└── migrations/              — السجل التاريخي والترجيلات الخاصة بقاعدة البيانات (M01–M77 + R00–R12 بإجمالي 80 ترحيل)
 
 ```
 
@@ -245,6 +268,15 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 | تفعيل `proxy.ts` كـ Middleware | Next.js 16 يستخدم `proxy.ts` مباشرةً — الحماية تعمل الآن فعلياً |
 | إصلاح JWT verification | استُبدل فك base64 اليدوي بـ `jose.jwtVerify` مع تحقق من التوقيع |
 | إصلاح `BulkUploadModal` | الكتابة المباشرة من المتصفح استُبدلت بـ Server Action مع `school_id` |
+| M77 — compound unique constraint | `student_profiles`: حُذف `national_id` unique عالمي، أُضيف `UNIQUE(school_id, national_id)` + index |
+| تأمين bulk-upload route | `app/api/bulk-upload/process/[jobId]/route.ts` يضم `school_id` في كل record + `onConflict: 'school_id,national_id'` |
+| تأمين automation actions | `app/admin/automation/_actions.ts`: toggle/delete يفلتران بـ `school_id` + create يأخذ schoolId من persona |
+| تأمين assignTeacherToSlot | `app/_actions/coordinator-classroom.ts`: فحص ملكية المعلم للمدرسة + `school_id` filter على timetable_slots |
+| تأمين AI service | `lib/services/ai-service.ts`: فحص ملكية الطالب للمدرسة قبل بناء payload + `school_id` في analytics query |
+| إزالة Mock ID | `app/classroom/[grade]/[section]/page.tsx`: حُذف fallback `"TCH123"` — يُوقَف عند غياب user.id |
+| إزالة system_role من invite | `app/_actions/invite.ts`: حُذف `system_role: 'system_user'` من upsert لحماية قيمة system_owner |
+| إصلاح activity_leader path | `lib/auth/roles.ts`: `ROLE_DASHBOARD_MAP` صُحِّح من `/activities` إلى `/activity` |
+| Layout guards جديدة | `app/lrc/layout.tsx` (school_librarian) · `app/qa/layout.tsx` (quality_coordinator) · `app/science/layout.tsx` (lab_technician) |
 
 ---
 

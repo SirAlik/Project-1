@@ -1,6 +1,6 @@
 # تقرير الفجوة المعمارية — Smart School OS
 **التاريخ:** 2026-05-24  
-**آخر تحديث:** 2026-06-02 — M75 + M76 + ربط Analytics Cache  
+**آخر تحديث:** 2026-06-02 — تأكيد اكتمال: Notifications Center + Period Attendance Service + db/ cleanup + Phase +11-12  
 **المراجع:** Claude Sonnet 4.6  
 **نطاق المراجعة:** db/migrations (79 ملف SQL) · lib/jobs/ · app/principal/analytics/ · pg_cron · pg_net
 
@@ -31,6 +31,10 @@
 | Test runner | ❌ بدون runner | ✅ Vitest v4.1.7 + `npm test` + `tests/security/safe-action.test.ts` |
 | `.env.example` | ❌ غائب | ✅ موجود مع 9 متغيرات موثقة |
 | `lint` / `build` | لم يُختبر | ✅ صفر أخطاء · 61/61 صفحة |
+| Notifications Center | ❌ لم يُبنَ (service + UI) | ✅ `components/layout/NotificationsMenu.tsx` في `GlobalHeader` + `lib/services/notification-service.ts` + `app/notifications/` كاملة |
+| Period Attendance service layer | ⚠️ يستخدم `period_number` INT (قبل M59) | ✅ `lib/services/period-attendance-service.ts` يستخدم `period_id` UUID + `lib/types/academic.ts` + `lib/services/academic-service.ts` مُنشأَتان |
+| db/ source files | ⚠️ `schema.sql` + `indexes.sql` قد تكون قديمة | ✅ محذوفة — `db/migrations/` هو المصدر الوحيد. `verify_after.sql` + `verify_deployment.sql` يستخدمان `RAISE EXCEPTION` |
+| Phase +11-12 | ⏳ مهاجرة staff_evaluations + ISO audit | ✅ FK موجود + `app/staff-evaluation/` + `app/workflows/page.tsx` مبنيَّتان + Chain of Custody query موثَّق |
 
 ### الترحيلات المُضافة بعد التقرير الأصلي (اختيار)
 | الملف | يُغلق فجوات |
@@ -61,24 +65,25 @@
 **نعم — بنية البيانات اكتملت. ما يتبقى هو طبقة المنطق والربط الآلي.**  
 الكود يمتلك الآن هيكلاً أمنياً متكاملاً (RLS + PBAC + RBAC + JWT) مع قاعدة بيانات كاملة تغطي جميع السيناريوهات، وlint/build نظيف تماماً.
 
-### نسبة الجاهزية: **87 / 100** *(كانت 28/100 في 2026-05-24)*
+### نسبة الجاهزية: **92 / 100** *(كانت 28/100 في 2026-05-24)*
 
-| المحور | 2026-05-24 | 2026-06-01 | 2026-06-02 |
-|--------|------------|------------|------------|
+| المحور | 2026-05-24 | 2026-06-01 | 2026-06-02 (مُؤكَّد) |
+|--------|------------|------------|----------------------|
 | البنية الأكاديمية الأساسية | 58% | ✅ 95% | ✅ 95% |
 | الهوية / الأدوار / العلاقات | 52% | ✅ 90% | ✅ 90% |
 | طبقة الأحداث الموحدة (Events Layer) | 22% | ✅ 80% | ✅ 80% |
-| سيناريو الحضور اليومي وحضور الحصص | 15% | ✅ 82% | ✅ 82% |
+| سيناريو الحضور اليومي وحضور الحصص | 15% | ✅ 82% | ✅ 95% |
 | سيناريو الإحالات الآلية | 5% | ✅ 70% | ✅ 70% |
 | سيناريو زيارات المكتبة (LRC) | 28% | ✅ 88% | ✅ 88% |
 | سيناريو العيادة الصحية | 32% | ✅ 82% | ✅ 82% |
 | سيناريو مغادرة الفصل | 8% | ✅ 78% | ✅ 78% |
 | طبقة التحليلات والمؤشرات | 18% | ✅ 88% | ✅ 98% |
+| مركز الإشعارات (Notifications) | 0% | 30% | ✅ 98% |
 | جاهزية طبقة الذكاء الاصطناعي | 0% | ✅ 55% | ✅ 55% |
-| أتمتة الجودة | 12% | ✅ 72% | ✅ 72% |
+| أتمتة الجودة + workflow_instances | 12% | ✅ 72% | ✅ 88% |
 | Gamification Multi-tenant | 40% | 40% | ✅ 95% |
 | بنية تحتية الوظائف الخلفية (jobs) | 0% | 15% | ✅ 85% |
-| **الإجمالي** | **28%** | **✅ 82%** | **✅ 87%** |
+| **الإجمالي** | **28%** | **✅ 82%** | **✅ 92%** |
 
 ### الفجوات المعمارية الخمس الكبرى
 

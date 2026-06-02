@@ -15,20 +15,24 @@ import { AnalyticsCard } from "../_components/AnalyticsCard";
 
 export default function SecretaryAnalytics() {
     const { stats, loading } = useSecretaryAnalytics();
+    const completionTargetDays = 2;
+    const completionEfficiency = stats.avgCompletionDays > 0
+        ? Math.max(0, Math.min(1, completionTargetDays / stats.avgCompletionDays))
+        : 0;
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-medium animate-pulse">جاري جلب إحصائيات السكرتارية...</p>
+                    <p className="text-stone-500 font-medium animate-pulse">جاري جلب إحصائيات السكرتارية...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -42,21 +46,21 @@ export default function SecretaryAnalytics() {
                         <div className="flex items-center gap-3 mb-2">
                             <Link
                                 href="/principal"
-                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-stone-200"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-400 rotate-180" />
+                                <ArrowLeft className="w-5 h-5 text-stone-500 rotate-180" />
                             </Link>
-                            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black bg-gradient-to-r from-stone-950 to-stone-500 bg-clip-text text-transparent">
                                 نبض السكرتارية والمكتب
                             </h1>
                         </div>
-                        <p className="text-zinc-500 mr-12 text-sm italic">
+                        <p className="text-stone-500 mr-12 text-sm italic">
                             متابعة تدفق المعاملات، الإجازات، والطلبات الإدارية
                         </p>
                     </div>
 
-                    <div className="bg-zinc-900/50 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                             تحديث فوري للسجلات
                         </div>
@@ -76,7 +80,7 @@ export default function SecretaryAnalytics() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
-                            className={`p-6 rounded-[2rem] bg-zinc-900/30 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
+                            className={`p-6 rounded-[2rem] bg-white/80 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
                         >
                             <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity`}>
                                 <item.icon className="w-16 h-16" />
@@ -84,8 +88,8 @@ export default function SecretaryAnalytics() {
                             <div className={`w-12 h-12 ${item.bg} rounded-2xl flex items-center justify-center mb-4`}>
                                 <item.icon className={`w-6 h-6 ${item.color}`} />
                             </div>
-                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
-                            <h2 className="text-3xl font-black text-white">{item.value}</h2>
+                            <p className="text-stone-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
+                            <h2 className="text-3xl font-black text-foreground">{item.value}</h2>
                         </motion.div>
                     ))}
                 </div>
@@ -99,11 +103,11 @@ export default function SecretaryAnalytics() {
                     >
                         <ChartContainer height={350}>
                             <BarChart data={stats.correspondenceTrend}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                                <XAxis dataKey="month" stroke="#4b5563" fontSize={11} />
-                                <YAxis stroke="#4b5563" fontSize={11} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" vertical={false} />
+                                <XAxis dataKey="month" stroke="#78716c" fontSize={11} />
+                                <YAxis stroke="#78716c" fontSize={11} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff', textAlign: 'right' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917', textAlign: 'right' }}
                                 />
                                 <Legend />
                                 <Bar dataKey="incoming" name="وارد" fill="#6366f1" radius={[4, 4, 0, 0]} />
@@ -120,25 +124,27 @@ export default function SecretaryAnalytics() {
                                     <svg className="w-full h-full" viewBox="0 0 100 100">
                                         <circle
                                             cx="50" cy="50" r="45"
-                                            fill="none" stroke="#27272a" strokeWidth="8"
+                                            fill="none" stroke="#e7e5e4" strokeWidth="8"
                                         />
                                         <circle
                                             cx="50" cy="50" r="45"
                                             fill="none" stroke="var(--primary)" strokeWidth="8"
                                             strokeDasharray="283"
-                                            strokeDashoffset={283 - (283 * 0.85)} // Mock 85% efficiency
+                                            strokeDashoffset={283 - (283 * completionEfficiency)}
                                             strokeLinecap="round"
                                             className="transition-all duration-1000 ease-out"
                                         />
                                     </svg>
                                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span className="text-3xl font-black text-white">{stats.avgCompletionDays}</span>
-                                        <span className="text-[10px] text-zinc-500 font-bold uppercase">أيام</span>
+                                        <span className="text-3xl font-black text-foreground">{stats.avgCompletionDays}</span>
+                                        <span className="text-[10px] text-stone-500 font-bold uppercase">أيام</span>
                                     </div>
                                 </div>
-                                <p className="mt-4 text-xs text-zinc-400 text-center leading-relaxed">
+                                <p className="mt-4 text-xs text-stone-500 text-center leading-relaxed">
                                     هدف المكتب: أقل من ٢ يوم <br />
-                                    <span className="text-emerald-400 font-bold">الحالة: مثالي</span>
+                                    <span className="text-emerald-400 font-bold">
+                                        {stats.avgCompletionDays > 0 ? "محسوبة من البيانات اليومية" : "لا توجد بيانات إنجاز كافية"}
+                                    </span>
                                 </p>
                             </div>
                         </AnalyticsCard>
@@ -146,17 +152,17 @@ export default function SecretaryAnalytics() {
                         <AnalyticsCard title="أحدث التحركات" subtitle="آخر ٥ معاملات تم تسجيلها">
                             <div className="space-y-3">
                                 {stats.recentActions.map((action, i) => (
-                                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                    <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-stone-200">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold ${action.type === 'وارد' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-sky-500/20 text-sky-400'}`}>
                                                 {action.type[0]}
                                             </div>
                                             <div>
-                                                <p className="text-xs font-bold text-zinc-200 truncate w-32">{action.title}</p>
-                                                <p className="text-[10px] text-zinc-500">{action.date}</p>
+                                                <p className="text-xs font-bold text-stone-700 truncate w-32">{action.title}</p>
+                                                <p className="text-[10px] text-stone-500">{action.date}</p>
                                             </div>
                                         </div>
-                                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-white/5">
+                                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-stone-200 text-stone-500 border border-stone-200">
                                             {action.status}
                                         </span>
                                     </div>

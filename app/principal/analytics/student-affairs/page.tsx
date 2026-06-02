@@ -19,17 +19,17 @@ export default function StudentAffairsAnalyticsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-medium animate-pulse">جاري جلب البيانات التحليلية...</p>
+                    <p className="text-stone-500 font-medium animate-pulse">جاري جلب البيانات التحليلية...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[120px]" />
@@ -43,18 +43,18 @@ export default function StudentAffairsAnalyticsPage() {
                         <div className="flex items-center gap-3 mb-2">
                             <Link
                                 href="/principal"
-                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-stone-200"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-400 rotate-180" />
+                                <ArrowLeft className="w-5 h-5 text-stone-500 rotate-180" />
                             </Link>
-                            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black bg-gradient-to-r from-stone-950 to-stone-500 bg-clip-text text-transparent">
                                 الرادار التحليلي: وكيل شؤون الطلاب
                             </h1>
                             {/* Added select element based on the instruction */}
                             <select
                                 value={selectedGrade}
                                 onChange={(e) => setSelectedGrade(e.target.value)}
-                                className="bg-zinc-900 border-none rounded-xl px-4 py-2 text-sm font-bold text-zinc-300 outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="bg-stone-100 border-none rounded-xl px-4 py-2 text-sm font-bold text-stone-600 outline-none focus:ring-2 focus:ring-indigo-500"
                                 aria-label="تصفية حسب الصف"
                             >
                                 <option value="">جميع الصفوف</option>
@@ -64,13 +64,13 @@ export default function StudentAffairsAnalyticsPage() {
                                 {/* Add more options as needed */}
                             </select>
                         </div>
-                        <p className="text-zinc-500 mr-12 text-sm italic">
+                        <p className="text-stone-500 mr-12 text-sm italic">
                             تحليل متقدم لمعدلات الانضباط، الغياب، والسلوك الطلابي
                         </p>
                     </div>
 
-                    <div className="bg-zinc-900/50 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
                             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                             بيانات مباشرة من نظام Supabase
                         </div>
@@ -90,7 +90,7 @@ export default function StudentAffairsAnalyticsPage() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
-                            className={`p-6 rounded-[2rem] bg-zinc-900/30 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
+                            className={`p-6 rounded-[2rem] bg-white/80 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
                         >
                             <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity`}>
                                 <item.icon className="w-16 h-16" />
@@ -98,8 +98,8 @@ export default function StudentAffairsAnalyticsPage() {
                             <div className={`w-12 h-12 ${item.bg} rounded-2xl flex items-center justify-center mb-4`}>
                                 <item.icon className={`w-6 h-6 ${item.color}`} />
                             </div>
-                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
-                            <h2 className="text-3xl font-black text-white">{item.value}</h2>
+                            <p className="text-stone-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
+                            <h2 className="text-3xl font-black text-foreground">{item.value}</h2>
                         </motion.div>
                     ))}
                 </div>
@@ -125,16 +125,16 @@ export default function StudentAffairsAnalyticsPage() {
                                                 <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" vertical={false} />
                                         <XAxis
                                             dataKey="date"
-                                            stroke="#4b5563"
+                                            stroke="#78716c"
                                             fontSize={10}
                                             tickFormatter={(val) => val.split('-').slice(1).join('/')}
                                         />
-                                        <YAxis stroke="#4b5563" fontSize={10} />
+                                        <YAxis stroke="#78716c" fontSize={10} />
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff', textAlign: 'right' }}
+                                            contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917', textAlign: 'right' }}
                                             itemStyle={{ fontSize: '10px' }}
                                         />
                                         <Area type="monotone" dataKey="present" name="حضور" stroke="#6366f1" fillOpacity={1} fill="url(#colorPresent)" />
@@ -161,14 +161,14 @@ export default function StudentAffairsAnalyticsPage() {
                                             ))}
                                         </Pie>
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff', textAlign: 'right' }}
+                                            contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917', textAlign: 'right' }}
                                         />
                                         <Legend />
                                     </PieChart>
                                 </ChartContainer>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                                    <span className="text-2xl font-black text-white">{stats.absenceDistribution.reduce((acc, curr) => acc + curr.value, 0)}</span>
-                                    <span className="text-[10px] text-zinc-500 font-bold uppercase">إجمالي الغيابات</span>
+                                    <span className="text-2xl font-black text-foreground">{stats.absenceDistribution.reduce((acc, curr) => acc + curr.value, 0)}</span>
+                                    <span className="text-[10px] text-stone-500 font-bold uppercase">إجمالي الغيابات</span>
                                 </div>
                             </div>
                         </AnalyticsCard>
@@ -184,12 +184,12 @@ export default function StudentAffairsAnalyticsPage() {
                             <div className="flex flex-col gap-2 overflow-x-auto pb-4">
                                 <div className="flex gap-2 mb-2 pr-12">
                                     {[7, 8, 9, 10, 11, 12].map(h => (
-                                        <div key={h} className="flex-1 text-center text-[10px] text-zinc-500 font-bold">{h}:00</div>
+                                        <div key={h} className="flex-1 text-center text-[10px] text-stone-500 font-bold">{h}:00</div>
                                     ))}
                                 </div>
                                 {['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'].map(day => (
                                     <div key={day} className="flex items-center gap-4">
-                                        <div className="w-8 text-[10px] text-zinc-400 font-bold">{day}</div>
+                                        <div className="w-8 text-[10px] text-stone-500 font-bold">{day}</div>
                                         <div className="flex-1 flex gap-2">
                                             {[7, 8, 9, 10, 11, 12].map(hour => {
                                                 const val = stats.weeklyHeatmap.find(h => h.day === day && h.hour === hour)?.value || 0;
@@ -207,7 +207,7 @@ export default function StudentAffairsAnalyticsPage() {
                                                     >
                                                         {val > 0 && (
                                                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/hex:opacity-100 transition-opacity">
-                                                                <span className="text-[10px] font-black text-white">{val}</span>
+                                                                <span className="text-[10px] font-black text-foreground">{val}</span>
                                                             </div>
                                                         )}
                                                     </div>
@@ -222,11 +222,11 @@ export default function StudentAffairsAnalyticsPage() {
                         <AnalyticsCard title="كثافة التأخر حسب الفصول" subtitle="أعلى ٥ فصول تسجيلاً لحالات التأخر">
                             <ChartContainer height={300}>
                                     <BarChart data={stats.classLateness} layout="vertical">
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" horizontal={false} />
-                                        <XAxis type="number" stroke="#4b5563" fontSize={10} hide />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" horizontal={false} />
+                                        <XAxis type="number" stroke="#78716c" fontSize={10} hide />
                                         <YAxis dataKey="class" type="category" stroke="#9ca3af" fontSize={11} width={60} />
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff', textAlign: 'right' }}
+                                            contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917', textAlign: 'right' }}
                                         />
                                         <Bar dataKey="count" name="عدد الحالات" fill="#a855f7" radius={[0, 4, 4, 0]} />
                                     </BarChart>
@@ -239,24 +239,24 @@ export default function StudentAffairsAnalyticsPage() {
                         <AnalyticsCard title="الطلاب الأكثر تأخراً" subtitle="قائمة التنبيه المبكر السلوكية">
                             <div className="space-y-4">
                                 {stats.topLateStudents.length > 0 ? stats.topLateStudents.map((student, idx) => (
-                                    <div key={idx} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5 group hover:bg-white/10 transition-colors">
+                                    <div key={idx} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-stone-200 group hover:bg-white/10 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center text-xs font-bold text-indigo-400">
                                                 {idx + 1}
                                             </div>
-                                            <span className="font-bold text-sm text-zinc-200">{student.name}</span>
+                                            <span className="font-bold text-sm text-stone-700">{student.name}</span>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             <span className="px-3 py-1 bg-rose-500/20 text-rose-400 text-[10px] font-black rounded-full">
                                                 {student.count} حالات
                                             </span>
                                             <button className="p-1 hover:bg-white/10 rounded" aria-label="خيارات">
-                                                <MoreVertical size={14} className="text-zinc-500" />
+                                                <MoreVertical size={14} className="text-stone-500" />
                                             </button>
                                         </div>
                                     </div>
                                 )) : (
-                                    <div className="text-center py-10 text-zinc-600 text-sm">
+                                    <div className="text-center py-10 text-stone-500 text-sm">
                                         لا يوجد سجلات كافية حالياً
                                     </div>
                                 )}

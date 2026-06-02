@@ -47,22 +47,22 @@ export function StudentProfileCard({ student, onUpdate }: Props) {
     ];
 
     return (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-[3rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
+        <div className="bg-stone-100 border border-stone-200 rounded-[3rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-500">
             {/* Header */}
-            <div className="bg-zinc-950 p-8 border-b border-zinc-800 relative overflow-hidden">
+            <div className="bg-white p-8 border-b border-stone-200 relative overflow-hidden">
                 <div className="flex justify-between items-start relative z-10">
                     <div className="flex items-center gap-6">
                         <div className="w-20 h-20 bg-indigo-500/10 rounded-[2rem] border border-indigo-500/20 flex items-center justify-center text-indigo-400">
                             <User className="w-10 h-10" />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-black text-white">{student.name}</h2>
-                            <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest">{student.student_id} • {student.grade_level}</p>
+                            <h2 className="text-2xl font-black text-foreground">{student.name}</h2>
+                            <p className="text-xs text-stone-500 font-bold uppercase tracking-widest">{student.student_id} • {student.grade_level}</p>
                         </div>
                     </div>
                     <button
                         onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
-                        className={`p-3 rounded-2xl border transition-all ${isEditing ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'}`}
+                        className={`p-3 rounded-2xl border transition-all ${isEditing ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-stone-100 border-stone-200 text-stone-500 hover:text-foreground'}`}
                     >
                         {isEditing ? <Check className="w-5 h-5" /> : <Edit3 className="w-5 h-5" />}
                     </button>
@@ -77,26 +77,26 @@ export function StudentProfileCard({ student, onUpdate }: Props) {
                 {sections.map((section, idx) => (
                     <div key={idx} className="space-y-4">
                         <div className="flex items-center gap-3 mb-2 px-2">
-                            <div className="p-2 bg-zinc-950 rounded-xl text-zinc-500">
+                            <div className="p-2 bg-white rounded-xl text-stone-500">
                                 <section.icon className="w-4 h-4" />
                             </div>
-                            <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest">{section.title}</h3>
+                            <h3 className="text-xs font-black text-stone-500 uppercase tracking-widest">{section.title}</h3>
                         </div>
 
                         <div className="grid grid-cols-1 gap-3">
                             {section.fields.map(field => (
-                                <div key={field.key} className="bg-zinc-950/50 border border-zinc-800/50 rounded-2xl p-4 transition-all hover:border-zinc-700">
-                                    <label className="block text-[8px] font-black text-zinc-600 uppercase mb-1">{field.label}</label>
+                                <div key={field.key} className="bg-white/80 border border-stone-200 rounded-2xl p-4 transition-all hover:border-stone-300">
+                                    <label className="block text-[8px] font-black text-stone-500 uppercase mb-1">{field.label}</label>
                                     {isEditing ? (
                                         <input
-                                            className="w-full bg-transparent border-none p-0 text-sm text-white focus:ring-0"
+                                            className="w-full bg-transparent border-none p-0 text-sm text-foreground focus:ring-0"
                                             value={(formData[field.key] as string | undefined) || ""}
                                             onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
                                             placeholder={field.placeholder}
                                             title={field.label}
                                         />
                                     ) : (
-                                        <span className="text-sm font-bold text-zinc-300">{(student[field.key] as string | undefined) || "---"}</span>
+                                        <span className="text-sm font-bold text-stone-600">{(student[field.key] as string | undefined) || "---"}</span>
                                     )}
                                 </div>
                             ))}
@@ -117,11 +117,11 @@ export function StudentProfileCard({ student, onUpdate }: Props) {
                             <input
                                 type="text"
                                 placeholder="بحث عن طالب..."
-                                className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-indigo-500 focus:bg-zinc-900 outline-none transition-all placeholder:text-zinc-600 font-medium mb-3"
+                                className="w-full bg-white/80 border border-stone-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:border-indigo-500 focus:bg-stone-100 outline-none transition-all placeholder:text-stone-500 font-medium mb-3"
                                 aria-label="بحث عن طالب"
                             />
                             <textarea
-                                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:ring-1 focus:ring-rose-500"
+                                className="w-full bg-white border border-stone-200 rounded-xl p-3 text-sm text-foreground focus:ring-1 focus:ring-rose-500"
                                 rows={2}
                                 value={formData.medical_notes || ""}
                                 onChange={(e) => setFormData({ ...formData, medical_notes: e.target.value })}

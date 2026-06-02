@@ -149,7 +149,7 @@ export default async function Home() {
             <div className="flex items-center gap-3">
               <Link
                 href={primaryCtaHref}
-                className="inline-flex items-center gap-2 rounded-2xl bg-[hsl(var(--gold-strong))] px-5 py-2.5 text-sm font-black text-white shadow-sm hover:bg-[hsl(var(--gold))] transition-colors"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[hsl(var(--gold-strong))] px-5 py-2.5 text-sm font-black text-foreground shadow-sm hover:bg-[hsl(var(--gold))] transition-colors"
               >
                 <Sparkles className="h-4 w-4" />
                 {primaryCtaText}
@@ -222,7 +222,7 @@ export default async function Home() {
           {/* Visual (بطاقات صلبة + بدون زجاج) */}
           <div className="lg:col-span-6">
             <div className="relative">
-              <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-[hsla(var(--gold),.20)] to-slate-200/40 blur-3xl opacity-70" />
+              <div className="absolute -inset-6 rounded-[3rem] bg-gradient-to-br from-[hsla(var(--gold),.20)] to-stone-200/40 blur-3xl opacity-70" />
 
               <div className="relative rounded-[2.75rem] border border-slate-200 bg-white shadow-2xl p-6 md:p-8">
                 <div className="flex items-center justify-between">
@@ -423,10 +423,10 @@ export default async function Home() {
           <div className="rounded-[2.25rem] border border-[hsl(var(--gold),.50)] bg-[hsl(var(--gold-strong))] text-white p-7 shadow-2xl shadow-[hsla(var(--gold),.20)] md:-translate-y-2">
             <Users className="h-10 w-10 text-white" />
             <div className="mt-5 text-2xl font-black">المعلمين</div>
-            <p className="mt-3 text-sm font-medium text-white/85 leading-relaxed">
+            <p className="mt-3 text-sm font-medium text-foreground/85 leading-relaxed">
               تقليل العبء الإداري، متابعة دقيقة، وتركيز على التعليم.
             </p>
-            <ul className="mt-5 space-y-2 text-sm font-bold text-white/90">
+            <ul className="mt-5 space-y-2 text-sm font-bold text-stone-700">
               {["رصد سريع", "خطط علاجية", "تنبيهات مبكرة"].map((t) => (
                 <li key={t} className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-white" />
@@ -500,7 +500,7 @@ export default async function Home() {
             </div>
             <Link
               href={primaryCtaHref}
-              className="inline-flex items-center gap-2 rounded-2xl bg-[hsl(var(--gold-strong))] px-6 py-3 text-sm font-black text-white shadow-sm hover:bg-[hsl(var(--gold))] transition-colors"
+              className="inline-flex items-center gap-2 rounded-2xl bg-[hsl(var(--gold-strong))] px-6 py-3 text-sm font-black text-foreground shadow-sm hover:bg-[hsl(var(--gold))] transition-colors"
             >
               {primaryCtaText}
               <ArrowUpRight className="h-4 w-4" />

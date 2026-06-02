@@ -241,7 +241,7 @@ export function PeriodSheet({ classes, today }: Props) {
                   >
                     <span>الحصة {period.period_number}</span>
                     {period.subject_name && (
-                      <span className={`text-[10px] mt-0.5 ${isActive ? 'text-white/80' : 'text-muted-foreground/70'}`}>
+                      <span className={`text-[10px] mt-0.5 ${isActive ? 'text-stone-700' : 'text-muted-foreground/70'}`}>
                         {period.subject_name}
                       </span>
                     )}

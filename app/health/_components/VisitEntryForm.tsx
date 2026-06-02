@@ -56,10 +56,10 @@ export function VisitEntryForm({ students, onSubmit }: Props) {
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <label className="text-xs text-zinc-400">الطالب</label>
+                        <label className="text-xs text-stone-500">الطالب</label>
                         <select
                             value={studentId} onChange={e => setStudentId(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm"
+                            className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm"
                             required
                             title="الطالب"
                         >
@@ -69,10 +69,10 @@ export function VisitEntryForm({ students, onSubmit }: Props) {
                     </div>
 
                     <div>
-                        <label className="text-xs text-zinc-400">سبب الزيارة</label>
+                        <label className="text-xs text-stone-500">سبب الزيارة</label>
                         <select
                             value={visitReason} onChange={e => setVisitReason(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm"
+                            className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm"
                             required
                             title="سبب الزيارة"
                         >
@@ -87,21 +87,21 @@ export function VisitEntryForm({ students, onSubmit }: Props) {
                 </div>
 
                 <div>
-                    <label className="text-xs text-zinc-400">الشكوى الظاهرة (وصف الطالب)</label>
+                    <label className="text-xs text-stone-500">الشكوى الظاهرة (وصف الطالب)</label>
                     <input
                         value={complaint} onChange={e => setComplaint(e.target.value)}
                         placeholder="مثال: ألم في الرأس منذ الصباح..."
-                        className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm"
+                        className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm"
                         required
                         aria-label="الشكوى الظاهرة"
                     />
                 </div>
 
                 <div>
-                    <label className="text-xs text-zinc-400">الإجراء المتخذ</label>
+                    <label className="text-xs text-stone-500">الإجراء المتخذ</label>
                     <select
                         value={action} onChange={e => setAction(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm"
+                        className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm"
                         aria-label="الإجراء المتخذ"
                     >
                         <option value="راحة بالمكتب">راحة بالمكتب</option>

@@ -29,7 +29,7 @@ export function ReportList({ reports, studentNameById, classNameById, openReport
     }
 
     return (
-        <section className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5">
+        <section className="mt-4 rounded-2xl border border-stone-200 bg-white/80 p-5">
             {/* Local Filters used to be global in page.tsx, moving some here or keeping global? 
           The simplified plan implies moving logic into components. 
           Let's include simple filters here or accept filtered list? 
@@ -40,40 +40,40 @@ export function ReportList({ reports, studentNameById, classNameById, openReport
                 <input
                     value={studentQuery} onChange={e => setStudentQuery(e.target.value)}
                     placeholder="بحث بالطالب..."
-                    className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none"
+                    className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm outline-none"
                 />
                 <input
                     value={classQuery} onChange={e => setClassQuery(e.target.value)}
                     placeholder="بحث بالفصل..."
-                    className="rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm outline-none"
+                    className="rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm outline-none"
                 />
             </div>
 
             <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold">بلاغات ولي الأمر</h2>
-                <div className="text-xs text-zinc-400">عدد: {filtered.length}</div>
+                <div className="text-xs text-stone-500">عدد: {filtered.length}</div>
             </div>
 
             <div className="mt-4 space-y-2">
                 {filtered.length === 0 ? (
-                    <div className="text-sm text-zinc-400">لا توجد بلاغات.</div>
+                    <div className="text-sm text-stone-500">لا توجد بلاغات.</div>
                 ) : (
                     filtered.map((r) => (
-                        <div key={r.id} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
+                        <div key={r.id} className="rounded-xl border border-stone-200 bg-white/80 p-4">
                             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="text-sm">
                                     <span className="font-semibold">{r.title || "بلاغ بدون عنوان"}</span>
-                                    <span className="text-zinc-400"> — </span>
-                                    <span className="text-zinc-300">{r.status || "غير محدد"}</span>
+                                    <span className="text-stone-500"> — </span>
+                                    <span className="text-stone-600">{r.status || "غير محدد"}</span>
                                 </div>
-                                <div className="text-xs text-zinc-400">{fmtDateTime(r.created_at)}</div>
+                                <div className="text-xs text-stone-500">{fmtDateTime(r.created_at)}</div>
                             </div>
 
-                            <div className="mt-2 text-sm text-zinc-300 whitespace-pre-wrap">
-                                {r.details || <span className="text-zinc-500">بدون تفاصيل</span>}
+                            <div className="mt-2 text-sm text-stone-600 whitespace-pre-wrap">
+                                {r.details || <span className="text-stone-500">بدون تفاصيل</span>}
                             </div>
 
-                            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+                            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-stone-500">
                                 <span>الطالب: {studentNameById(r.student_id)}</span>
                                 <span>•</span>
                                 <span>الفصل: {classNameById(r.class_id)}</span>

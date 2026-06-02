@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { SignJWT } from 'jose';
 import { createSupabaseServerClient, getPrivateUser } from '../db/supabase-server';
-import { UserRole } from './roles';
+import { UserRole, ALL_ROLES } from './roles';
 
 /**
  * Persona Context - The Verified Identity
@@ -52,7 +52,7 @@ export async function getActivePersona(): Promise<PersonaContext | null> {
             if (typeof payload.schoolId === 'string') {
                 requestedSchoolId = payload.schoolId;
             }
-            if (typeof payload.role === 'string') {
+            if (typeof payload.role === 'string' && ALL_ROLES.has(payload.role as UserRole)) {
                 requestedRole = payload.role as UserRole;
             }
         } catch {
@@ -74,7 +74,7 @@ export async function getActivePersona(): Promise<PersonaContext | null> {
 
     // B. Role Escalation
     // Users cannot claim a role higher than their authority.
-    // (Simplification: User Role = Authority Role for now, unless multi-role implementation exists)
+    // Current authority model: the verified JWT role is authoritative.
     if (requestedRole !== authorityRole) {
         // console.warn(`[Security] Role mismatch. Asserting authority role.`);
         requestedRole = authorityRole;
@@ -83,7 +83,7 @@ export async function getActivePersona(): Promise<PersonaContext | null> {
     return {
         userId: user.id,
         role: requestedRole,
-        schoolId: authoritySchoolId, // Strict: Use Authority School ID for now
+        schoolId: authoritySchoolId,
         isSystemOwner,
         displayName: user.user_metadata?.full_name,
         email: user.email

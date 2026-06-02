@@ -10,7 +10,7 @@ import { Trophy, ChevronLeft, BarChart3, ShieldCheck, Activity } from "lucide-re
 import { AIInsightCard } from "@/components/ai/AIInsightCard";
 
 export default function QADashboard() {
-    const { state, actions } = useQA();
+    const { state } = useQA();
     const [isKnightsOpen, setIsKnightsOpen] = useState(false);
 
     // Derived Stats
@@ -19,9 +19,10 @@ export default function QADashboard() {
         ? (state.observations.reduce((a, b) => a + b.overall_score, 0) / totalObs).toFixed(1)
         : "0";
     const highRiskStudents = state.risks.filter(r => r.risk_level === 'high').length;
-
-    // Seed Button for Demo
-    const handleSeed = () => actions.seedMockData();
+    const latestAttendanceRate = state.kpis.at(-1)?.metrics.attendance_rate;
+    const attendanceValue = typeof latestAttendanceRate === "number"
+        ? `${latestAttendanceRate.toFixed(1)}%`
+        : "لا توجد بيانات";
 
     return (
         <>
@@ -53,15 +54,7 @@ export default function QADashboard() {
                             <Link href="/qa/corrective-action/new" className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-2xl text-xs font-bold shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2">
                                 إجراء تصحيحي جديد <ChevronLeft className="w-4 h-4" />
                             </Link>
-                            <Link href="/qa/advanced" className="bg-sky-600 hover:bg-sky-500 text-white px-6 py-2.5 rounded-2xl text-xs font-bold shadow-xl shadow-sky-500/20 transition-all flex items-center gap-2">
-                                الإحصائيات المتقدمة <ChevronLeft className="w-4 h-4" />
-                            </Link>
 
-                            {state.kpis.length === 0 && (
-                                <button onClick={handleSeed} className="glass-panel text-current px-4 py-2 text-[10px] font-bold rounded-xl opacity-40 hover:opacity-100 transition-opacity uppercase tracking-widest">
-                                    + Seed Demo Data
-                                </button>
-                            )}
                         </div>
                     </header>
 
@@ -76,7 +69,7 @@ export default function QADashboard() {
                         <KPICard title="متوسط الأداء التعليمي" value={`${avgScore}%`} trend="up" color="primary" icon={BarChart3} />
                         <KPICard title="الزيارات الصفية" value={totalObs} color="primary" icon={Activity} />
                         <KPICard title="مؤشر الخطر (طلاب)" value={highRiskStudents} trend="down" color="rose" icon={ShieldCheck} />
-                        <KPICard title="نسبة الحضور (اليوم)" value="94.2%" trend="up" color="accent" icon={Trophy} />
+                        <KPICard title="نسبة الحضور (اليوم)" value={attendanceValue} trend={typeof latestAttendanceRate === "number" ? "up" : undefined} color="accent" icon={Trophy} />
                     </div>
 
                     {/* AI Insight */}
@@ -103,7 +96,7 @@ export default function QADashboard() {
                                                 <div className="absolute -top-10 left-1/2 -translate-x-1/2 glass-panel px-2.5 py-1.5 rounded-xl text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all pointer-events-none border whitespace-nowrap shadow-xl">
                                                     {(k.metrics.attendance_rate as number).toFixed(1)}%
                                                 </div>
-                                                <span className="text-[10px] font-black text-white/50 group-hover:text-white transition-colors rotate-90 origin-bottom mb-2">{k.date.split('-').slice(1).join('/')}</span>
+                                                <span className="text-[10px] font-black text-stone-400 group-hover:text-foreground transition-colors rotate-90 origin-bottom mb-2">{k.date.split('-').slice(1).join('/')}</span>
                                             </div>
                                             <div className="mt-4 text-[9px] font-bold opacity-20 uppercase tracking-widest">{new Date(k.date).toLocaleDateString('ar-EG', { weekday: 'short' })}</div>
                                         </div>

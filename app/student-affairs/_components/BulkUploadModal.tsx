@@ -96,16 +96,16 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-zinc-950 border border-zinc-800 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                <div className="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-200/70 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-white border border-stone-200 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                <div className="p-6 border-b border-stone-200 flex justify-between items-center bg-white/80">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-[hsla(var(--gold),.20)] flex items-center justify-center border border-[hsla(var(--gold),.20)]">
                             <Upload className="w-5 h-5 text-[hsl(var(--gold))]" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-zinc-100">استيراد جماعي (CSV)</h2>
-                            <p className="text-xs text-zinc-500 font-bold">لطلاب الصف الرابع</p>
+                            <h2 className="text-xl font-bold text-stone-800">استيراد جماعي (CSV)</h2>
+                            <p className="text-xs text-stone-500 font-bold">لطلاب الصف الرابع</p>
                         </div>
                     </div>
                     <button
@@ -113,7 +113,7 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
                         className="p-2 hover:bg-white/5 rounded-full transition-colors"
                         aria-label="إغلاق النافذة"
                     >
-                        <X size={20} className="text-zinc-500" />
+                        <X size={20} className="text-stone-500" />
                     </button>
                 </div>
 
@@ -127,7 +127,7 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
                                     <AlertCircle className="w-16 h-16 text-rose-500 mx-auto mb-4" />
                                 )}
                                 <h3 className="text-xl font-bold">نتائج الاستيراد</h3>
-                                <p className="text-zinc-400 mt-2">تم استيراد {results.success} طالباً بنجاح</p>
+                                <p className="text-stone-500 mt-2">تم استيراد {results.success} طالباً بنجاح</p>
                             </div>
 
                             {results.errors.length > 0 && (
@@ -144,7 +144,7 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
 
                             <button
                                 onClick={onClose}
-                                className="w-full bg-zinc-900 hover:bg-zinc-800 text-white font-bold py-3 rounded-2xl border border-zinc-800 transition-all"
+                                className="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold py-3 rounded-2xl border border-stone-200 transition-all"
                             >
                                 إغلاق
                             </button>
@@ -153,13 +153,13 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
                         <div className="space-y-6">
                             <div
                                 onClick={() => fileInputRef.current?.click()}
-                                className="border-2 border-dashed border-zinc-700 rounded-2xl p-8 text-center cursor-pointer hover:border-zinc-500 transition-colors"
+                                className="border-2 border-dashed border-stone-300 rounded-2xl p-8 text-center cursor-pointer hover:border-zinc-500 transition-colors"
                             >
-                                <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-                                <p className="text-zinc-400 font-medium">
+                                <FileText className="w-12 h-12 text-stone-500 mx-auto mb-3" />
+                                <p className="text-stone-500 font-medium">
                                     {file ? file.name : "اضغط لاختيار ملف CSV"}
                                 </p>
-                                <p className="text-zinc-600 text-xs mt-1">
+                                <p className="text-stone-500 text-xs mt-1">
                                     الأعمدة المطلوبة: name, classroom, national_id (اختياري)
                                 </p>
                             </div>

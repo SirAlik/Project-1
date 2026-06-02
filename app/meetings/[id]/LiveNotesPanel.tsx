@@ -98,7 +98,7 @@ export function LiveNotesPanel({ meetingId, initialNotes }: Props) {
     <div className="flex flex-col gap-4">
       {/* قائمة الملاحظات */}
       <div className="glass-card rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="px-6 py-4 border-b border-stone-200 flex items-center justify-between">
           <h3 className="text-sm font-black">سجل الاجتماع الحي</h3>
           <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />

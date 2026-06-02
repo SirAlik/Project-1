@@ -43,8 +43,6 @@ export default function ClassDetailsPage() {
     // Animation triggers
     const [animatingIds, setAnimatingIds] = useState<Record<string, 'reward' | 'penalty' | null>>({});
 
-    const MOCK_LESSONS = ["الوحدة الثالثة: رحلة خير", "الوحدة الرابعة: من أصوات الطبيعة", "مراجعة مكتسبات سابقة"];
-
     const handleAddEvent = (type: string) => {
         const note = currentLesson ? `[مرتبط بدرس: ${currentLesson}]` : "";
 
@@ -77,14 +75,14 @@ export default function ClassDetailsPage() {
             <div className="fixed inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
             <div className="max-w-7xl mx-auto relative z-10">
-                <header className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 glass-panel p-6 rounded-3xl border border-white/5">
+                <header className="mb-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 glass-panel p-6 rounded-3xl border border-stone-200">
                     <div className="flex items-center gap-5">
                         <div className="w-14 h-14 bg-gradient-to-br from-[var(--primary)] to-[var(--accent)] rounded-2xl flex items-center justify-center shadow-lg shadow-[var(--primary)]/20">
                             <GraduationCap className="text-white w-7 h-7 icon-morph" />
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <Link href="/classroom" className="text-[10px] font-black opacity-40 hover:opacity-100 transition-opacity uppercase tracking-widest text-zinc-400">
+                                <Link href="/classroom" className="text-[10px] font-black opacity-40 hover:opacity-100 transition-opacity uppercase tracking-widest text-stone-500">
                                     الفصول
                                 </Link>
                                 <ChevronRight className="w-3 h-3 opacity-20" />
@@ -97,16 +95,16 @@ export default function ClassDetailsPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-3">
-                        <div className="flex bg-zinc-900 p-1 rounded-xl border border-white/5 mr-4">
+                        <div className="flex bg-stone-100 p-1 rounded-xl border border-stone-200 mr-4">
                             <button
                                 onClick={() => setViewMode("list")}
-                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${viewMode === 'list' ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'text-zinc-500 hover:text-white'}`}
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${viewMode === 'list' ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'text-stone-500 hover:text-foreground'}`}
                             >
                                 <Users className="w-3 h-3 inline ml-1" /> قائمة
                             </button>
                             <button
                                 onClick={() => setViewMode("map")}
-                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${viewMode === 'map' ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'text-zinc-500 hover:text-white'}`}
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${viewMode === 'map' ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'text-stone-500 hover:text-foreground'}`}
                             >
                                 <Grid3X3 className="w-3 h-3 inline ml-1" /> خريطة
                             </button>
@@ -114,21 +112,21 @@ export default function ClassDetailsPage() {
 
                         <button
                             onClick={() => actions.toggleModal("cleaning", true)}
-                            className="bg-zinc-900 border border-rose-500/20 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-all active:scale-95"
+                            className="bg-stone-100 border border-rose-500/20 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-all active:scale-95"
                         >
                             🚨 تنبيه نظافة
                         </button>
 
-                        <div className="flex items-center gap-3 bg-zinc-900 px-4 py-2.5 rounded-xl border border-white/5">
+                        <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-stone-200">
                             <BookOpen className="w-4 h-4 text-[var(--primary)]" />
                             <select
-                                className="bg-transparent text-[10px] font-black outline-none cursor-pointer uppercase tracking-widest text-zinc-300"
+                                className="bg-transparent text-[10px] font-black outline-none uppercase tracking-widest text-stone-500 disabled:cursor-not-allowed"
                                 value={currentLesson}
                                 onChange={(e) => setCurrentLesson(e.target.value)}
+                                disabled
                                 aria-label="الدرس الحالي"
                             >
-                                <option value="" className="bg-[#09090b]">الدرس الحالي...</option>
-                                {MOCK_LESSONS.map(l => <option key={l} value={l} className="bg-[#09090b]">{l}</option>)}
+                                <option value="">لم يتم ربط الدروس بعد</option>
                             </select>
                         </div>
 
@@ -151,7 +149,7 @@ export default function ClassDetailsPage() {
 
                         <Link
                             href={`/classroom/analytics?grade=${grade}&section=${section}`}
-                            className="bg-[var(--primary)]/10 hover:bg-[var(--primary)] border border-[var(--primary)]/20 text-[var(--primary)] hover:text-white px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 shadow-lg hover:shadow-[var(--primary)]/20"
+                            className="bg-[var(--primary)]/10 hover:bg-[var(--primary)] border border-[var(--primary)]/20 text-[var(--primary)] hover:text-foreground px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 shadow-lg hover:shadow-[var(--primary)]/20"
                         >
                             <LayoutGrid className="w-4 h-4" /> تحليل أداء الفصل
                         </Link>
@@ -161,9 +159,9 @@ export default function ClassDetailsPage() {
                 <div className="grid lg:grid-cols-12 gap-8">
                     {/* Left Column: Events & Stars */}
                     <div className="lg:col-span-4 space-y-8">
-                        <Card title="الإجراءات والنجوم" className="overflow-hidden border-white/5 bg-zinc-900/50">
-                            <div className="mb-8 p-6 rounded-2xl bg-zinc-950/50 border border-white/5">
-                                <p className="text-[10px] font-black opacity-40 uppercase tracking-widest mb-3 text-zinc-500">الطالب المختار حالياً</p>
+                        <Card title="الإجراءات والنجوم" className="overflow-hidden border-stone-200 bg-white/80">
+                            <div className="mb-8 p-6 rounded-2xl bg-white/80 border border-stone-200">
+                                <p className="text-[10px] font-black opacity-40 uppercase tracking-widest mb-3 text-stone-500">الطالب المختار حالياً</p>
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-[var(--primary)]/10 flex items-center justify-center text-[var(--primary)] font-black text-xl border border-[var(--primary)]/20">
                                         {state.selectedStudentName?.[0] || "?"}
@@ -184,19 +182,19 @@ export default function ClassDetailsPage() {
                             <div className="mt-6 flex flex-col gap-2">
                                 <button
                                     onClick={() => actions.toggleModal("gradebook", true)}
-                                    className="w-full flex items-center justify-center gap-2 bg-zinc-900 border border-white/5 text-zinc-400 py-3 rounded-xl text-xs font-black hover:text-white transition-all"
+                                    className="w-full flex items-center justify-center gap-2 bg-stone-100 border border-stone-200 text-stone-500 py-3 rounded-xl text-xs font-black hover:text-foreground transition-all"
                                 >
                                     <BookOpen size={16} /> دفتر المتابعة
                                 </button>
                                 <button
                                     onClick={() => actions.toggleModal("groups", true)}
-                                    className="w-full flex items-center justify-center gap-2 bg-zinc-900 border border-white/5 text-zinc-400 py-3 rounded-xl text-xs font-black hover:text-white transition-all"
+                                    className="w-full flex items-center justify-center gap-2 bg-stone-100 border border-stone-200 text-stone-500 py-3 rounded-xl text-xs font-black hover:text-foreground transition-all"
                                 >
                                     <Users size={16} /> توزيع المجموعات
                                 </button>
                             </div>
 
-                            <div className="mt-10 pt-10 border-t border-white/5">
+                            <div className="mt-10 pt-10 border-t border-stone-200">
                                 <StarSelector
                                     students={state.students}
                                     stars={state.stars}
@@ -211,7 +209,7 @@ export default function ClassDetailsPage() {
                     {/* Middle Column: Student List & Log */}
                     <div className="lg:col-span-8 space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <Card className="p-8 border-white/5 bg-zinc-900/50 relative overflow-hidden">
+                            <Card className="p-8 border-stone-200 bg-white/80 relative overflow-hidden">
                                 <div className="flex justify-between items-center mb-8 relative z-10">
                                     <h3 className="text-lg font-black flex items-center gap-3 text-white">
                                         <Users className="w-5 h-5 text-[var(--primary)]" />
@@ -260,19 +258,19 @@ export default function ClassDetailsPage() {
                                                                             : "border-[var(--primary)]/30 bg-[var(--primary)]/5 hover:border-[var(--primary)]"
                                                                     : isSelected
                                                                         ? "border-[var(--primary)] bg-[var(--primary)]/10 shadow-[0_0_25px_rgba(62,199,211,0.2)]"
-                                                                        : "border-white/5 bg-zinc-900/30 hover:border-white/20"
+                                                                        : "border-stone-200 bg-white/80 hover:border-stone-200"
                                                                 }`}
                                                         >
                                                             <div className="flex items-center gap-4 text-right overflow-hidden relative z-10 w-full">
                                                                 <div className={`shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black border-2 transition-all ${isOut ? "bg-[var(--accent)] border-[var(--accent)]/50 text-white" : state.classStarted
                                                                     ? attStatus === 'absent' ? "bg-[var(--danger)] border-[var(--danger)]/50 text-white" : attStatus === 'late' ? "bg-[var(--warning)] border-[var(--warning)]/50 text-white" : "bg-[var(--primary)] border-[var(--primary)]/50 text-white"
-                                                                    : isSelected ? "bg-[var(--primary)] border-[var(--primary)]/50 text-white" : "bg-zinc-800 border-white/10 text-zinc-400 group-hover:bg-zinc-700"
+                                                                    : isSelected ? "bg-[var(--primary)] border-[var(--primary)]/50 text-white" : "bg-stone-200 border-stone-200 text-stone-500 group-hover:bg-stone-300"
                                                                     }`}>
                                                                     {s.name[0]}
                                                                 </div>
                                                                 <div className="flex flex-col items-start min-w-0 flex-1">
                                                                     <div className="flex items-center gap-2 w-full">
-                                                                        <span className={`text-[13px] font-black truncate ${isSelected ? "text-white" : "text-zinc-300 group-hover:text-white"}`}>
+                                                                        <span className={`text-[13px] font-black truncate ${isSelected ? "text-white" : "text-stone-600 group-hover:text-foreground"}`}>
                                                                             {s.name}
                                                                         </span>
 
@@ -385,8 +383,8 @@ export default function ClassDetailsPage() {
                                     <CheckCircle className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-black text-white">تم تنفيذ الإجراء بنجاح</p>
-                                    <p className="text-[10px] text-zinc-500 font-bold">يمكنك التراجع خلال ٥ ثوانٍ</p>
+                                    <p className="text-sm font-black text-foreground">تم تنفيذ الإجراء بنجاح</p>
+                                    <p className="text-[10px] text-stone-500 font-bold">يمكنك التراجع خلال ٥ ثوانٍ</p>
                                 </div>
                             </div>
                             <button
@@ -406,7 +404,8 @@ export default function ClassDetailsPage() {
                 onClose={() => setIsLrcModalOpen(false)}
                 classes={lrcState.classes}
                 onBook={(data) => {
-                    lrcActions.requestBooking({ ...data, teacherId: state.user?.id || "TCH123" });
+                    if (!state.user?.id) return;
+                    lrcActions.requestBooking({ ...data, teacherId: state.user.id });
                     setIsLrcModalOpen(false);
                     actions.setMessage("✅ تم إرسال طلب حجز المصادر");
                 }}

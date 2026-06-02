@@ -53,6 +53,44 @@ This is the correct time for:
 
 ---
 
+## Known Resolved State — 2026-06-02
+
+The following issues are **already resolved**. Do not report them as new findings unless you find a regression or incomplete fix.
+
+| Item | Resolved State |
+| --- | --- |
+| Demo Mode / Mock Data | `lib/mock-data/` deleted. `NEXT_PUBLIC_DEMO_MODE` removed. No mock data anywhere. |
+| `middleware.ts` | Migrated to `proxy.ts` (Next.js 16 convention). `proxy.ts` uses `jose.jwtVerify`. |
+| Legacy helper functions | `is_super_admin()` + `is_admin()` dropped in R11. `auth_school_id()` + `auth_role_key()` removed. |
+| `USING (true)` policies | Removed across all tables in R09 security hardening. |
+| Legacy role names | Purged in `20260523_normalize_role_keys` + `20260524_enum_rename_and_rebuild_rls`. |
+| Duplicate role tables | `user_roles` dropped in R04. Only `user_personas` is active. |
+| Gamification schema | M75 (2026-06-02): 19 tables rebuilt multi-tenant with `school_id NOT NULL` + RLS + 2 RPC functions. Pre-M75 schema is superseded. |
+| Background job infrastructure | M76 (2026-06-02): `pg_cron` + `pg_net` enabled. `cron_trigger_daily_feed()` SECURITY DEFINER. Job `daily-analytics-feed` active at `0 0 * * *`. |
+| Analytics cache → UI | All `/principal/analytics/*` hooks read from `daily_kpis` / `class_weekly_summary` / `student_analytics_cache`. No live DB queries for dashboard KPIs. |
+| `/api/cron/daily-feed` | Route exists at `app/api/cron/daily-feed/route.ts`, protected by `Authorization: Bearer <CRON_SECRET>`. |
+| Migration count | 80 migrations total: M01–M77 + R00–R12. `db/migrations/` is the single source of truth. |
+| `npm run lint` | Zero errors, zero warnings (ESLint 9.x, phases 1–5 complete). |
+| `npm run build` | 61/61 pages, zero TypeScript errors, zero warnings. |
+| `BulkUploadModal` | Uses Server Action with `school_id` — no direct browser write to DB. |
+| Notifications Center | `components/layout/NotificationsMenu.tsx` wired in `GlobalHeader` — bell icon, unread badge, dropdown (last 10 items, mark-all-read). `lib/services/notification-service.ts` + `app/notifications/` (page + client + actions) complete. |
+| Period Attendance service layer | `lib/services/period-attendance-service.ts` uses `period_id` UUID throughout (no `period_number`). `lib/types/academic.ts` + `lib/services/academic-service.ts` created post-M59. No hardcoded timing — `app/classroom/page.tsx` uses DB lookup. |
+| db/ source files | `db/schema.sql` + `db/indexes.sql` do not exist — `db/migrations/` is the sole authoritative source of truth. `db/migrations/verify_after.sql` + `db/verify_deployment.sql` both use `RAISE EXCEPTION` on failure. |
+| Phase +11-12 | `staff_evaluations` has optional FK to `workflow_instances` (ISO 9001:2015 §9.1.3 traceability). `app/staff-evaluation/` + `app/workflows/page.tsx` (pending approval gates) built. Chain of Custody query documented in `sidra_architecture_master.md` §10. |
+| M77 — compound national_id | `student_profiles`: global `national_id_key` unique dropped. `UNIQUE(school_id, national_id)` added — national IDs are now scoped per school. `onConflict` in bulk-upload updated to `'school_id,national_id'`. |
+| Bulk-upload school_id | `app/api/bulk-upload/process/[jobId]/route.ts`: every student record now includes `school_id: persona.schoolId`. Records are fully tenant-bound. |
+| Automation cross-tenant fix | `app/admin/automation/_actions.ts`: `toggleRuleAction` + `deleteRuleAction` filter by `school_id` for `school_admin`. `createRuleAction` takes `schoolId` from persona, not client input. |
+| Coordinator-classroom ownership | `app/_actions/coordinator-classroom.ts` `assignTeacherToSlot`: verifies teacher belongs to the same school via `user_personas` lookup + adds `school_id` filter on `timetable_slots` update. |
+| AI service student ownership | `lib/services/ai-service.ts`: validates student belongs to school before building AI payload. `buildStudentProfilePayload` now requires `schoolId` argument. `student_analytics_cache` query filtered by `school_id`. |
+| TCH123 mock ID removed | `app/classroom/[grade]/[section]/page.tsx`: hardcoded `"TCH123"` fallback removed. `onBook` now returns early if `user.id` is absent. |
+| invite.ts system_role fix | `app/_actions/invite.ts`: removed `system_role: 'system_user'` from `profiles.upsert()`. DB default handles new users; `system_owner` accounts are no longer at risk of overwrite during invite acceptance. |
+| activity_leader route fix | `lib/auth/roles.ts` `ROLE_DASHBOARD_MAP`: corrected `activity_leader` path from `/activities` (non-existent) to `/activity`. |
+| Layout guards — lrc / qa / science | `app/lrc/layout.tsx` (role: `school_librarian`) · `app/qa/layout.tsx` (role: `quality_coordinator`) · `app/science/layout.tsx` (role: `lab_technician`) created — these routes were previously accessible to any authenticated user. |
+
+**When auditing these areas:** verify the fix is complete and no regression was introduced. Do not flag the original problem as open.
+
+---
+
 ## Engineering Mandate
 
 You are not a maintenance engineer applying small patches.
@@ -85,7 +123,7 @@ You are performing a **ground-up structural audit** and must identify:
 | "Avoid destructive DB changes" | Destructive DB changes are allowed when architecturally correct. |
 | "Preserve old role names" | Legacy role names must be removed. |
 | "Ignore old migrations" | Old migrations must be reviewed for contradictions and legacy residue. |
-| "UI can use mock data silently" | Mock data must be clearly marked or removed from production-like flows. |
+| "Mock data may still exist" | `lib/mock-data/` was deleted entirely. No mock data exists. Any page showing empty state is correct — it means the DB is empty, not broken. |
 
 ---
 
@@ -139,204 +177,164 @@ Do not do or recommend any of the following:
 ❌ Mixing server-only logic into client components
 ❌ Treating mock data as real production data
 ❌ Reviewing cache/build output files
+❌ Reintroducing dark mode classes or forced dark production screens
+❌ Keeping .bak files inside app/
+❌ Keeping sandbox/demo routes inside production app routes without explicit isolation
+```
 
-Approved Dependency Baseline
+---
+
+## UI And Mock Cleanup Rules
+
+- Production UI is **Light UI only**.
+- Do not add `dark:` classes.
+- Do not use forced dark backgrounds such as `bg-black`, `bg-zinc-950`, `bg-slate-950`, or `bg-neutral-950`.
+- Use soft warm backgrounds, clean white/off-white cards, subtle borders, and readable neutral text.
+- Do not add UI libraries without explicit approval.
+- Do not place mock/demo/fake data in production routes.
+- Do not keep `.bak` files inside `app/`.
+- Sandbox/demo routes must not live inside production app routes unless explicitly isolated and documented.
+- If a feature is not connected to real data yet, show a clear empty state or mark the route as not implemented.
+- Do not accept `schoolId` from the client for sensitive operations.
+- Tenant scope must come from server-side persona/context.
+- Supabase browser client must not write protected data.
+- `supabaseAdmin` / `service_role` must not be used in user-facing flows.
+- Server Actions must validate input and enforce permissions before mutations.
+- After cleanup, run `npm run lint` and `npm run build`.
+
+---
+
+## Approved Dependency Baseline
 
 The following versions are the approved architectural baseline:
 
-Node.js: 24.x
-npm: 11.x
-Next.js: 16.2.6
-React: 19.2.6
-TypeScript: 6.x
-Tailwind CSS: 4.x
-Zod: 4.x
-jose: 6.x
-lucide-react: 1.x
-react-dropzone: 15.x
-ESLint: 9.x
-Framer Motion
-GSAP
-Supabase Auth + PostgreSQL + RLS
+| Dependency | Version |
+| --- | --- |
+| Node.js | 24.x |
+| npm | 11.x |
+| Next.js | 16.2.6 |
+| React | 19.2.6 |
+| TypeScript | 6.x |
+| Tailwind CSS | 4.x |
+| Zod | 4.x |
+| jose | 6.x |
+| lucide-react | 1.x |
+| react-dropzone | 15.x |
+| ESLint | 9.x (pinned — ESLint 10 not yet compatible with eslint-config-next) |
+| Framer Motion | latest stable |
+| GSAP | latest stable |
+| Supabase Auth + PostgreSQL + RLS | — |
 
-ESLint 10 must not be adopted until eslint-config-next and the related Next.js ecosystem officially support it.
+### Dependency Rules
 
-Dependency Rules
-Do not downgrade dependencies because of outdated examples.
-Do not downgrade dependencies because of AI tooling limitations.
-Do not downgrade dependencies because of personal preference.
-Do not use npm audit fix --force.
-Do not downgrade Next.js to satisfy npm audit.
-Keep package-lock.json synchronized using npm install.
-Do not manually edit package-lock.json unless there is a documented reason.
-Any dependency upgrade must be checked against:
-Next.js compatibility
-React compatibility
-TypeScript compatibility
-ESLint compatibility
-Production build stability
-Architecture North Star
+- Do not downgrade dependencies because of outdated examples, AI tooling limitations, or personal preference.
+- Do not use `npm audit fix --force`.
+- Do not downgrade Next.js to satisfy `npm audit`.
+- Keep `package-lock.json` synchronized using `npm install`.
+- Do not manually edit `package-lock.json` without a documented reason.
+- Any upgrade must be validated against Next.js, React, TypeScript, ESLint, and production build stability.
+
+---
+
+## Architecture North Star
 
 The target architecture must follow these principles:
 
-1. Multi-Tenant SaaS
-Strict tenant isolation.
-Every active tenant table must have school_id uuid NOT NULL.
-No cross-school reads.
-No cross-school writes.
-No nullable tenant ownership for active business data.
-2. RLS-First Security
-Every active table must have Row Level Security enabled.
-RLS policies must be explicit.
-RLS policies must be role-aware.
-RLS policies must enforce tenant isolation.
-No USING (true) policies.
-No anonymous access unless explicitly justified.
-3. JWT-Based Auth
-RLS policies should use auth.jwt() -> 'app_metadata' according to the project architecture.
-Role and school context must be derived safely.
-Helper functions must be reviewed for:
-Security
-Fallback behavior
-Null behavior
-Tenant leakage
-Performance
-Privilege escalation risk
-4. Single Source of Truth
-No duplicate role systems.
-No old and new role names coexisting.
-No duplicate tables serving the same domain.
-No duplicate service layers for the same operation.
-db/migrations/ is the authoritative database source.
-5. Clean App Architecture
+### 1. Multi-Tenant SaaS
 
-Clear separation must exist between:
+- Strict tenant isolation.
+- Every active tenant table must have `school_id uuid NOT NULL`.
+- No cross-school reads. No cross-school writes.
+- No nullable tenant ownership for active business data.
 
-Server Components
-Client Components
-Server Actions
-Supabase browser client
-Supabase server client
-Supabase admin/service-role client
-Auth helpers
-Services
-Validators
-Types
-UI components
-Official School OS Role Keys
+### 2. RLS-First Security
 
-Only these role keys are valid:
+- Every active table must have Row Level Security enabled.
+- RLS policies must be explicit, role-aware, and enforce tenant isolation.
+- No `USING (true)` policies.
+- No anonymous access unless explicitly justified.
 
-system_owner
-school_admin
-school_principal
-school_librarian
-student_affairs_vp
-academic_vp
-school_affairs_vp
-school_secretary
-activity_leader
-student_counselor
-student
-parent
-teacher
-health_coordinator
-quality_coordinator
+### 3. JWT-Based Auth
+
+- RLS policies use `auth.jwt() -> 'app_metadata'`.
+- Role and school context must be derived safely.
+- Helper functions must be reviewed for: security, fallback behavior, null handling, tenant leakage, performance, privilege escalation risk.
+
+### 4. Single Source of Truth
+
+- No duplicate role systems.
+- No old and new role names coexisting.
+- No duplicate tables serving the same domain.
+- `db/migrations/` is the authoritative database source (80 migrations: M01–M77 + R00–R12).
+
+### 5. Clean App Architecture
+
+Clear separation must exist between: Server Components · Client Components · Server Actions · Supabase browser client · Supabase server client · Supabase admin/service-role client · Auth helpers · Services · Validators · Types · UI components.
+
+---
+
+## Official School OS Role Keys
+
+Only these 16 role keys are valid:
+
+```text
+system_owner        school_admin         school_principal
+school_librarian    student_affairs_vp   academic_vp
+school_affairs_vp   school_secretary     activity_leader
+student_counselor   student              parent
+teacher             health_coordinator   quality_coordinator
 lab_technician
+```
 
-Reject and report any legacy or suspicious role names such as:
+Reject and report any legacy role name such as: `principal` · `vp_students` · `vp_academic` · `vp_school` · `school_coordinator` · `super_admin` · `admin` · `librarian` · `counselor` · `quality` · `health` · `lab` · `secretary` · `activity`
 
-principal
-vp_students
-vp_academic
-vp_school
-school_coordinator
-super_admin
-admin
-librarian
-counselor
-quality
-health
-lab
-secretary
-activity
+Unless clearly part of a documented migration mapping.
 
-Unless they are clearly part of a documented migration mapping or intentionally deprecated compatibility layer.
+---
 
-Critical Next.js 16 Rules
+## Critical Next.js 16 Rules
 
-Review carefully for Next.js 16 App Router correctness.
+Review for Next.js 16 App Router correctness. Check:
 
-Check:
-
-app/ route structure.
-Server Component and Client Component boundaries.
-"use client" placement.
-"use server" placement.
-Server Actions.
-Route protection.
-Role-based redirects.
-Tenant-aware routing.
-proxy.ts usage.
-Old middleware.ts residue.
-Unauthorized access handling.
-Layout nesting.
-Data fetching strategy.
-Import traces in build failures.
+- `app/` route structure and layout nesting.
+- Server Component and Client Component boundaries.
+- `"use client"` and `"use server"` placement.
+- Server Actions correctness.
+- Route protection via `proxy.ts` (migrated from `middleware.ts` — check for old `middleware.ts` residue).
+- Role-based redirects and tenant-aware routing.
+- Data fetching strategy and import traces in build failures.
 
 Rules:
 
-Files containing "use server" must only export async server functions.
-Non-action helpers must not be exported from "use server" files.
-Server-only clients must not be imported into client components.
-Browser clients must not be used for privileged server work.
-Build errors must be diagnosed from the full import trace, not only the visible final line.
-Do not hide Next.js errors with config hacks.
-Critical Supabase and RLS Rules
+- Files containing `"use server"` must only export `async` server functions.
+- Non-action helpers must not be exported from `"use server"` files.
+- Server-only clients must not be imported into client components.
+- Browser clients must not be used for privileged server work.
+- Do not hide Next.js errors with config hacks.
 
-Review all Supabase usage strictly.
+---
+
+## Critical Supabase and RLS Rules
 
 Check database and migrations for:
 
-Tables without school_id.
-Nullable school_id on active tenant tables.
-Tables without RLS.
-Policies using USING (true).
-Policies missing role checks.
-Policies missing tenant isolation.
-Policies allowing cross-school access.
-Policies granting unsafe anonymous access.
-SECURITY DEFINER functions without SET search_path = public.
-Functions executable by anon without justification.
-Functions executable by authenticated when they should be admin-only.
-Trigger functions that write tenant data without validating school context.
-Duplicate or obsolete policies.
-Old helper functions still present.
+- Tables without `school_id` or with nullable `school_id` on active tenant tables.
+- Tables without RLS enabled.
+- Policies using `USING (true)`.
+- Policies missing role checks or tenant isolation.
+- `SECURITY DEFINER` functions without `SET search_path = public`.
+- Functions executable by `anon` without justification.
+- Functions executable by `authenticated` when they should be admin-only.
+- Trigger functions writing tenant data without validating school context.
+- Duplicate or obsolete policies.
 
-Review helper functions such as:
+Review active helper functions (`get_my_school_id`, `get_my_role`, `get_current_persona`) for: security · JWT reliance · null handling · fallback behavior · tenant isolation · performance · privilege escalation risk.
 
-get_my_school_id
-get_my_role
-auth_school_id
-auth_role_key
-is_super_admin
-is_admin
-get_current_persona
-get_current_school
+**Note:** `auth_school_id()`, `auth_role_key()`, `is_super_admin()`, `is_admin()` are **already removed**. Finding them would indicate a regression.
 
-For each helper, assess:
+### Golden RLS Pattern
 
-Security
-JWT reliance
-Null handling
-Fallback behavior
-Tenant isolation
-Performance
-Privilege escalation risk
-Golden RLS Pattern
-
-The preferred pattern is:
-
+```sql
 CREATE POLICY "table_select" ON public.some_table
 FOR SELECT
 USING (
@@ -346,132 +344,43 @@ USING (
     AND (auth.jwt() -> 'app_metadata' ->> 'role') IN ('role_a', 'role_b')
   )
 );
+```
 
-Reject:
+---
 
-USING (true)
+## TypeScript Rules
 
-Reject legacy helpers unless intentionally migrated:
+Do not weaken TypeScript. Reject: `any` · `as any` · `Record<string, unknown>` as a lazy substitute · `ts-ignore` · `ts-expect-error` without strict reason · loosely typed Supabase joins · implicit unsafe casts.
 
-auth_school_id()
-auth_role_key()
-is_super_admin()
-is_admin()
-TypeScript Rules
+Prefer: explicit interfaces · Zod schemas for external inputs · narrow union types · `unknown` with proper narrowing · `as const` for literal arrays · local typed Supabase join result shapes · shared domain types in `lib/types/` · clear return types on exported functions · clear input types for server actions.
 
-Do not weaken TypeScript.
+---
 
-Reject:
+## UI and Component Rules
 
-any
-as any
-random Record<string, unknown>
-ts-ignore
-ts-expect-error without strict reason
-loosely typed Supabase joins
-implicit unsafe casts
+Approved UI stack: `shadcn/ui` · Radix UI · Tailwind CSS 4 · TanStack Table · Recharts · `components/ui/chart-container.tsx` (chart wrapping) · Lucide React · Framer Motion (purposeful) · GSAP (justified use only).
 
-Prefer:
+Review for: duplicate components · repeated card/table/form patterns · hardcoded styling that should be shared · charts not using the shared container · inconsistent layouts between dashboards · missing loading/error/empty states · poor accessibility · business logic in UI components.
 
-Explicit interfaces.
-Zod schemas for external/user inputs.
-Narrow union types.
-unknown with proper narrowing.
-as const for literal arrays.
-Local typed Supabase join result shapes.
-Shared domain types in lib/types.
-Clear return types for exported functions.
-Clear input types for server actions.
-UI and Component Rules
+---
 
-Approved UI stack:
+## Files and Folders to Avoid
 
-shadcn/ui
-Radix UI
-Tailwind CSS 4
-TanStack Table for advanced tables
-Recharts for charts
-components/ui/chart-container.tsx for chart wrapping
-Lucide React for icons
-Framer Motion for purposeful animation
-GSAP only where justified
+Do not inspect: `node_modules/` · `.next/` · `out/` · `build/` · `dist/` · `coverage/` · `.cache/` · `.turbo/` · `.vercel/` · `.env*` · `logs/` · `*.log` · `*.txt` · `*_output*.txt` · `*.tsbuildinfo` · `scratch/` · `backup_scratch/` · `_archive_cleanup/` · `docs/archive/` · `docs/reports/` · `docs/old/` · `docs/generated/`
 
-Review for:
+Use `.codexignore` strictly. Do not burn tokens on cache, generated output, logs, or old scratch files.
 
-Duplicate components.
-Similar cards/tables/forms built repeatedly.
-Hardcoded styling that should be shared.
-Pages using mock data silently.
-Charts not using the shared chart container.
-Tables not using the approved table strategy.
-Inconsistent layouts between dashboards.
-Missing loading states.
-Missing error states.
-Missing empty states.
-Poor accessibility.
-Overuse of animation.
-Components containing business logic that belongs in services/hooks.
-Files and Folders to Avoid
+---
 
-Do not waste context or tokens reviewing generated or irrelevant files.
+## Mandatory Audit Workflow
 
-Do not inspect:
+Work in stages. For every stage:
 
-node_modules/
-.next/
-out/
-build/
-dist/
-coverage/
-.cache/
-.turbo/
-.vercel/
-.env*
-logs/
-*.log
-*.txt
-*_output.txt
-*_output_clean.txt
-install_log.txt
-npm_ci_log.txt
-lint_baseline.txt
-build_log.txt
-typecheck_log.txt
-audit_log.txt
-*.tsbuildinfo
-scratch/
-backup_scratch/
-_archive_cleanup/
-docs/archive/
-docs/reports/
-docs/old/
-docs/generated/
+1. Explain what you will inspect.
+2. Inspect the relevant folders/files.
+3. Produce a stage report in **Arabic**.
+4. Classify findings into: Fatal errors · Security risks · Architectural issues · TypeScript/build/lint issues · Cleanup/dead-code issues · Improvement opportunities.
+5. Give recommended fixes in priority order.
+6. Continue to the next stage.
 
-Use .codexignore strictly.
-
-Do not burn tokens on cache, generated output, logs, or old scratch files.
-
-Mandatory Audit Workflow
-
-You must not scan the project randomly.
-
-You must work in stages.
-
-For every stage:
-
-Explain what you will inspect.
-Inspect the relevant folders/files.
-Produce a stage report in Arabic.
-Classify findings into:
-Fatal errors
-Security risks
-Architectural issues
-TypeScript/build/lint issues
-Cleanup/dead-code issues
-Improvement opportunities
-Give recommended fixes in priority order.
-Then continue to the next stage.
-
-Do not wait until the end to report everything.
-
-After each folder/stage, give the user a clear result before continuing.
+Do not wait until the end to report everything. After each stage, give the user a clear result before continuing.

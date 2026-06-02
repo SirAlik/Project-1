@@ -39,7 +39,7 @@ export default async function ClassTimetablePage(props: PageProps) {
                         إدارة الفصول
                     </Link>
                     <ChevronRight size={14} />
-                    <span className="font-bold text-white">{classData.name}</span>
+                    <span className="font-bold text-foreground">{classData.name}</span>
                 </div>
 
                 {/* Header */}
@@ -47,7 +47,7 @@ export default async function ClassTimetablePage(props: PageProps) {
                     <div>
                         <h1 className="text-4xl font-black tracking-tight mb-2 flex items-center gap-4">
                             <span className="text-[var(--primary)]">{classData.name}</span>
-                            <span className="text-lg opacity-40 font-normal px-3 py-1 rounded-full border border-white/10">
+                            <span className="text-lg opacity-40 font-normal px-3 py-1 rounded-full border border-stone-200">
                                 {classData.grade_level}
                             </span>
                         </h1>

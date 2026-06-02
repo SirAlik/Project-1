@@ -100,21 +100,21 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" dir="rtl">
-            <div className="w-full max-w-4xl bg-zinc-950 border border-zinc-800 rounded-[2.5rem] overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-200/70 backdrop-blur-sm p-4" dir="rtl">
+            <div className="w-full max-w-4xl bg-white border border-stone-200 rounded-[2.5rem] overflow-hidden animate-in zoom-in-95 duration-300">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-zinc-800">
+                <div className="flex items-center justify-between p-6 border-b border-stone-200">
                     <div className="flex items-center gap-3">
                         <div className="p-3 bg-indigo-500/10 rounded-2xl">
                             <BarChart3 className="w-5 h-5 text-indigo-500" />
                         </div>
                         <div>
                             <h2 className="text-lg font-black">{getTitle()}</h2>
-                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">نافذة الغوص العميق</p>
+                            <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">نافذة الغوص العميق</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors" aria-label="إغلاق النافذة">
-                        <X size={24} className="text-zinc-400" />
+                        <X size={24} className="text-stone-500" />
                     </button>
                 </div>
 
@@ -128,7 +128,7 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
                     </div>
 
                     {/* Main Chart */}
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
+                    <div className="bg-white/80 border border-stone-200 rounded-2xl p-6">
                         <ChartContainer height={256}>
                             <BarChart data={getChartData()}>
                                 <XAxis dataKey="name" fontSize={11} tickLine={false} axisLine={false} />
@@ -148,8 +148,8 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
                     </div>
 
                     {/* Top Students Table */}
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <div className="p-4 border-b border-zinc-800">
+                    <div className="bg-white/80 border border-stone-200 rounded-2xl overflow-hidden">
+                        <div className="p-4 border-b border-stone-200">
                             <h3 className="text-sm font-black flex items-center gap-2">
                                 <TrendingUp className="w-4 h-4 text-[hsl(var(--gold))]" />
                                 أكثر الطلاب تأخراً (Top 10)
@@ -157,9 +157,9 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
                         </div>
                         <div className="divide-y divide-zinc-800/50">
                             {topLateStudents.map((student, i) => (
-                                <div key={i} className="flex items-center justify-between p-4 hover:bg-zinc-900/30 transition-colors">
+                                <div key={i} className="flex items-center justify-between p-4 hover:bg-white/80 transition-colors">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center text-xs font-black text-zinc-400">
+                                        <div className="w-8 h-8 bg-stone-200 rounded-lg flex items-center justify-center text-xs font-black text-stone-500">
                                             {i + 1}
                                         </div>
                                         <span className="text-sm font-bold">{student.name}</span>
@@ -170,7 +170,7 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
                                 </div>
                             ))}
                             {topLateStudents.length === 0 && (
-                                <div className="p-8 text-center text-zinc-600 italic">لا توجد بيانات كافية</div>
+                                <div className="p-8 text-center text-stone-500 italic">لا توجد بيانات كافية</div>
                             )}
                         </div>
                     </div>
@@ -186,7 +186,7 @@ function FilterChip({ icon: Icon, label, active, onClick }: { icon: React.Compon
             onClick={onClick}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${active
                 ? 'bg-indigo-500 text-white'
-                : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 border border-zinc-800'
+                : 'bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200'
                 }`}
         >
             <Icon className="w-3 h-3" />

@@ -18,17 +18,17 @@ export default function CounselorAnalytics() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-medium animate-pulse">جاري جلب بيانات التوجيه والإرشاد...</p>
+                    <p className="text-stone-500 font-medium animate-pulse">جاري جلب بيانات التوجيه والإرشاد...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[120px]" />
@@ -42,21 +42,21 @@ export default function CounselorAnalytics() {
                         <div className="flex items-center gap-3 mb-2">
                             <Link
                                 href="/principal"
-                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-stone-200"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-400 rotate-180" />
+                                <ArrowLeft className="w-5 h-5 text-stone-500 rotate-180" />
                             </Link>
-                            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black bg-gradient-to-r from-stone-950 to-stone-500 bg-clip-text text-transparent">
                                 مؤشرات الاستقرار السلوكي
                             </h1>
                         </div>
-                        <p className="text-zinc-500 mr-12 text-sm italic">
+                        <p className="text-stone-500 mr-12 text-sm italic">
                             تحليل الحالات الإرشادية، معدلات التعافي، وخارطة التحديات الميدانية
                         </p>
                     </div>
 
-                    <div className="bg-zinc-900/50 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
                             <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse" />
                             رصد استباقي للحالات الاجتماعية والتربوية
                         </div>
@@ -76,7 +76,7 @@ export default function CounselorAnalytics() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
-                            className={`p-6 rounded-[2rem] bg-zinc-900/30 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
+                            className={`p-6 rounded-[2rem] bg-white/80 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
                         >
                             <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity`}>
                                 <item.icon className="w-16 h-16" />
@@ -84,8 +84,8 @@ export default function CounselorAnalytics() {
                             <div className={`w-12 h-12 ${item.bg} rounded-2xl flex items-center justify-center mb-4`}>
                                 <item.icon className={`w-6 h-6 ${item.color}`} />
                             </div>
-                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
-                            <h2 className="text-3xl font-black text-white">{item.value}</h2>
+                            <p className="text-stone-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
+                            <h2 className="text-3xl font-black text-foreground">{item.value}</h2>
                         </motion.div>
                     ))}
                 </div>
@@ -98,7 +98,7 @@ export default function CounselorAnalytics() {
                                 <XAxis type="number" hide />
                                 <YAxis dataKey="name" type="category" stroke="#9ca3af" fontSize={10} width={100} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917' }}
                                 />
                                 <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                                     {stats.casePyramid.map((entry, index) => (
@@ -119,11 +119,11 @@ export default function CounselorAnalytics() {
                                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                                <XAxis dataKey="month" stroke="#4b5563" fontSize={11} />
-                                <YAxis stroke="#4b5563" fontSize={11} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" vertical={false} />
+                                <XAxis dataKey="month" stroke="#78716c" fontSize={11} />
+                                <YAxis stroke="#78716c" fontSize={11} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917' }}
                                 />
                                 <Area type="monotone" dataKey="count" name="الجلسات" stroke="#6366f1" fillOpacity={1} fill="url(#colorSessions)" />
                             </AreaChart>
@@ -135,7 +135,7 @@ export default function CounselorAnalytics() {
                     {/* Issues Map (Bubble/Scatter as Location Map) */}
                     <AnalyticsCard title="خارطة التحديات السلوكية" subtitle="أكثر المواقع تسجيلاً للملاحظات في المدرسة">
                         <div className="h-[250px] w-full flex items-center justify-center">
-                            <div className="relative w-full h-full bg-white/5 rounded-[2rem] border border-white/5 overflow-hidden">
+                            <div className="relative w-full h-full bg-white/5 rounded-[2rem] border border-stone-200 overflow-hidden">
                                 {stats.issueLocations.map((loc, i) => {
                                     const top = [20, 60, 40, 80, 30][i];
                                     const left = [30, 20, 70, 50, 85][i];
@@ -156,7 +156,7 @@ export default function CounselorAnalytics() {
                                             }}
                                         >
                                             <div className="text-center">
-                                                <p className="text-[10px] font-black text-white">{loc.name}</p>
+                                                <p className="text-[10px] font-black text-foreground">{loc.name}</p>
                                                 <p className="text-[8px] text-indigo-400 font-bold">{loc.value}</p>
                                             </div>
                                             <div className="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping opacity-20 pointer-events-none" />
@@ -165,8 +165,8 @@ export default function CounselorAnalytics() {
                                 })}
                                 {/* Labels mapping */}
                                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                                    <MapPin className="w-3 h-3 text-zinc-500" />
-                                    <span className="text-[8px] text-zinc-500 uppercase font-black">المواقع المرصودة حياً</span>
+                                    <MapPin className="w-3 h-3 text-stone-500" />
+                                    <span className="text-[8px] text-stone-500 uppercase font-black">المواقع المرصودة حياً</span>
                                 </div>
                             </div>
                         </div>
@@ -176,14 +176,14 @@ export default function CounselorAnalytics() {
                     <AnalyticsCard title="أحدث المعاملات المستلمة" subtitle="آخر ٥ حالات تم فتحها">
                         <div className="space-y-3">
                             {stats.recentCases.map((c, i) => (
-                                <div key={i} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5">
+                                <div key={i} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-stone-200">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5">
-                                            <ShieldAlert className="w-4 h-4 text-zinc-400" />
+                                        <div className="w-8 h-8 rounded-xl bg-stone-200 flex items-center justify-center border border-stone-200">
+                                            <ShieldAlert className="w-4 h-4 text-stone-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-zinc-200 truncate w-40">{c.title}</p>
-                                            <p className="text-[9px] text-zinc-500">{c.category}</p>
+                                            <p className="text-xs font-bold text-stone-700 truncate w-40">{c.title}</p>
+                                            <p className="text-[9px] text-stone-500">{c.category}</p>
                                         </div>
                                     </div>
                                     <span className={`text-[9px] px-2 py-0.5 rounded-full border ${c.status === 'مغلقة' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`}>

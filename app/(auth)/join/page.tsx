@@ -77,10 +77,10 @@ function JoinPageContent() {
 
     if (state === 'validating') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black text-white">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="animate-spin text-primary" size={32} />
-                    <p className="text-muted text-sm">جاري التحقق من الدعوة...</p>
+                    <p className="text-slate-500 text-sm">جاري التحقق من الدعوة...</p>
                 </div>
             </div>
         );
@@ -88,8 +88,8 @@ function JoinPageContent() {
 
     if (state === 'invalid') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
-                <div className="max-w-md w-full bg-zinc-900 border border-red-500/20 rounded-2xl p-8 text-center space-y-4">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-4">
+                <div className="max-w-md w-full bg-white border border-red-200 rounded-2xl p-8 text-center space-y-4 shadow-lg">
                     <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto text-red-500">
                         <AlertCircle size={32} />
                     </div>
@@ -105,8 +105,8 @@ function JoinPageContent() {
 
     if (state === 'success') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
-                <div className="max-w-md w-full bg-zinc-900 border border-emerald-500/20 rounded-2xl p-8 text-center space-y-4">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-4">
+                <div className="max-w-md w-full bg-white border border-emerald-200 rounded-2xl p-8 text-center space-y-4 shadow-lg">
                     <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto text-emerald-500">
                         <CheckCircle size={32} />
                     </div>
@@ -120,20 +120,20 @@ function JoinPageContent() {
     if (!inviteData) return null;
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-black text-white p-4" dir="rtl">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800 p-4" dir="rtl">
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl"
+                className="max-w-md w-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl"
             >
                 {/* Header Profile Identity */}
-                <div className="bg-zinc-800/50 p-6 border-b border-zinc-800 text-center">
+                <div className="bg-slate-50 p-6 border-b border-slate-200 text-center">
                     <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 mx-auto mb-4 flex items-center justify-center text-2xl font-bold shadow-lg shadow-indigo-500/20">
                         {inviteData.name[0]}
                     </div>
                     <h2 className="text-xl font-bold mb-1">مرحباً، {inviteData.name}</h2>
                     <p className="text-sm text-muted-foreground">
-                        أنت مدعو للانضمام كـ <span className="text-white font-medium">{inviteData.role}</span>
+                        أنت مدعو للانضمام كـ <span className="text-slate-900 font-medium">{inviteData.role}</span>
                         <br />
                         في <span className="text-primary">{inviteData.schoolName}</span>
                     </p>
@@ -153,7 +153,7 @@ function JoinPageContent() {
                                 minLength={6}
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
-                                className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors text-center text-lg tracking-widest placeholder:tracking-normal"
+                                className="w-full bg-slate-100 border border-slate-300 rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:border-primary transition-colors text-center text-lg tracking-widest placeholder:tracking-normal"
                                 placeholder="••••••••"
                             />
                             <p className="text-[10px] text-muted-foreground text-center">
@@ -178,14 +178,13 @@ function JoinPageContent() {
     );
 }
 
-// Wrap in Suspense for useSearchParams compatibility with static export
 export default function JoinPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen flex items-center justify-center bg-black text-white">
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-800">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                    <span className="text-sm text-white/60">جاري التحميل...</span>
+                    <span className="text-sm text-slate-400">جاري التحميل...</span>
                 </div>
             </div>
         }>

@@ -9,7 +9,7 @@ export default function AccessDeniedPage() {
     const router = useRouter();
 
     return (
-        <div className="min-h-screen bg-black text-white flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="min-h-screen bg-slate-50 text-slate-900 flex items-center justify-center p-6 relative overflow-hidden">
             {/* Animated background grid */}
             <div className="absolute inset-0 opacity-10">
                 <div className="absolute inset-0 opacity-10 bg-grid-pattern" />
@@ -22,7 +22,7 @@ export default function AccessDeniedPage() {
                 className="relative z-10 max-w-2xl w-full"
             >
                 {/* Glass panel */}
-                <div className="glass-panel p-12 rounded-3xl border border-white/10 backdrop-blur-xl">
+                <div className="bg-white p-12 rounded-3xl border border-slate-200 shadow-xl">
                     {/* Icon */}
                     <motion.div
                         initial={{ scale: 0 }}
@@ -65,9 +65,9 @@ export default function AccessDeniedPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5 }}
-                        className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10"
+                        className="mb-8 p-4 bg-slate-100 rounded-xl border border-slate-200"
                     >
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between text-slate-700 text-sm">
                             <span className="text-muted">رمز الخطأ:</span>
                             <span className="font-mono text-rose-400">ACCESS_DENIED</span>
                         </div>
@@ -82,7 +82,7 @@ export default function AccessDeniedPage() {
                     >
                         <button
                             onClick={() => router.back()}
-                            className="flex items-center justify-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold transition-all group"
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-sm font-bold transition-all group text-slate-700"
                         >
                             <ArrowRight size={18} className="group-hover:-translate-x-1 transition-transform rotate-180" />
                             العودة للخلف

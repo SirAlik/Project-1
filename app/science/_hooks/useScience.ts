@@ -79,7 +79,7 @@ export function useScience() {
         const { error } = await supabase.from("lab_bookings").insert([{
             booking_date: date,
             period,
-            teacher_id: user?.id, // Mock ID or real Auth ID
+            teacher_id: user?.id,
             teacher_name: currentUserName,
             experiment_id: experimentId,
             experiment_title: exp?.title,

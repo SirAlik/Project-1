@@ -15,13 +15,13 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-zinc-900/50 p-6 rounded-[2rem] border border-zinc-800">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white/80 p-6 rounded-[2rem] border border-stone-200">
                 <div>
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-indigo-400" />
                         إدارة الاجتماعات واللقاءات
                     </h3>
-                    <p className="text-zinc-500 text-sm mt-1">جدولة الاجتماعات، دعوة الحضور، وتوثيق المحاضر.</p>
+                    <p className="text-stone-500 text-sm mt-1">جدولة الاجتماعات، دعوة الحضور، وتوثيق المحاضر.</p>
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
@@ -33,15 +33,15 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {meetings.map(meeting => (
-                    <div key={meeting.id} className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2.5rem] hover:border-zinc-700 transition-all group">
+                    <div key={meeting.id} className="bg-white/80 border border-stone-200 p-6 rounded-[2.5rem] hover:border-stone-300 transition-all group">
                         <div className="flex justify-between items-start mb-6">
                             <div className={`px - 4 py - 1.5 rounded - full text - [9px] font - black border uppercase tracking - widest ${meeting.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/10' :
                                 meeting.status === 'scheduled' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/10' :
-                                    'bg-zinc-800 text-zinc-500 border-zinc-700'
+                                    'bg-stone-200 text-stone-500 border-stone-300'
                                 } `}>
                                 {meeting.status === 'completed' ? 'منتهى' : 'مجدول'}
                             </div>
-                            <button type="button" className="p-2 text-zinc-600 hover:text-white transition-colors" aria-label="خيارات الاجتماع">
+                            <button type="button" className="p-2 text-stone-500 hover:text-foreground transition-colors" aria-label="خيارات الاجتماع">
                                 <MoreVertical className="w-4 h-4" />
                             </button>
                         </div>
@@ -49,29 +49,29 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
                         <h4 className="text-white font-bold text-lg mb-4">{meeting.title}</h4>
 
                         <div className="grid grid-cols-2 gap-y-4 mb-6">
-                            <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-bold uppercase">
+                            <div className="flex items-center gap-3 text-stone-500 text-[10px] font-bold uppercase">
                                 <Calendar className="w-4 h-4 text-zinc-700" />
                                 <span>{meeting.meeting_date}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-bold uppercase">
+                            <div className="flex items-center gap-3 text-stone-500 text-[10px] font-bold uppercase">
                                 <Clock className="w-4 h-4 text-zinc-700" />
                                 <span>{meeting.meeting_time} {meeting.end_time && `- ${meeting.end_time} `}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-zinc-500 text-[10px] font-bold uppercase col-span-2">
+                            <div className="flex items-center gap-3 text-stone-500 text-[10px] font-bold uppercase col-span-2">
                                 <MapPin className="w-4 h-4 text-zinc-700" />
                                 <span>{meeting.location || 'غير محدد'}</span>
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-6 border-t border-zinc-800/50">
+                        <div className="flex items-center justify-between pt-6 border-t border-stone-200">
                             <div className="flex -space-x-2 space-x-reverse">
                                 {meeting.attendees?.slice(0, 3).map((a: MeetingAttendee, idx: number) => (
-                                    <div key={idx} className="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-950 flex items-center justify-center text-[10px] font-black text-zinc-400 uppercase">
+                                    <div key={idx} className="w-8 h-8 rounded-full bg-stone-200 border-2 border-zinc-950 flex items-center justify-center text-[10px] font-black text-stone-500 uppercase">
                                         {a.employee_name?.substring(0, 1) || 'U'}
                                     </div>
                                 ))}
                                 {(meeting.attendees?.length || 0) > 3 && (
-                                    <div className="w-8 h-8 rounded-full bg-zinc-800 border-2 border-zinc-950 flex items-center justify-center text-[8px] font-black text-zinc-500">
+                                    <div className="w-8 h-8 rounded-full bg-stone-200 border-2 border-zinc-950 flex items-center justify-center text-[8px] font-black text-stone-500">
                                         +{(meeting.attendees?.length || 0) - 3}
                                     </div>
                                 )}
@@ -84,9 +84,9 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
                 ))}
 
                 {meetings.length === 0 && (
-                    <div className="bg-zinc-900/50 border border-zinc-800 p-12 rounded-[2.5rem] text-center col-span-full">
+                    <div className="bg-white/80 border border-stone-200 p-12 rounded-[2.5rem] text-center col-span-full">
                         <Calendar className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
-                        <h4 className="text-zinc-500 font-bold">لم يتم جدولة اجتماعات بعد</h4>
+                        <h4 className="text-stone-500 font-bold">لم يتم جدولة اجتماعات بعد</h4>
                         <button onClick={() => setShowModal(true)} className="mt-4 text-indigo-400 font-black text-[10px] uppercase hover:underline" aria-label="جدول أول اجتماع الآن">جدول أول اجتماع الآن</button>
                     </div>
                 )}
@@ -94,15 +94,15 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
 
             {/* Schedule Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl rounded-[3rem] shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-200/70 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-stone-100 border border-stone-200 w-full max-w-2xl rounded-[3rem] shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
                         <div className="p-10">
                             <div className="flex justify-between items-start mb-10">
                                 <div>
                                     <h4 className="text-white text-2xl font-black">جدولة اجتماع جديد</h4>
-                                    <p className="text-zinc-500 text-sm mt-1">سيتم توليد &quot;دعوة اجتماع&quot; (QF19-1) تلقائياً.</p>
+                                    <p className="text-stone-500 text-sm mt-1">سيتم توليد &quot;دعوة اجتماع&quot; (QF19-1) تلقائياً.</p>
                                 </div>
-                                <button onClick={() => setShowModal(false)} className="text-zinc-500 hover:text-white transition-colors p-2" aria-label="إغلاق المجدول">
+                                <button onClick={() => setShowModal(false)} className="text-stone-500 hover:text-foreground transition-colors p-2" aria-label="إغلاق المجدول">
                                     <X size={18} />
                                 </button>
                             </div>
@@ -125,26 +125,26 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
                             }} className="space-y-8">
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2 col-span-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">عنوان الاجتماع</label>
-                                        <input name="title" type="text" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white font-bold" placeholder="مثال: الاجتماع الدوري الأول للهيئة التعليمية" required aria-label="عنوان الاجتماع" />
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">عنوان الاجتماع</label>
+                                        <input name="title" type="text" className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground font-bold" placeholder="مثال: الاجتماع الدوري الأول للهيئة التعليمية" required aria-label="عنوان الاجتماع" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">التاريخ</label>
-                                        <input name="date" type="date" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white font-bold" required aria-label="تاريخ الاجتماع" />
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">التاريخ</label>
+                                        <input name="date" type="date" className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground font-bold" required aria-label="تاريخ الاجتماع" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">الوقت</label>
-                                        <input name="time" type="time" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white font-bold" required aria-label="وقت الاجتماع" />
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">الوقت</label>
+                                        <input name="time" type="time" className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground font-bold" required aria-label="وقت الاجتماع" />
                                     </div>
                                     <div className="space-y-2 col-span-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">المكان</label>
-                                        <input name="location" type="text" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white font-bold" placeholder="مثال: غرفة المعلمين / مكتب المدير" required aria-label="مكان الاجتماع" />
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">المكان</label>
+                                        <input name="location" type="text" className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground font-bold" placeholder="مثال: غرفة المعلمين / مكتب المدير" required aria-label="مكان الاجتماع" />
                                     </div>
                                     <div className="space-y-2 col-span-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">وصف الاجتماع</label>
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">وصف الاجتماع</label>
                                         <textarea
                                             name="description"
-                                            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white font-bold resize-none"
+                                            className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground font-bold resize-none"
                                             placeholder="أضف وصفاً أو أجندة الاجتماع..."
                                             rows={3}
                                             aria-label="وصف الاجتماع"
@@ -153,13 +153,13 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">دعوة الحضور</label>
-                                    <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 h-48 overflow-y-auto space-y-2 scrollbar-thin">
+                                    <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">دعوة الحضور</label>
+                                    <div className="bg-white border border-stone-200 rounded-2xl p-4 h-48 overflow-y-auto space-y-2 scrollbar-thin">
                                         {employees.map(emp => (
-                                            <label key={emp.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-900 transition-colors cursor-pointer group">
+                                            <label key={emp.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-stone-100 transition-colors cursor-pointer group">
                                                 <input
                                                     type="checkbox"
-                                                    className="w-4 h-4 bg-zinc-800 border-zinc-700 rounded text-indigo-500 focus:ring-0"
+                                                    className="w-4 h-4 bg-stone-200 border-stone-300 rounded text-indigo-500 focus:ring-0"
                                                     checked={selectedAttendees.includes(emp.id)}
                                                     onChange={(e) => {
                                                         if (e.target.checked) setSelectedAttendees([...selectedAttendees, emp.id]);
@@ -167,8 +167,8 @@ export function MeetingScheduler({ meetings, employees, onSchedule }: Props) {
                                                     }}
                                                 />
                                                 <div className="flex-1">
-                                                    <p className="text-xs font-bold text-white group-hover:text-white transition-colors">{emp.name}</p>
-                                                    <p className="text-[10px] text-zinc-500">{emp.position}</p>
+                                                    <p className="text-xs font-bold text-foreground group-hover:text-foreground transition-colors">{emp.name}</p>
+                                                    <p className="text-[10px] text-stone-500">{emp.position}</p>
                                                 </div>
                                             </label>
                                         ))}

@@ -46,7 +46,7 @@ function MeetingCard({ meeting }: { meeting: MeetingListItem }) {
       className="group flex items-start gap-4 p-5 rounded-2xl border border-border/60 bg-card hover:border-sky-500/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-200"
     >
       {/* أيقونة */}
-      <div className="flex-shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center bg-sky-500/10 text-sky-500 group-hover:bg-sky-500 group-hover:text-white transition-colors">
+      <div className="flex-shrink-0 w-11 h-11 rounded-2xl flex items-center justify-center bg-sky-500/10 text-sky-500 group-hover:bg-sky-500 group-hover:text-foreground transition-colors">
         <CalendarDays className="w-5 h-5" />
       </div>
 

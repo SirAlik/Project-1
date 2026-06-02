@@ -46,7 +46,7 @@ export default function SciencePage() {
                                     key={t.id}
                                     onClick={() => setTab(t.id)}
                                     className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${tab === t.id
-                                        ? "bg-white dark:bg-zinc-800 text-cyan-500 shadow-xl"
+                                        ? "bg-white text-cyan-500 shadow-xl"
                                         : "opacity-40 hover:opacity-100"
                                         }`}
                                 >
@@ -91,14 +91,14 @@ export default function SciencePage() {
                                 <div className="glass-card p-8">
                                     <h3 className="text-sm font-bold opacity-40 uppercase tracking-widest mb-6">إحصائيات سريعة</h3>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-6 rounded-2xl glass-panel border border-white/5 text-center flex flex-col items-center">
+                                        <div className="p-6 rounded-2xl glass-panel border border-stone-200 text-center flex flex-col items-center">
                                             <div className="w-10 h-10 rounded-full bg-[hsla(var(--gold),.15)] flex items-center justify-center mb-4">
                                                 <TestTube2 className="w-5 h-5 text-[hsl(var(--gold))]" />
                                             </div>
                                             <div className="text-3xl font-bold">{state.bookings.filter(b => b.status === 'pending').length}</div>
                                             <div className="text-[10px] uppercase font-bold opacity-40 tracking-widest">قيد الانتظار</div>
                                         </div>
-                                        <div className="p-6 rounded-2xl glass-panel border border-white/5 text-center flex flex-col items-center">
+                                        <div className="p-6 rounded-2xl glass-panel border border-stone-200 text-center flex flex-col items-center">
                                             <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
                                                 <ShieldCheck className="w-5 h-5 text-emerald-500" />
                                             </div>
@@ -140,7 +140,7 @@ export default function SciencePage() {
                                     <div className="relative group max-w-sm w-full">
                                         <input
                                             placeholder="بحث في المخزون..."
-                                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-3.5 text-sm outline-none focus:border-cyan-500/50 transition-all"
+                                            className="w-full bg-white/5 border border-stone-200 rounded-2xl px-6 py-3.5 text-sm outline-none focus:border-cyan-500/50 transition-all"
                                         />
                                     </div>
                                 </div>

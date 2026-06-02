@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useTransition } from "react";
 import Link                 from "next/link";
 import { Bell, CheckCheck, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence }        from "framer-motion";
-import { getNotificationsAction, markAllAsReadAction } from "@/app/notifications/_actions";
+import { getNotificationsAction, markAllAsReadAction } from "@/app/(protected)/notifications/_actions";
 import type { NotificationItem } from "@/lib/services/notification-service";
 
 // ─────────────────────────────────────────────────────────────────────────────

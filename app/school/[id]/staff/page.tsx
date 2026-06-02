@@ -51,7 +51,7 @@ export default async function StaffPage(props: { params: Promise<{ id: string }>
                 <header className="mb-10 flex items-center justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                            <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600">
                                 <Users size={24} />
                             </div>
                             <h1 className="text-3xl font-black text-foreground">إدارة الموظفين</h1>

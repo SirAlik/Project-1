@@ -80,19 +80,20 @@ export async function POST(
             : null;
 
         return {
-          name:       row.name.trim(),
-          national_id: row.national_id.trim(),
-          class_id:   classId,
+          name:         row.name.trim(),
+          national_id:  row.national_id.trim(),
+          class_id:     classId,
+          school_id:    persona.schoolId,
           parent_phone: row.parent_phone?.trim() || null,
           grade_level:  row.grade_level ? parseInt(row.grade_level, 10) || null : null,
-          is_approved: true,
+          is_approved:  true,
         };
       });
 
       const { error: insertErr, count } = await supabaseAdmin
         .from('student_profiles')
         .upsert(inserts, {
-          onConflict:      'national_id',
+          onConflict:      'school_id,national_id',
           ignoreDuplicates: false,
           count:           'exact',
         });

@@ -28,16 +28,16 @@ export default function VerifyPhase2Page() {
     }, [runCheck]);
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-white p-12 font-sans" dir="rtl">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-12 font-sans" dir="rtl">
             <div className="max-w-4xl mx-auto space-y-8">
-                <header className="flex items-center justify-between border-b border-white/10 pb-6">
+                <header className="flex items-center justify-between border-b border-stone-200 pb-6">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-emerald-500/20 rounded-xl text-emerald-400">
                             <ShieldCheck size={32} />
                         </div>
                         <div>
                             <h1 className="text-3xl font-black tracking-tight">System Integrity Check</h1>
-                            <p className="text-zinc-400">Phase 2.2 Validation Gate</p>
+                            <p className="text-stone-500">Phase 2.2 Validation Gate</p>
                         </div>
                     </div>
                     <button
@@ -66,12 +66,12 @@ export default function VerifyPhase2Page() {
                     </Card>
 
                     {/* Instruction Card */}
-                    <Card className="p-8 bg-zinc-900/50 border-white/5">
+                    <Card className="p-8 bg-white/80 border-stone-200">
                         <h2 className="text-xl font-bold flex items-center gap-2 mb-4">
                             <Activity className="text-indigo-400" />
                             Manual Verifications
                         </h2>
-                        <ul className="space-y-3 text-sm text-zinc-400 list-disc list-inside">
+                        <ul className="space-y-3 text-sm text-stone-500 list-disc list-inside">
                             <li>Check <strong>RoleSwitcher</strong> UI label (No &apos;Admin&apos;).</li>
                             <li>Generate a new Invite.</li>
                             <li>Join via incognito window.</li>
@@ -82,14 +82,14 @@ export default function VerifyPhase2Page() {
 
                 {/* Detailed Checks */}
                 <div className="space-y-4">
-                    <h3 className="text-lg font-bold text-zinc-500 uppercase tracking-widest text-xs">Integrity Matrix</h3>
+                    <h3 className="text-lg font-bold text-stone-500 uppercase tracking-widest text-xs">Integrity Matrix</h3>
                     {report?.checks.map((check: VerifyReport["checks"][number], i: number) => (
-                        <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-black/20 border border-white/5">
+                        <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-stone-200/70 border border-stone-200">
                             <div className="flex items-center gap-4">
                                 <div className={`w-2 h-2 rounded-full ${check.status === 'PASS' ? 'bg-emerald-500' : check.status === 'FAIL' ? 'bg-rose-500' : 'bg-[hsl(var(--gold))]'}`} />
                                 <div>
                                     <div className="font-bold">{check.name}</div>
-                                    <div className="text-xs text-zinc-500">Expected: {String(check.expected ?? '')}</div>
+                                    <div className="text-xs text-stone-500">Expected: {String(check.expected ?? '')}</div>
                                 </div>
                             </div>
                             <div className="text-right">

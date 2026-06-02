@@ -54,7 +54,7 @@ export default function ActivityLeaderPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as ActivityTab)}
                                 className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? "bg-white dark:bg-zinc-800 text-[hsl(var(--gold))] shadow-xl"
+                                    ? "bg-white text-[hsl(var(--gold))] shadow-xl"
                                     : "opacity-40 hover:opacity-100"
                                     }`}
                             >

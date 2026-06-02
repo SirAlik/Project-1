@@ -42,13 +42,13 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
             code="QF-71-F-4-2"
             fileName={`مقابلة_فردية_${student?.name || "طالب"}`}
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-zinc-900/40 p-6 rounded-xl border border-zinc-800">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 bg-white/80 p-6 rounded-xl border border-stone-200">
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">اختيار الطالب</label>
+                    <label className="text-xs text-stone-500 block">اختيار الطالب</label>
                     <select
                         value={selectedStudent}
                         onChange={(e) => { setSelectedStudent(e.target.value); setSelectedCaseId(""); }}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
                         aria-label="اختيار الطالب"
                     >
                         <option value="">-- اختر طالب --</option>
@@ -57,11 +57,11 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">ربط المعاملة (إن وجد)</label>
+                    <label className="text-xs text-stone-500 block">ربط المعاملة (إن وجد)</label>
                     <select
                         value={selectedCaseId}
                         onChange={(e) => setSelectedCaseId(e.target.value)}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
                         disabled={!selectedStudent}
                         aria-label="ربط المعاملة"
                     >
@@ -71,22 +71,22 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">التاريخ والوقت (تلقائي)</label>
-                    <div className="bg-zinc-950/50 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-400">
+                    <label className="text-xs text-stone-500 block">التاريخ والوقت (تلقائي)</label>
+                    <div className="bg-white/80 border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-500">
                         {dateTime}
                     </div>
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">الصف الدراسي</label>
-                    <div className="bg-zinc-950/50 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-400">
+                    <label className="text-xs text-stone-500 block">الصف الدراسي</label>
+                    <div className="bg-white/80 border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-500">
                         {className}
                     </div>
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">الموجه الطلابي</label>
-                    <div className="bg-zinc-950/50 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-400">
+                    <label className="text-xs text-stone-500 block">الموجه الطلابي</label>
+                    <div className="bg-white/80 border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-500">
                         {userName || "—"}
                     </div>
                 </div>
@@ -94,24 +94,24 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
 
             <div className="space-y-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-zinc-300">موضوع المقابلة</label>
+                    <label className="text-sm font-bold text-stone-600">موضوع المقابلة</label>
                     <input
                         type="text"
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                         placeholder="مثال: صعوبات دراسية، تحسين سلوك..."
-                        className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all"
+                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all"
                         aria-label="موضوع المقابلة"
                     />
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-bold text-zinc-300">ملاحظات ونتائج الجلسة</label>
+                    <label className="text-sm font-bold text-stone-600">ملاحظات ونتائج الجلسة</label>
                     <textarea
                         rows={5}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all resize-none"
+                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all resize-none"
                         aria-label="ملاحظات ونتائج الجلسة"
                     />
                 </div>
@@ -119,12 +119,12 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
 
             <div className="mt-10 grid grid-cols-2 gap-20 text-center">
                 <div className="space-y-4">
-                    <div className="border-b-2 border-zinc-800 pb-2 text-zinc-500 text-sm">توقيع الموجه</div>
-                    <div className="font-bold text-zinc-400">{userName}</div>
+                    <div className="border-b-2 border-stone-200 pb-2 text-stone-500 text-sm">توقيع الموجه</div>
+                    <div className="font-bold text-stone-500">{userName}</div>
                 </div>
                 <div className="space-y-4">
-                    <div className="border-b-2 border-zinc-800 pb-2 text-zinc-500 text-sm">توقيع الطالب</div>
-                    <div className="font-bold text-zinc-400">{student?.name || "..................."}</div>
+                    <div className="border-b-2 border-stone-200 pb-2 text-stone-500 text-sm">توقيع الطالب</div>
+                    <div className="font-bold text-stone-500">{student?.name || "..................."}</div>
                 </div>
             </div>
         </QualityFormWrapper>

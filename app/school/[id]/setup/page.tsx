@@ -15,12 +15,6 @@ const steps = [
     { id: 'execute', title: 'تنفيذ الاستيراد', icon: <ShieldCheck size={20} /> }
 ];
 
-/**
- * School-Scoped Setup Page
- * ========================
- * Same functionality as /admin/setup but with school_id context
- * Accessible by: system_coordinator (School IT Coordinators)
- */
 export default function SchoolSetupPage() {
     const params = useParams();
     const schoolId = params.id as string;
@@ -37,7 +31,7 @@ export default function SchoolSetupPage() {
     }, []);
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 lg:p-12 overflow-x-hidden" dir="rtl">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6 lg:p-12 overflow-x-hidden" dir="rtl">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="mb-12">
@@ -65,11 +59,11 @@ export default function SchoolSetupPage() {
                                     backgroundColor: index <= currentStep ? 'var(--primary)' : 'rgba(255,255,255,0.05)',
                                     scale: index === currentStep ? 1.2 : 1
                                 }}
-                                className={`w-10 h-10 rounded-full flex items-center justify-center border border-white/10 ${index <= currentStep ? 'text-black' : 'text-white/40'}`}
+                                className={`w-10 h-10 rounded-full flex items-center justify-center border border-stone-200 ${index <= currentStep ? 'text-black' : 'text-stone-400'}`}
                             >
                                 {index < currentStep ? <CheckCircle2 size={18} /> : step.icon}
                             </motion.div>
-                            <span className={`text-[10px] font-bold uppercase tracking-widest ${index <= currentStep ? 'text-primary' : 'text-white/20'}`}>
+                            <span className={`text-[10px] font-bold uppercase tracking-widest ${index <= currentStep ? 'text-primary' : 'text-stone-400'}`}>
                                 {step.title}
                             </span>
                         </div>
@@ -77,7 +71,7 @@ export default function SchoolSetupPage() {
                 </div>
 
                 {/* Content Area */}
-                <div className="glass-panel p-8 min-h-[500px] relative overflow-hidden backdrop-blur-3xl border-white/5">
+                <div className="glass-panel p-8 min-h-[500px] relative overflow-hidden backdrop-blur-3xl border-stone-200">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentStep}

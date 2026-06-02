@@ -24,7 +24,7 @@ export function StarSelector({ students, stars, onToggle, onSave, saving }: Prop
                 </span>
             </div>
 
-            <p className="text-xs text-zinc-400 mb-4">
+            <p className="text-xs text-stone-500 mb-4">
                 اختر أفضل 3 طلاب لهذا اليوم ثم اضغط حفظ.
             </p>
 
@@ -39,7 +39,7 @@ export function StarSelector({ students, stars, onToggle, onSave, saving }: Prop
                 relative rounded-xl border px-3 py-2 text-sm transition-all text-right
                 ${active
                                     ? "border-[hsla(var(--gold),.50)] bg-[hsla(var(--gold),.20)] text-[hsl(var(--gold))] shadow-[0_0_10px_hsla(var(--gold),.20)]"
-                                    : "border-white/5 bg-white/5 text-zinc-400 hover:bg-white/10"
+                                    : "border-stone-200 bg-white/5 text-stone-500 hover:bg-white/10"
                                 }
               `}
                         >

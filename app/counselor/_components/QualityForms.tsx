@@ -26,14 +26,14 @@ export function QualityForms({ studentsList, classesList, cases, getAbsenceCount
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-wrap gap-3 border-b border-zinc-800 pb-4">
+            <div className="flex flex-wrap gap-3 border-b border-stone-200 pb-4">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveForm(tab.id)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeForm === tab.id
                             ? "bg-purple-600 text-white shadow-lg shadow-purple-500/20"
-                            : "bg-zinc-900 text-zinc-400 hover:bg-zinc-800 border border-zinc-800"
+                            : "bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200"
                             }`}
                     >
                         {tab.name}
@@ -41,7 +41,7 @@ export function QualityForms({ studentsList, classesList, cases, getAbsenceCount
                 ))}
             </div>
 
-            <div className="bg-zinc-900/50 rounded-2xl border border-zinc-800 p-1">
+            <div className="bg-white/80 rounded-2xl border border-stone-200 p-1">
                 {activeForm === "2-2" && (
                     <Form22_ComprehensiveProfile studentsList={studentsList} classesList={classesList} cases={cases} user={user} />
                 )}

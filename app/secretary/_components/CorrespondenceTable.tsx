@@ -37,17 +37,17 @@ export function CorrespondenceTable({ letters, onAdd, onUpdateStatus, onDelete }
 
     return (
         <Card className="min-h-[500px]">
-            <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
-                <div className="flex bg-zinc-900/50 p-1 rounded-xl">
+            <div className="flex justify-between items-center mb-6 border-b border-stone-200 pb-4">
+                <div className="flex bg-white/80 p-1 rounded-xl">
                     <button
                         onClick={() => setFilter("incoming")}
-                        className={`px-4 py-2 rounded-lg text-sm transition ${filter === "incoming" ? "bg-zinc-800 text-white shadow" : "text-zinc-500 hover:text-zinc-300"}`}
+                        className={`px-4 py-2 rounded-lg text-sm transition ${filter === "incoming" ? "bg-stone-200 text-stone-700 shadow" : "text-stone-500 hover:text-stone-600"}`}
                     >
                         وارد
                     </button>
                     <button
                         onClick={() => setFilter("outgoing")}
-                        className={`px-4 py-2 rounded-lg text-sm transition ${filter === "outgoing" ? "bg-zinc-800 text-white shadow" : "text-zinc-500 hover:text-zinc-300"}`}
+                        className={`px-4 py-2 rounded-lg text-sm transition ${filter === "outgoing" ? "bg-stone-200 text-stone-700 shadow" : "text-stone-500 hover:text-stone-600"}`}
                     >
                         صادر
                     </button>
@@ -61,25 +61,25 @@ export function CorrespondenceTable({ letters, onAdd, onUpdateStatus, onDelete }
             </div>
 
             {isFormOpen && (
-                <form onSubmit={handleSubmit} className="mb-8 p-4 bg-zinc-900/30 border border-white/5 rounded-2xl animate-in fade-in slide-in-from-top-4">
+                <form onSubmit={handleSubmit} className="mb-8 p-4 bg-white/80 border border-stone-200 rounded-2xl animate-in fade-in slide-in-from-top-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="text-xs text-zinc-400">الموضوع</label>
-                            <input required value={subject} onChange={e => setSubject(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm" title="الموضوع" />
+                            <label className="text-xs text-stone-500">الموضوع</label>
+                            <input required value={subject} onChange={e => setSubject(e.target.value)} className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm" title="الموضوع" />
                         </div>
                         <div>
-                            <label className="text-xs text-zinc-400">التاريخ</label>
-                            <input required type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm" title="التاريخ" />
+                            <label className="text-xs text-stone-500">التاريخ</label>
+                            <input required type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm" title="التاريخ" />
                         </div>
                         {filter === "incoming" ? (
                             <div>
-                                <label className="text-xs text-zinc-400">من (الجهة المرسلة)</label>
-                                <input required value={sender} onChange={e => setSender(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm" title="الجهة المرسلة" />
+                                <label className="text-xs text-stone-500">من (الجهة المرسلة)</label>
+                                <input required value={sender} onChange={e => setSender(e.target.value)} className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm" title="الجهة المرسلة" />
                             </div>
                         ) : (
                             <div>
-                                <label className="text-xs text-zinc-400">إلى (الجهة المستقبلة)</label>
-                                <input required value={receiver} onChange={e => setReceiver(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-2 text-sm" title="الجهة المستقبلة" />
+                                <label className="text-xs text-stone-500">إلى (الجهة المستقبلة)</label>
+                                <input required value={receiver} onChange={e => setReceiver(e.target.value)} className="w-full bg-white border border-stone-300 rounded-xl p-2 text-sm" title="الجهة المستقبلة" />
                             </div>
                         )}
                     </div>
@@ -91,7 +91,7 @@ export function CorrespondenceTable({ letters, onAdd, onUpdateStatus, onDelete }
 
             <div className="overflow-x-auto">
                 <table className="w-full text-sm text-right">
-                    <thead className="text-zinc-500 border-b border-white/5">
+                    <thead className="text-stone-500 border-b border-stone-200">
                         <tr>
                             <th className="pb-3 pr-2">#</th>
                             <th className="pb-3">الموضوع</th>
@@ -104,13 +104,13 @@ export function CorrespondenceTable({ letters, onAdd, onUpdateStatus, onDelete }
                     <tbody className="divide-y divide-white/5">
                         {filtered.length === 0 && (
                             <tr>
-                                <td colSpan={6} className="text-center py-8 text-zinc-500">لا توجد سجلات.</td>
+                                <td colSpan={6} className="text-center py-8 text-stone-500">لا توجد سجلات.</td>
                             </tr>
                         )}
                         {filtered.map((l, idx) => (
                             <tr key={l.id} className="group hover:bg-white/5 transition-colors">
-                                <td className="py-3 pr-2 text-zinc-600">{idx + 1}</td>
-                                <td className="py-3 font-medium text-zinc-200">
+                                <td className="py-3 pr-2 text-stone-500">{idx + 1}</td>
+                                <td className="py-3 font-medium text-stone-700">
                                     <input
                                         type="text"
                                         value={l.subject}
@@ -119,15 +119,15 @@ export function CorrespondenceTable({ letters, onAdd, onUpdateStatus, onDelete }
                                         aria-label={`الموضوع: ${l.subject}`}
                                     />
                                 </td>
-                                <td className="py-3 text-zinc-400">{filter === "incoming" ? l.sender : l.receiver}</td>
-                                <td className="py-3 text-zinc-500">{new Date(l.date).toLocaleDateString("ar-SA")}</td>
+                                <td className="py-3 text-stone-500">{filter === "incoming" ? l.sender : l.receiver}</td>
+                                <td className="py-3 text-stone-500">{new Date(l.date).toLocaleDateString("ar-SA")}</td>
                                 <td className="py-3"><StatusBadge status={l.status} /></td>
                                 <td className="py-3 flex gap-2">
                                     {l.status === 'received' && (
                                         <button onClick={() => onUpdateStatus(l.id, 'processed')} className="text-xs text-blue-400 hover:text-blue-300">معالجة</button>
                                     )}
                                     {l.status === 'processed' && (
-                                        <button onClick={() => onUpdateStatus(l.id, 'archived')} className="text-xs text-zinc-400 hover:text-zinc-300">أرشفة</button>
+                                        <button onClick={() => onUpdateStatus(l.id, 'archived')} className="text-xs text-stone-500 hover:text-stone-600">أرشفة</button>
                                     )}
                                     <button onClick={() => onDelete(l.id)} className="text-xs text-rose-500 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition">حذف</button>
                                 </td>

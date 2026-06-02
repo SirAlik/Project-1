@@ -9,6 +9,8 @@
 
 import type { RouteMetadata } from '@/lib/routes';
 
+let traceCounter = 0;
+
 // ============================================================
 // TYPES
 // ============================================================
@@ -87,7 +89,12 @@ export interface RouteVisibilityExplanation {
  * Generates a unique trace ID for correlation.
  */
 export function generateTraceId(): string {
-    return `trace_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    if (globalThis.crypto?.randomUUID) {
+        return `trace_${globalThis.crypto.randomUUID()}`;
+    }
+
+    traceCounter += 1;
+    return `trace_${Date.now()}_${traceCounter.toString(36)}`;
 }
 
 /**

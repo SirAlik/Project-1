@@ -17,13 +17,18 @@ import {
     MoreVertical,
 } from "lucide-react";
 
+import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { IdentityStrip } from "@/components/ui/IdentityStrip";
 import { AIExplainButton } from "@/components/ui/AIExplainButton";
 import { getCachedGlobalStats, getCachedSchoolsList, type SchoolRow } from "@/lib/dashboard-data";
+import { getActivePersona } from "@/lib/auth/context-service";
 
 // Server Component - Real Data
 export default async function SystemOwnerDashboard() {
+    const persona = await getActivePersona();
+    if (!persona || persona.role !== 'system_owner') redirect('/portal');
+
     const [stats, schools] = await Promise.all([getCachedGlobalStats(), getCachedSchoolsList()]);
 
     return (

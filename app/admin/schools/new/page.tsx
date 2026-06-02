@@ -12,14 +12,10 @@ const STEPS = [
     { id: 3, title: "تأكيد وإنشاء", icon: <CheckCircle2 size={20} /> },
 ];
 
-import { useRouter } from "next/navigation";
-import { createSchoolAction } from "./_actions";
 import { toast } from "sonner"; // Assuming sonner is installed/used
 
 export default function NewSchoolPage() {
-    const router = useRouter();
     const [step, setStep] = useState(1);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         type: "private",
@@ -31,17 +27,8 @@ export default function NewSchoolPage() {
     const nextStep = () => setStep(s => Math.min(s + 1, 3));
     const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
-    const handleCreateSchool = async () => {
-        setIsSubmitting(true);
-        try {
-            await createSchoolAction(formData);
-            toast.success("تم إنشاء المدرسة بنجاح");
-            router.push("/admin/dashboard");
-        } catch (error) {
-            console.error(error);
-            toast.error("حدث خطأ أثناء الإنشاء");
-            setIsSubmitting(false);
-        }
+    const handleCreateSchool = () => {
+        toast.error("إنشاء المدارس غير متصل بقاعدة البيانات بعد");
     };
 
     return (
@@ -54,6 +41,10 @@ export default function NewSchoolPage() {
                     </Link>
                     <h1 className="text-3xl font-black tracking-tight mb-2 text-foreground">إضافة مدرسة جديدة</h1>
                     <p className="text-muted-foreground text-sm opacity-80">معالج إنشاء كيان تعليمي جديد في النظام</p>
+                </div>
+
+                <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm font-bold leading-7 text-amber-800">
+                    هذا المسار غير متصل حالياً بعملية إنشاء حقيقية في قاعدة البيانات. تم تعطيل التنفيذ حتى يتم بناء Server Action آمن ومقيد بالصلاحيات.
                 </div>
 
                 {/* Stepper */}
@@ -160,12 +151,12 @@ export default function NewSchoolPage() {
                                 exit={{ opacity: 0, x: -20 }}
                                 className="flex flex-col items-center justify-center text-center py-10"
                             >
-                                <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6">
+                                <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 mb-6">
                                     <CheckCircle2 size={40} />
                                 </div>
                                 <h3 className="text-2xl font-black mb-2 text-foreground">جاهز للإنشاء</h3>
                                 <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-8">
-                                    سيتم إنشاء قاعدة بيانات خاصة للمدرسة وتجهيز لوحة التحكم للمدير.
+                                    هذه مراجعة للمدخلات فقط. لن يتم إنشاء مدرسة حتى يتم ربط هذا المسار بتنفيذ فعلي آمن.
                                 </p>
                                 <div className="bg-muted/30 p-6 rounded-2xl w-full max-w-md text-right space-y-3 mb-8 border border-border">
                                     <div className="flex justify-between">
@@ -203,17 +194,11 @@ export default function NewSchoolPage() {
                         ) : (
                             <button
                                 onClick={handleCreateSchool}
-                                disabled={isSubmitting}
-                                className="bg-emerald-600 dark:bg-emerald-500 text-white px-8 py-3 rounded-xl font-bold text-xs hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled
+                                className="bg-stone-200 text-stone-500 px-8 py-3 rounded-xl font-bold text-xs transition-colors flex items-center gap-2 disabled:cursor-not-allowed"
                             >
-                                {isSubmitting ? (
-                                    <>جاري الإنشاء...</>
-                                ) : (
-                                    <>
-                                        إنشاء المدرسة
-                                        <CheckCircle2 size={14} />
-                                    </>
-                                )}
+                                إنشاء غير مفعل
+                                <CheckCircle2 size={14} />
                             </button>
                         )}
                     </div>

@@ -2,9 +2,16 @@ import { createServerClient as createSSRClient } from '@supabase/ssr';
 import { type SupabaseClient, type User } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-// عناوين بديلة تمنع التعطل عند غياب بيانات البيئة
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL    ?? 'https://placeholder.supabase.co';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-key';
+function requireEnv(name: "NEXT_PUBLIC_SUPABASE_URL" | "NEXT_PUBLIC_SUPABASE_ANON_KEY"): string {
+    const value = process.env[name];
+    if (!value) {
+        throw new Error(`Missing required environment variable: ${name}`);
+    }
+    return value;
+}
+
+const SUPABASE_URL = requireEnv("NEXT_PUBLIC_SUPABASE_URL");
+const SUPABASE_KEY = requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
 /**
  * Creates a Standard User Client (Subject to RLS).

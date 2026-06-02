@@ -68,7 +68,7 @@ export default function HealthPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as "clinic" | "inventory" | "compliance" | "reports")}
                                 className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? "bg-white dark:bg-zinc-800 text-[var(--primary)] shadow-xl"
+                                    ? "bg-white text-[var(--primary)] shadow-xl"
                                     : "opacity-40 hover:opacity-100"
                                     }`}
                             >

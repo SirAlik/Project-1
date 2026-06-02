@@ -35,14 +35,14 @@ export function ParentNoteModal({ isOpen, onClose, studentName, studentId, onSen
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                        className="absolute inset-0 bg-stone-200/70 backdrop-blur-md"
                     />
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-lg bg-zinc-900 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl"
+                        className="relative w-full max-w-lg bg-stone-100 border border-stone-200 rounded-[32px] overflow-hidden shadow-2xl"
                         dir="rtl"
                     >
                         <div className="p-8">
@@ -52,18 +52,18 @@ export function ParentNoteModal({ isOpen, onClose, studentName, studentId, onSen
                                         <Mail className="w-6 h-6 icon-morph" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black text-white">ملاحظة لولي الأمر</h3>
-                                        <p className="text-xs text-zinc-500 font-bold">الطالب: {studentName}</p>
+                                        <h3 className="text-xl font-black text-foreground">ملاحظة لولي الأمر</h3>
+                                        <p className="text-xs text-stone-500 font-bold">الطالب: {studentName}</p>
                                     </div>
                                 </div>
-                                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl text-zinc-500 transition-colors" aria-label="إغلاق النافذة">
+                                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl text-stone-500 transition-colors" aria-label="إغلاق النافذة">
                                     <X size={20} />
                                 </button>
                             </div>
 
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">درجة الأهمية</label>
+                                    <label className="block text-[10px] font-black text-stone-500 uppercase tracking-widest mb-3">درجة الأهمية</label>
                                     <div className="grid grid-cols-3 gap-2">
                                         {[
                                             { id: 'low', label: 'عادية', color: 'bg-[var(--primary)]/10 text-[var(--primary)] border-[var(--primary)]/20', icon: Info },
@@ -73,7 +73,7 @@ export function ParentNoteModal({ isOpen, onClose, studentName, studentId, onSen
                                             <button
                                                 key={item.id}
                                                 onClick={() => setUrgency(item.id as "low" | "medium" | "high")}
-                                                className={`flex items-center justify-center gap-2 p-3 rounded-2xl border-2 transition-all ${urgency === item.id ? item.color.replace('/10', '/20') + ' border-current' : 'bg-zinc-800 text-zinc-500 border-transparent hover:border-white/5'}`}
+                                                className={`flex items-center justify-center gap-2 p-3 rounded-2xl border-2 transition-all ${urgency === item.id ? item.color.replace('/10', '/20') + ' border-current' : 'bg-stone-200 text-stone-500 border-transparent hover:border-stone-200'}`}
                                             >
                                                 <item.icon size={14} />
                                                 <span className="text-xs font-black">{item.label}</span>
@@ -83,12 +83,12 @@ export function ParentNoteModal({ isOpen, onClose, studentName, studentId, onSen
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">محتوى الملاحظة</label>
+                                    <label className="block text-[10px] font-black text-stone-500 uppercase tracking-widest mb-3">محتوى الملاحظة</label>
                                     <textarea
                                         value={content}
                                         onChange={(e) => setContent(e.target.value)}
                                         placeholder="اكتب ملاحظتك هنا ليراها ولي الأمر في حسابه..."
-                                        className="w-full bg-zinc-800 border-white/5 rounded-2xl p-4 text-sm text-white focus:border-indigo-500 transition-all outline-none min-h-[150px] resize-none"
+                                        className="w-full bg-stone-200 border-stone-200 rounded-2xl p-4 text-sm text-stone-700 focus:border-indigo-500 transition-all outline-none min-h-[150px] resize-none"
                                     />
                                 </div>
 

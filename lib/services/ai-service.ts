@@ -138,12 +138,14 @@ async function buildAttendanceAnalysisPayload(
 
 async function buildStudentProfilePayload(
   studentId: string,
+  schoolId:  string,
 ): Promise<PayloadData> {
-  // أحدث سجل في الكاش لهذا الطالب (مرتب بـ updated_at)
+  // أحدث سجل في الكاش لهذا الطالب — مُقيَّد بـ school_id لمنع cross-tenant data exposure
   const { data: cache } = await supabaseAdmin
     .from('student_analytics_cache')
     .select('total_absences_ytd, behavior_incidents_ytd, referrals_ytd, risk_level')
     .eq('student_id', studentId)
+    .eq('school_id', schoolId)
     .order('updated_at', { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -239,7 +241,7 @@ async function buildPayload(
   switch (contextType) {
     case 'school_overview':     return buildSchoolOverviewPayload(schoolId, date);
     case 'attendance_analysis': return buildAttendanceAnalysisPayload(schoolId, date);
-    case 'student_profile':     return buildStudentProfilePayload(scopeId);
+    case 'student_profile':     return buildStudentProfilePayload(scopeId, schoolId);
     case 'lrc_usage':           return buildLrcUsagePayload(schoolId, date);
     case 'health_trend':        return buildHealthTrendPayload(schoolId, date);
     default:                    return buildEmptyPayload();
@@ -393,7 +395,8 @@ export async function generateInsight(
     .limit(1)
     .maybeSingle();
 
-  // 3. جلب القالب المناسب
+  // 3. جلب القالب المناسب — القوالب عالمية (seeded بدون school_id في M73) وتُستخدم
+  //    عبر supabaseAdmin دون RLS. إن أُضيف school_id لاحقاً أضف .eq('school_id', schoolId).
   const { data: template, error: tErr } = await supabaseAdmin
     .from('ai_prompt_templates')
     .select('*')
@@ -408,7 +411,18 @@ export async function generateInsight(
 
   const tmpl = template as AIPromptTemplate;
 
-  // 4. بناء الـ payload من الكاش
+  // 4. التحقق من ملكية الـ scope_id للمدرسة (حماية cross-tenant) عند student_profile
+  if (contextType === 'student_profile' && scopeId) {
+    const { count: studentCount } = await supabaseAdmin
+      .from('student_profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('id', scopeId)
+      .eq('school_id', schoolId);
+
+    if (!studentCount) return { ok: false, error: 'الطالب غير موجود في هذه المدرسة' };
+  }
+
+  // 5. بناء الـ payload من الكاش
   let payload: PayloadData = {};
   try {
     payload = await buildPayload(schoolId, contextType, scope, scopeId, generatedDate);
@@ -416,16 +430,16 @@ export async function generateInsight(
     console.error('[ai-service] buildPayload خطأ:', err);
   }
 
-  // 5. تصيير الـ prompt وإرساله لـ Claude
+  // 6. تصيير الـ prompt وإرساله لـ Claude
   const rendered      = renderPrompt(tmpl.template_text, payload);
-  const MODEL = 'claude-sonnet-4-6';
+  const MODEL = process.env.AI_MODEL ?? 'claude-sonnet-4-6';
   const claudeResult  = await callClaudeAPI(rendered, tmpl.max_tokens, MODEL);
 
   if (!claudeResult) {
     return { ok: false, error: 'فشل توليد الرؤية من Claude API' };
   }
 
-  // 6. UPSERT في ai_insights (يُحدِّث لو الدور + السياق + اليوم موجود مسبقاً)
+  // 7. UPSERT في ai_insights (يُحدِّث لو الدور + السياق + اليوم موجود مسبقاً)
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
   const row = {

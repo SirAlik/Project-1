@@ -37,14 +37,14 @@ export function RandomPicker({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl"
+                        className="absolute inset-0 bg-white/95 backdrop-blur-xl"
                     />
 
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="relative w-full max-w-lg glass-panel p-8 rounded-[3rem] border border-white/10 shadow-3xl text-center overflow-hidden"
+                        className="relative w-full max-w-lg glass-panel p-8 rounded-[3rem] border border-stone-200 shadow-3xl text-center overflow-hidden"
                     >
                         {/* Background Sparkles */}
                         <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
@@ -56,18 +56,18 @@ export function RandomPicker({
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setPickerType("standard")}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${pickerType === 'standard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white/5 text-zinc-500 hover:text-white'}`}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${pickerType === 'standard' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'bg-white/5 text-stone-500 hover:text-foreground'}`}
                                 >
                                     عشوائي كلاسيكي
                                 </button>
                                 <button
                                     onClick={() => setPickerType("train")}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${pickerType === 'train' ? 'bg-[hsl(var(--gold-strong))] text-white shadow-lg shadow-[hsla(var(--gold),.20)]' : 'bg-white/5 text-zinc-500 hover:text-white'}`}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${pickerType === 'train' ? 'bg-[hsl(var(--gold-strong))] text-white shadow-lg shadow-[hsla(var(--gold),.20)]' : 'bg-white/5 text-stone-500 hover:text-foreground'}`}
                                 >
                                     القطار السريع 🚅
                                 </button>
                             </div>
-                            <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-500 hover:bg-white/10 hover:text-white transition-all" aria-label="إغلاق القرعة العشوائية">
+                            <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-stone-500 hover:bg-white/10 hover:text-foreground transition-all" aria-label="إغلاق القرعة العشوائية">
                                 <X size={20} />
                             </button>
                         </header>
@@ -78,8 +78,8 @@ export function RandomPicker({
                                     <div className="w-24 h-24 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto border-2 border-dashed border-indigo-500/30">
                                         <Shuffle className="w-10 h-10 text-indigo-400" />
                                     </div>
-                                    <h2 className="text-2xl font-black text-white">ابدأ الاختيار الذكي</h2>
-                                    <p className="text-zinc-500 text-sm font-medium">سيقوم النظام باختيار أحد الطلاب عشوائياً للمشاركة</p>
+                                    <h2 className="text-2xl font-black text-foreground">ابدأ الاختيار الذكي</h2>
+                                    <p className="text-stone-500 text-sm font-medium">سيقوم النظام باختيار أحد الطلاب عشوائياً للمشاركة</p>
                                 </div>
                             ) : pickedStudent && !picking ? (
                                 <motion.div
@@ -91,7 +91,7 @@ export function RandomPicker({
                                         <motion.div
                                             animate={{ scale: [1, 1.2, 1], rotate: [0, 5, -5, 0] }}
                                             transition={{ repeat: Infinity, duration: 2 }}
-                                            className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[2.5rem] flex items-center justify-center text-4xl font-black text-white shadow-2xl shadow-indigo-500/40 border-4 border-white/20 mx-auto"
+                                            className="w-32 h-32 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-[2.5rem] flex items-center justify-center text-4xl font-black text-foreground shadow-2xl shadow-indigo-500/40 border-4 border-stone-200 mx-auto"
                                         >
                                             {pickedStudent.name[0]}
                                         </motion.div>
@@ -99,10 +99,10 @@ export function RandomPicker({
                                             <Trophy className="text-white w-6 h-6" />
                                         </div>
                                     </div>
-                                    <h1 className="text-3xl font-black text-white tracking-tight">{pickedStudent.name}</h1>
+                                    <h1 className="text-3xl font-black text-foreground tracking-tight">{pickedStudent.name}</h1>
                                     <div className="flex gap-2 justify-center">
                                         <div className="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded-full border border-emerald-500/20">جاهز للمشاركة</div>
-                                        {noRepeat && <div className="px-3 py-1 bg-zinc-800 text-zinc-500 text-[10px] font-black rounded-full border border-white/5">لن يتكرر</div>}
+                                        {noRepeat && <div className="px-3 py-1 bg-stone-200 text-stone-500 text-[10px] font-black rounded-full border border-stone-200">لن يتكرر</div>}
                                     </div>
                                 </motion.div>
                             ) : (
@@ -115,7 +115,7 @@ export function RandomPicker({
                                                     rotateY: [0, 180, 360],
                                                 }}
                                                 transition={{ repeat: Infinity, duration: 0.8 }}
-                                                className="w-24 h-32 bg-zinc-800 rounded-2xl border-4 border-white/10 flex items-center justify-center"
+                                                className="w-24 h-32 bg-stone-200 rounded-2xl border-4 border-stone-200 flex items-center justify-center"
                                             >
                                                 <Star className="text-indigo-400 w-10 h-10 fill-indigo-400/20" />
                                             </motion.div>
@@ -129,7 +129,7 @@ export function RandomPicker({
                                                 className="flex gap-4"
                                             >
                                                 {students.concat(students).map((s, i) => (
-                                                    <div key={i} className="w-20 h-20 bg-zinc-800 rounded-2xl border border-white/5 flex items-center justify-center text-zinc-500 font-bold shrink-0">
+                                                    <div key={i} className="w-20 h-20 bg-stone-200 rounded-2xl border border-stone-200 flex items-center justify-center text-stone-500 font-bold shrink-0">
                                                         {s.name[0]}
                                                     </div>
                                                 ))}
@@ -150,9 +150,9 @@ export function RandomPicker({
                                         checked={noRepeat}
                                         onChange={(e) => setNoRepeat(e.target.checked)}
                                         id="norepeat"
-                                        className="w-4 h-4 rounded-md border-white/10 bg-zinc-900 accent-indigo-500"
+                                        className="w-4 h-4 rounded-md border-stone-200 bg-stone-100 accent-indigo-500"
                                     />
-                                    <label htmlFor="norepeat" className="text-xs font-bold text-zinc-500">عدم تكرار الطلاب المختارين</label>
+                                    <label htmlFor="norepeat" className="text-xs font-bold text-stone-500">عدم تكرار الطلاب المختارين</label>
                                 </div>
 
                                 <button

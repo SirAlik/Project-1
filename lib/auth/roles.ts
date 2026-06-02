@@ -35,7 +35,7 @@ export type SchoolRole =
     | 'quality_coordinator';
 
 export type UserRole = GlobalRole | SchoolRole;
-// Alias for backward compatibility if needed, or prefer UserRole
+// Alias kept for shared type imports; prefer UserRole in new code.
 export type Role = UserRole;
 
 export const GLOBAL_ROLES = new Set<UserRole>(['system_owner']);
@@ -77,7 +77,7 @@ export const ROLE_DASHBOARD_MAP: Record<UserRole, string> = {
     student_counselor: '/counselor',
     health_coordinator: '/health',
     lab_technician: '/science',
-    activity_leader: '/activities',
+    activity_leader: '/activity',
     quality_coordinator: '/qa',
 
     // Core

@@ -17,17 +17,17 @@ export default function LabAnalytics() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-[hsla(var(--gold),.25)] border-t-[hsl(var(--gold))] rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-medium animate-pulse">جاري جلب إحصائيات المختبر...</p>
+                    <p className="text-stone-500 font-medium animate-pulse">جاري جلب إحصائيات المختبر...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[hsla(var(--gold),.05)] rounded-full blur-[120px]" />
@@ -41,21 +41,21 @@ export default function LabAnalytics() {
                         <div className="flex items-center gap-3 mb-2">
                             <Link
                                 href="/principal"
-                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-stone-200"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-400 rotate-180" />
+                                <ArrowLeft className="w-5 h-5 text-stone-500 rotate-180" />
                             </Link>
-                            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black bg-gradient-to-r from-stone-950 to-stone-500 bg-clip-text text-transparent">
                                 مراقبة المختبر والعلوم
                             </h1>
                         </div>
-                        <p className="text-zinc-500 mr-12 text-sm italic">
+                        <p className="text-stone-500 mr-12 text-sm italic">
                             تتبع التجارب المنفذة، إشغال المعامل، وسلامة العهدة
                         </p>
                     </div>
 
-                    <div className="bg-zinc-900/50 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
                             <div className="w-2 h-2 bg-[hsl(var(--gold))] rounded-full animate-pulse" />
                             رصد حي للتجارب العملية
                         </div>
@@ -75,7 +75,7 @@ export default function LabAnalytics() {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
-                            className={`p-6 rounded-[2rem] bg-zinc-900/30 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
+                            className={`p-6 rounded-[2rem] bg-white/80 border ${item.border} backdrop-blur-xl relative overflow-hidden group`}
                         >
                             <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity`}>
                                 <item.icon className="w-16 h-16" />
@@ -83,8 +83,8 @@ export default function LabAnalytics() {
                             <div className={`w-12 h-12 ${item.bg} rounded-2xl flex items-center justify-center mb-4`}>
                                 <item.icon className={`w-6 h-6 ${item.color}`} />
                             </div>
-                            <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
-                            <h2 className="text-3xl font-black text-white">{item.value}</h2>
+                            <p className="text-stone-500 text-xs font-bold uppercase tracking-wider mb-1">{item.label}</p>
+                            <h2 className="text-3xl font-black text-foreground">{item.value}</h2>
                         </motion.div>
                     ))}
                 </div>
@@ -97,7 +97,7 @@ export default function LabAnalytics() {
                                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                                     <circle
                                         cx="50" cy="50" r="40"
-                                        fill="none" stroke="#27272a" strokeWidth="10"
+                                        fill="none" stroke="#e7e5e4" strokeWidth="10"
                                         strokeDasharray="251.2"
                                         strokeDashoffset="0"
                                     />
@@ -111,11 +111,11 @@ export default function LabAnalytics() {
                                     />
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-4xl font-black text-white">{stats.totalExperiments}</span>
-                                    <span className="text-[10px] text-zinc-500 font-bold uppercase">من {stats.experimentTarget}</span>
+                                    <span className="text-4xl font-black text-foreground">{stats.totalExperiments}</span>
+                                    <span className="text-[10px] text-stone-500 font-bold uppercase">من {stats.experimentTarget}</span>
                                 </div>
                             </div>
-                            <p className="mt-4 text-xs text-zinc-400 text-center leading-relaxed">
+                            <p className="mt-4 text-xs text-stone-500 text-center leading-relaxed">
                                 معدل الإنجاز الحالي <br />
                                 <span className="text-[hsl(var(--gold))] font-bold">متوافق مع الخطة الزمنية</span>
                             </p>
@@ -137,7 +137,7 @@ export default function LabAnalytics() {
                                     ))}
                                 </Pie>
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917' }}
                                 />
                                 <Legend />
                             </PieChart>
@@ -148,14 +148,14 @@ export default function LabAnalytics() {
                     <AnalyticsCard title="آخر حجوزات المختبر" subtitle="تنسيق استخدام المعامل">
                         <div className="space-y-4">
                             {stats.recentBookings.map((booking, i) => (
-                                <div key={i} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-white/5">
+                                <div key={i} className="flex justify-between items-center p-3 rounded-2xl bg-white/5 border border-stone-200">
                                     <div>
-                                        <p className="text-xs font-bold text-zinc-200">{booking.teacher}</p>
-                                        <p className="text-[10px] text-zinc-500">{booking.experiment}</p>
+                                        <p className="text-xs font-bold text-stone-700">{booking.teacher}</p>
+                                        <p className="text-[10px] text-stone-500">{booking.experiment}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-[10px] text-zinc-400">{booking.date}</p>
-                                        <span className={`text-[9px] px-2 py-0.5 rounded-full border ${booking.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-zinc-800 text-zinc-500 border-white/5'}`}>
+                                        <p className="text-[10px] text-stone-500">{booking.date}</p>
+                                        <span className={`text-[9px] px-2 py-0.5 rounded-full border ${booking.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-stone-200 text-stone-500 border-stone-200'}`}>
                                             {booking.status}
                                         </span>
                                     </div>
@@ -173,12 +173,12 @@ export default function LabAnalytics() {
                     <div className="flex flex-col gap-2 overflow-x-auto pb-4">
                         <div className="flex gap-2 mb-2 pr-12">
                             {[1, 2, 3, 4, 5, 6, 7].map(p => (
-                                <div key={p} className="flex-1 text-center text-[10px] text-zinc-500 font-bold">ح {p}</div>
+                                <div key={p} className="flex-1 text-center text-[10px] text-stone-500 font-bold">ح {p}</div>
                             ))}
                         </div>
                         {['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'].map(day => (
                             <div key={day} className="flex items-center gap-4">
-                                <div className="w-10 text-[10px] text-zinc-400 font-bold">{day}</div>
+                                <div className="w-10 text-[10px] text-stone-500 font-bold">{day}</div>
                                 <div className="flex-1 flex gap-2">
                                     {[1, 2, 3, 4, 5, 6, 7].map(period => {
                                         const val = stats.occupancyHeatmap.find(h => h.day === day && h.period === period)?.value || 0;
@@ -194,7 +194,7 @@ export default function LabAnalytics() {
                                             >
                                                 {val > 0 && (
                                                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/hex:opacity-100 transition-opacity">
-                                                        <span className="text-[10px] font-black text-white">{val}</span>
+                                                        <span className="text-[10px] font-black text-foreground">{val}</span>
                                                     </div>
                                                 )}
                                             </div>

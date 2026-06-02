@@ -57,43 +57,12 @@ export function useQA() {
         else { setMsg("✅ Observation Added"); loadData(); }
     }
 
-    async function seedMockData() {
-        // Only seed if empty
-        if (kpis.length > 0) return;
-
-        setMsg("🌱 Seeding Mock Data...");
-
-        // 1. Mock KPIs
-        const mockKPIs = [];
-        const today = new Date();
-        for (let i = 30; i >= 0; i--) {
-            const d = new Date(today);
-            d.setDate(d.getDate() - i);
-            mockKPIs.push({
-                date: d.toISOString().split('T')[0],
-                role: 'school_wide',
-                metrics: {
-                    attendance_rate: 88 + Math.random() * 10,
-                    incidents: Math.floor(Math.random() * 5),
-                    avg_gpa: 80 + Math.random() * 5
-                }
-            });
-        }
-        await supabase.from("qa_kpis_daily").insert(mockKPIs);
-
-        // 2. Mock Risks
-        // Need student IDs first... Assuming some exist or we skip
-        // For now, we will just reload
-        setMsg("✅ Seed Complete (KPIs)");
-        loadData();
-    }
-
     useEffect(() => {
         startTransition(async () => { await loadData(); });
     }, [loadData]);
 
     return {
         state: { observations, risks, interventions, kpis, loading, msg },
-        actions: { setMsg, loadData, addObservation, seedMockData }
+        actions: { setMsg, loadData, addObservation }
     };
 }

@@ -63,34 +63,34 @@ export function FormC53_CounselorReferral() {
                     </p>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-zinc-800">
+                <div className="overflow-hidden rounded-xl border border-stone-200">
                     <table className="w-full text-right border-collapse">
                         <thead>
-                            <tr className="bg-zinc-900/50 text-xs font-bold text-zinc-300">
-                                <th className="p-3 border-b border-zinc-800">اسم الطالب</th>
-                                <th className="p-3 border-b border-zinc-800">الفصل</th>
-                                <th className="p-3 border-b border-zinc-800 text-center">مرات التأخر (هذا الشهر)</th>
-                                <th className="p-3 border-b border-zinc-800">توصية الوكيل</th>
+                            <tr className="bg-white/80 text-xs font-bold text-stone-600">
+                                <th className="p-3 border-b border-stone-200">اسم الطالب</th>
+                                <th className="p-3 border-b border-stone-200">الفصل</th>
+                                <th className="p-3 border-b border-stone-200 text-center">مرات التأخر (هذا الشهر)</th>
+                                <th className="p-3 border-b border-stone-200">توصية الوكيل</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800">
                             {referrals.map((r) => (
                                 <tr key={r.id} className="text-sm hover:bg-white/5 transition-colors">
                                     <td className="p-3 font-bold">{r.name}</td>
-                                    <td className="p-3 text-zinc-400">{r.class}</td>
+                                    <td className="p-3 text-stone-500">{r.class}</td>
                                     <td className="p-3 text-center">
                                         <span className="bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full font-bold">
                                             {r.count} مرات
                                         </span>
                                     </td>
-                                    <td className="p-3 text-xs text-zinc-500 italic">
+                                    <td className="p-3 text-xs text-stone-500 italic">
                                         توجيه الطالب للموجه الطلابي لدراسة حالة &quot;تكرار التأخر الصباحي&quot;
                                     </td>
                                 </tr>
                             ))}
                             {referrals.length === 0 && !loading && (
                                 <tr>
-                                    <td colSpan={4} className="p-10 text-center text-zinc-600">
+                                    <td colSpan={4} className="p-10 text-center text-stone-500">
                                         لا يوجد طلاب تجاوزوا الحد المسموح للتأخر حالياً
                                     </td>
                                 </tr>
@@ -100,9 +100,9 @@ export function FormC53_CounselorReferral() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-8 mt-10">
-                    <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/10">
-                        <p className="text-xs text-zinc-500 mb-8">وكيل شؤون الطلاب:</p>
-                        <div className="h-px bg-zinc-800 w-1/2 mb-2" />
+                    <div className="p-4 rounded-xl border border-stone-200 bg-stone-100/10">
+                        <p className="text-xs text-stone-500 mb-8">وكيل شؤون الطلاب:</p>
+                        <div className="h-px bg-stone-200 w-1/2 mb-2" />
                         <p className="font-bold text-sm">تحويل إلكتروني معتمد</p>
                     </div>
                 </div>

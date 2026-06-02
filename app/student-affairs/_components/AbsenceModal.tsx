@@ -16,8 +16,8 @@ export function AbsenceModal({ student, isOpen, onClose, onSave }: AbsenceModalP
     if (!isOpen || !student) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-200/70 p-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6">
                 <h3 className="mb-4 text-lg font-bold">تسجيل غياب: {student.name}</h3>
 
                 <div className="mb-4 flex gap-4">
@@ -43,11 +43,11 @@ export function AbsenceModal({ student, isOpen, onClose, onSave }: AbsenceModalP
                     </label>
                 </div>
 
-                <label className="mb-2 block text-sm text-zinc-400">ملاحظات (اختياري)</label>
+                <label className="mb-2 block text-sm text-stone-500">ملاحظات (اختياري)</label>
                 <textarea
                     value={note}
                     onChange={(e) => setNote(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-800 bg-black/50 p-3 text-sm outline-none focus:border-emerald-500/50"
+                    className="w-full rounded-xl border border-stone-200 bg-stone-200/70 p-3 text-sm outline-none focus:border-emerald-500/50"
                     placeholder="مثال: ظرف عائلي..."
                     rows={3}
                 />
@@ -55,7 +55,7 @@ export function AbsenceModal({ student, isOpen, onClose, onSave }: AbsenceModalP
                 <div className="mt-6 flex justify-end gap-3">
                     <button
                         onClick={onClose}
-                        className="rounded-xl px-4 py-2 text-sm text-zinc-400 hover:bg-zinc-900"
+                        className="rounded-xl px-4 py-2 text-sm text-stone-500 hover:bg-stone-100"
                     >
                         إلغاء
                     </button>

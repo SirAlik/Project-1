@@ -115,7 +115,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 - `lib/` — خدمات مشتركة مثل Supabase client وPBAC وcontext services
 - `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
 - `components/` — مكونات React
-- `db/migrations/` — ترحيلات قاعدة البيانات (79 ملف: M01–M76 + R00–R12)
+- `db/migrations/` — ترحيلات قاعدة البيانات (80 ملف: M01–M77 + R00–R12)
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)
 - `.env.example` — قالب متغيرات البيئة الـ8 المطلوبة للمطورين الجدد
 - `vitest.config.ts` + `tests/` — إعداد Vitest (تشغيل: `npm test`)
@@ -133,11 +133,28 @@ Use the approved dependency baseline unless a documented architectural decision 
 - لا تغيّر scripts في `package.json` لإخفاء أخطاء build أو lint
 - لا تُضعف قواعد TypeScript أو ESLint من أجل تمرير الفحص شكلياً
 
+## قواعد UI وMock Cleanup
+
+- الواجهة المعتمدة هي Light UI فقط.
+- يمنع استخدام `dark:` أو الخلفيات الداكنة القسرية في مسارات الإنتاج.
+- يمنع استخدام `bg-black` أو `bg-zinc-950` أو `bg-slate-950` أو `bg-neutral-950`.
+- استخدم خلفيات دافئة ناعمة وبطاقات بيضاء أو off-white وحدوداً هادئة ونصوصاً محايدة.
+- لا تضف مكتبات UI جديدة دون موافقة صريحة.
+- يمنع وجود mock/demo/fake data في production routes.
+- يمنع إبقاء ملفات `.bak` داخل `app/`.
+- مسارات sandbox لا تعيش داخل production app routes إلا إذا كانت معزولة ومذكورة صراحة.
+- إذا لم تكن الميزة متصلة ببيانات حقيقية، اعرض حالة فارغة واضحة أو حالة غير مفعلة؛ لا تعرض مؤشرات وهمية.
+- لا تقبل `schoolId` من العميل في العمليات الحساسة؛ tenant scope يأتي من server-side persona/context.
+- يمنع Supabase browser client للكتابة على بيانات محمية.
+- يمنع `supabaseAdmin` و`service_role` في user-facing flows.
+- Server Actions يجب أن تستخدم validation وpermission checks.
+- بعد التنظيف أو أي تعديل لاحق: `npm run lint` ثم `npm run build`.
+
 ---
 
 ## حالة تنظيف الكود (Lint Cleanup Phases)
 
-> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة بالكامل. `npm run lint` يعطي **صفر أخطاء وصفر تحذيرات**. `npm run build` ينجح بـ **61/61 صفحة** بدون أي خطأ TypeScript أو تحذيرات. اصطلاح `proxy.ts` مُطبَّق وفعّال كـ Middleware في Next.js 16. تحذير Recharts مُصلَح معمارياً. **Demo Mode مُحذوف بالكامل** — لا `lib/mock-data/`، لا `NEXT_PUBLIC_DEMO_MODE`. JWT verification في `proxy.ts` مُصلَح بـ `jose.jwtVerify`. `BulkUploadModal` يستخدم Server Action مع `school_id`.
+> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة بالكامل. `npm run lint` يعطي **صفر أخطاء وصفر تحذيرات**. `npm run build` ينجح بـ **61/61 صفحة** بدون أي خطأ TypeScript أو تحذيرات. اصطلاح `proxy.ts` مُطبَّق وفعّال كـ Middleware في Next.js 16. تحذير Recharts مُصلَح معمارياً. **Demo Mode مُحذوف بالكامل** — لا `lib/mock-data/`، لا `NEXT_PUBLIC_DEMO_MODE`. JWT verification في `proxy.ts` مُصلَح بـ `jose.jwtVerify`. `BulkUploadModal` يستخدم Server Action مع `school_id`. **Notifications Center مكتمل** — `components/layout/NotificationsMenu.tsx` + `lib/services/notification-service.ts` + `app/notifications/` مربوطة بـ `GlobalHeader`. **Period Attendance Service** يستخدم `period_id` UUID (بعد M59) — `lib/services/period-attendance-service.ts` + `lib/services/academic-service.ts` + `lib/types/academic.ts` جميعها موجودة. **Phase +11-12** مُنجز — `staff_evaluations` → `workflow_instances` FK موجود + `app/staff-evaluation/` + `app/workflows/page.tsx` مبنيَّتان. **Virtual-Swimming-Wave (2026-06-03) مُنجز** — تأمين 9 نقاط cross-tenant: M77 compound unique `(school_id, national_id)` + bulk-upload school_id + automation school_id scoping + coordinator-classroom teacher ownership + AI service student ownership + إزالة TCH123 mock ID + إزالة `system_role: 'system_user'` من invite + إصلاح `activity_leader` path في ROLE_DASHBOARD_MAP + layout guards جديدة لـ `app/lrc/` · `app/qa/` · `app/science/`.
 
 ### ✅ المرحلة الأولى — مكتملة
 

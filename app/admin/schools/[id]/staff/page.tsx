@@ -28,11 +28,11 @@ export default function SchoolStaffPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white p-6 lg:p-12" dir="rtl">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6 lg:p-12" dir="rtl">
             <div className="max-w-6xl mx-auto">
                 <header className="mb-10 flex justify-between items-center">
                     <div>
-                        <Link href="/admin/dashboard" className="text-xs font-bold text-muted hover:text-white transition-colors mb-2 block">
+                        <Link href="/admin/dashboard" className="text-xs font-bold text-muted hover:text-foreground transition-colors mb-2 block">
                             ← العودة للوحة التحكم
                         </Link>
                         <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">

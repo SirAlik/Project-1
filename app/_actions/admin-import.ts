@@ -35,8 +35,8 @@ const importRowSchema = z.object({
     email: z.string().email('بريد إلكتروني غير صالح'),
     full_name: z.string().min(2, 'الاسم مطلوب'),
     national_id: z.string().optional(),
-    phone: z.string().min(9, 'رقم الجوال مطلوب'), // Was parent_phone, standardized to phone
-    parent_phone: z.string().optional(), // Kept for backward compat if needed, but phone is primary
+    phone: z.string().min(9, 'رقم الجوال مطلوب'),
+    parent_phone: z.string().optional(),
 
     // Support comma-separated roles like "Teacher, Parent"
     // Phase 2: Validate against allowed SCHOOL_ROLES
@@ -384,12 +384,11 @@ async function createStudentRecords(
 
 
 // ============================================================
-// LEGACY EXPORTS (Backward Compatibility)
+// LEGACY EXPORTS
 // ============================================================
 
 /**
  * @deprecated Use the new Safe Action `validateImportData` instead.
- * Kept for backward compatibility.
  */
 export async function validateImportDataLegacy(
     entries: { index: number; row: ImportRow }[]
@@ -399,4 +398,3 @@ export async function validateImportDataLegacy(
     if (result.serverError) throw new Error(result.serverError);
     return [];
 }
-

@@ -24,27 +24,27 @@ export function InventoryManager({ supplies, onUpdate, onAdd, onDelete }: Invent
     return (
         <div className="space-y-6">
             {/* Add New Item Form */}
-            <form onSubmit={handleAdd} className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 space-y-4">
-                <h4 className="text-sm font-bold text-zinc-300 flex items-center gap-2">
+            <form onSubmit={handleAdd} className="p-4 rounded-2xl bg-stone-100 border border-stone-200 space-y-4">
+                <h4 className="text-sm font-bold text-stone-600 flex items-center gap-2">
                     <Plus className="w-4 h-4 text-emerald-500" /> إضافة مادة جديدة
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <input
                         type="text"
                         placeholder="اسم المادة"
-                        className="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 outline-none"
+                        className="bg-white border border-stone-300 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 outline-none"
                         value={newItem.item_name}
                         onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
                     />
                     <input
                         type="number"
                         placeholder="الكمية"
-                        className="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 outline-none"
+                        className="bg-white border border-stone-300 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 outline-none"
                         value={newItem.quantity}
                         onChange={(e) => setNewItem({ ...newItem, quantity: parseInt(e.target.value) || 0 })}
                     />
                     <select
-                        className="bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 outline-none"
+                        className="bg-white border border-stone-300 rounded-xl px-4 py-2 text-sm focus:border-emerald-500 outline-none"
                         value={newItem.category}
                         onChange={(e) => setNewItem({ ...newItem, category: e.target.value as SupplyCategory })}
                         aria-label="تصنيف المادة"
@@ -70,7 +70,7 @@ export function InventoryManager({ supplies, onUpdate, onAdd, onDelete }: Invent
                         key={item.id}
                         className={`p-4 rounded-2xl border transition-all flex items-center justify-between ${item.quantity < 5
                             ? "bg-rose-500/5 border-rose-500/20"
-                            : "bg-zinc-900/40 border-zinc-800"
+                            : "bg-white/80 border-stone-200"
                             }`}
                     >
                         <div className="flex items-center gap-4">
@@ -78,8 +78,8 @@ export function InventoryManager({ supplies, onUpdate, onAdd, onDelete }: Invent
                                 <Package className="w-5 h-5" />
                             </div>
                             <div>
-                                <h5 className="font-bold text-zinc-100">{item.item_name}</h5>
-                                <p className="text-xs text-zinc-500 uppercase">{item.category}</p>
+                                <h5 className="font-bold text-stone-800">{item.item_name}</h5>
+                                <p className="text-xs text-stone-500 uppercase">{item.category}</p>
                             </div>
                         </div>
 
@@ -91,18 +91,18 @@ export function InventoryManager({ supplies, onUpdate, onAdd, onDelete }: Invent
                                 </div>
                             )}
 
-                            <div className="flex items-center bg-zinc-950 rounded-xl border border-zinc-800 p-1">
+                            <div className="flex items-center bg-white rounded-xl border border-stone-200 p-1">
                                 <button
                                     onClick={() => onUpdate(item.id, { quantity: Math.max(0, item.quantity - 1) })}
-                                    className="p-1 hover:bg-zinc-800 rounded-lg text-rose-500 transition-colors"
+                                    className="p-1 hover:bg-stone-200 rounded-lg text-rose-500 transition-colors"
                                     aria-label="إنقاص الكمية"
                                 >
                                     <Minus className="w-4 h-4" />
                                 </button>
-                                <span className="w-12 text-center font-black text-zinc-100">{item.quantity}</span>
+                                <span className="w-12 text-center font-black text-stone-800">{item.quantity}</span>
                                 <button
                                     onClick={() => onUpdate(item.id, { quantity: item.quantity + 1 })}
-                                    className="p-1 hover:bg-zinc-800 rounded-lg text-emerald-500 transition-colors"
+                                    className="p-1 hover:bg-stone-200 rounded-lg text-emerald-500 transition-colors"
                                     aria-label="زيادة الكمية"
                                 >
                                     <Plus className="w-4 h-4" />
@@ -111,7 +111,7 @@ export function InventoryManager({ supplies, onUpdate, onAdd, onDelete }: Invent
 
                             <button
                                 onClick={() => onDelete(item.id)}
-                                className="p-2 text-zinc-600 hover:text-rose-500 transition-colors"
+                                className="p-2 text-stone-500 hover:text-rose-500 transition-colors"
                                 aria-label="حذف المادة"
                             >
                                 <Trash2 className="w-4 h-4" />

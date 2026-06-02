@@ -49,7 +49,15 @@ function getDashboardPath(role: string, schoolId?: string): string | null {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { role, redirectTo } = body;
+        const rawRedirectTo: unknown = body.redirectTo;
+        // قبول redirectTo من العميل فقط إذا كان مساراً داخلياً يبدأ بـ / وخالٍ من ://
+        const redirectTo: string | undefined =
+            typeof rawRedirectTo === 'string' &&
+            rawRedirectTo.startsWith('/') &&
+            !rawRedirectTo.includes('://')
+                ? rawRedirectTo
+                : undefined;
+        const { role } = body;
 
         const requestedRole = role;
 

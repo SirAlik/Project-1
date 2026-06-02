@@ -22,13 +22,13 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-zinc-900/50 p-6 rounded-[2rem] border border-zinc-800">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white/80 p-6 rounded-[2rem] border border-stone-200">
                 <div>
-                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
                         <ShoppingCart className="w-5 h-5 text-indigo-400" />
                         طلبات الاحتياج والمشتريات
                     </h3>
-                    <p className="text-zinc-500 text-sm mt-1">تقديم طلبات تأمين مستلزمات المدرسة ومتابعة حالتها.</p>
+                    <p className="text-stone-500 text-sm mt-1">تقديم طلبات تأمين مستلزمات المدرسة ومتابعة حالتها.</p>
                 </div>
                 <button
                     onClick={() => { setShowModal(true); setItems([{ name: "", qty: 1, specs: "" }]); }}
@@ -40,12 +40,12 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
 
             <div className="grid grid-cols-1 gap-4">
                 {requests.map(request => (
-                    <div key={request.id} className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-[2.5rem] hover:border-zinc-700 transition-all group">
+                    <div key={request.id} className="bg-white/80 border border-stone-200 p-6 rounded-[2.5rem] hover:border-stone-300 transition-all group">
                         <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
                             <div className="flex items-start gap-4">
                                 <div className={`p-4 rounded-3xl border ${request.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                                     request.status === 'pending' ? 'bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] border-[hsla(var(--gold),.25)]' :
-                                        'bg-zinc-800 text-zinc-500 border-zinc-700'
+                                        'bg-stone-200 text-stone-500 border-stone-300'
                                     }`}>
                                     <Package className="w-5 h-5" />
                                 </div>
@@ -57,7 +57,7 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
                                             {request.status === 'approved' ? 'تم الاعتماد' : 'قيد المراجعة'}
                                         </span>
                                     </div>
-                                    <div className="flex items-center gap-4 mt-2 text-[10px] font-bold text-zinc-500 uppercase">
+                                    <div className="flex items-center gap-4 mt-2 text-[10px] font-bold text-stone-500 uppercase">
                                         <span className="flex items-center gap-1.5"><Clock className="w-3" /> {request.request_date}</span>
                                         <span className="flex items-center gap-1.5"><Package className="w-3" /> {request.items?.length || 0} أصناف</span>
                                     </div>
@@ -72,24 +72,24 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
                 ))}
 
                 {requests.length === 0 && (
-                    <div className="bg-zinc-900/50 border border-zinc-800 p-12 rounded-[2.5rem] text-center">
+                    <div className="bg-white/80 border border-stone-200 p-12 rounded-[2.5rem] text-center">
                         <Package className="w-12 h-12 text-zinc-800 mx-auto mb-4" />
-                        <h4 className="text-zinc-500 font-bold">لا توجد طلبات احتياج حالية</h4>
+                        <h4 className="text-stone-500 font-bold">لا توجد طلبات احتياج حالية</h4>
                     </div>
                 )}
             </div>
 
             {/* Procurement Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-zinc-900 border border-zinc-800 w-full max-w-2xl rounded-[3rem] shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-stone-200/70 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-stone-100 border border-stone-200 w-full max-w-2xl rounded-[3rem] shadow-2xl animate-in zoom-in-95 duration-300 overflow-hidden">
                         <div className="p-10">
                             <div className="flex justify-between items-start mb-8">
                                 <div>
                                     <h4 className="text-white text-2xl font-black">نموذج طلب احتياج</h4>
-                                    <p className="text-zinc-500 text-sm mt-1">املأ البيانات لتوليد نموذج QF71-A-4-1 رسمياً.</p>
+                                    <p className="text-stone-500 text-sm mt-1">املأ البيانات لتوليد نموذج QF71-A-4-1 رسمياً.</p>
                                 </div>
-                                <button onClick={() => setShowModal(false)} className="text-zinc-500 hover:text-white transition-colors p-2">إغلاق</button>
+                                <button onClick={() => setShowModal(false)} className="text-stone-500 hover:text-foreground transition-colors p-2">إغلاق</button>
                             </div>
 
                             <form onSubmit={(e) => {
@@ -107,18 +107,18 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
                             }} className="space-y-8">
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center px-1">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">الأصناف المطلوبة</label>
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest">الأصناف المطلوبة</label>
                                         <button type="button" onClick={addItem} className="text-[10px] font-black text-indigo-400 hover:text-indigo-300 flex items-center gap-1.5 transition-colors">
                                             <Plus className="w-3 h-3" /> إضافة صنف
                                         </button>
                                     </div>
                                     <div className="space-y-4 max-h-60 overflow-y-auto pr-2 scrollbar-thin">
                                         {items.map((item, idx) => (
-                                            <div key={idx} className="grid grid-cols-12 gap-3 p-4 bg-zinc-950 border border-zinc-800 rounded-2xl relative">
+                                            <div key={idx} className="grid grid-cols-12 gap-3 p-4 bg-white border border-stone-200 rounded-2xl relative">
                                                 <div className="col-span-12 md:col-span-6 space-y-1">
                                                     <input
                                                         placeholder="اسم الصنف"
-                                                        className="w-full bg-transparent border-none p-0 text-sm text-white font-bold focus:ring-0 placeholder:text-zinc-700"
+                                                        className="w-full bg-transparent border-none p-0 text-sm text-foreground font-bold focus:ring-0 placeholder:text-stone-400"
                                                         value={item.name}
                                                         onChange={(e) => updateItem(idx, "name", e.target.value)}
                                                         required
@@ -129,7 +129,7 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
                                                     <input
                                                         type="number"
                                                         placeholder="الكمية"
-                                                        className="w-full bg-transparent border-none p-0 text-sm text-white font-bold focus:ring-0 placeholder:text-zinc-700"
+                                                        className="w-full bg-transparent border-none p-0 text-sm text-foreground font-bold focus:ring-0 placeholder:text-stone-400"
                                                         value={item.qty}
                                                         onChange={(e) => updateItem(idx, "qty", parseInt(e.target.value))}
                                                         required
@@ -142,10 +142,10 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
-                                                <div className="col-span-12 mt-2 pt-2 border-t border-zinc-900">
+                                                <div className="col-span-12 mt-2 pt-2 border-t border-stone-200">
                                                     <input
                                                         placeholder="المواصفات (اختياري)"
-                                                        className="w-full bg-transparent border-none p-0 text-[10px] text-zinc-500 font-bold focus:ring-0 placeholder:text-zinc-800"
+                                                        className="w-full bg-transparent border-none p-0 text-[10px] text-stone-500 font-bold focus:ring-0 placeholder:text-stone-400"
                                                         value={item.specs}
                                                         onChange={(e) => updateItem(idx, "specs", e.target.value)}
                                                         aria-label="مواصفات الصنف"
@@ -158,16 +158,16 @@ export function ProcurementForm({ requests, onSubmit }: Props) {
 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">درجة الأهمية</label>
-                                        <select name="urgency" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-xs text-white font-bold appearance-none"
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">درجة الأهمية</label>
+                                        <select name="urgency" className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-xs text-foreground font-bold appearance-none"
                                             aria-label="درجة الأهمية">
                                             <option value="normal">عادي</option>
                                             <option value="urgent">عاجل جداً</option>
                                         </select>
                                     </div>
                                     <div className="space-y-2 col-span-2">
-                                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">المسوغات (السبب)</label>
-                                        <textarea name="justification" className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-xs text-white font-bold h-24" placeholder="مثال: انتهاء المخزون، بدء الفصل الثاني..." required />
+                                        <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">المسوغات (السبب)</label>
+                                        <textarea name="justification" className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-xs text-foreground font-bold h-24" placeholder="مثال: انتهاء المخزون، بدء الفصل الثاني..." required />
                                     </div>
                                 </div>
 

@@ -455,7 +455,7 @@ WHERE wi.id = $workflow_id ORDER BY wt.created_at;
 | **+5-6** | **Smart Wizards:** wizard_sessions + reason_codes_catalog + QF03-1 flow | ✅ Schema مُطبَّق |
 | **+7-8** | **Meeting Module:** meeting_sessions + Realtime + digital sign-off | ✅ Schema مُطبَّق |
 | **+9-10** | **Bulk Upload:** schema registry + validation Edge Function + approval | ✅ Schema مُطبَّق |
-| **+11-12** | **Hardening:** مهاجرة staff_evaluations لـ workflow_instances + ISO mock audit | ⏳ |
+| **+11-12** | **Hardening:** مهاجرة staff_evaluations لـ workflow_instances + ISO mock audit | ✅ Schema مُنجز — FK موجود في M56 + `app/staff-evaluation/` + `app/workflows/page.tsx` مبنيَّتان + Chain of Custody query موثَّق في §10 |
 
 ### مصفوفة التبعيات
 
@@ -530,4 +530,4 @@ UI Action → INSERT في Layer 2 → Trigger → generated_forms
 
 ---
 
-*Sidra-ARR-v3.3 | رجب 1446هـ | يُلغي v1 وv2 — آخر تحديث: R12 مكتمل. 81 migration (M01–M74 + R00–R12). Demo mode: `lib/mock-data/`. Vitest: `npm test`. NOT NULL، بلا backfill، DROP CASCADE.*
+*Sidra-ARR-v3.4 | رجب 1446هـ | يُلغي v1 وv2 — آخر تحديث: 2026-06-02. 79 migration (M01–M76 + R00–R12). Demo mode: محذوف بالكامل. Vitest: `npm test`. NOT NULL، بلا backfill، DROP CASCADE. Notifications: NotificationsMenu.tsx مربوط. Phase +11-12: مُنجز.*

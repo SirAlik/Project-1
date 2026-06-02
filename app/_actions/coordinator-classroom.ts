@@ -124,13 +124,29 @@ export const assignTeacherToSlot = createSafeAction({
         resource: 'timetable',
     },
 
-    async handler({ slotId, teacherId }) {
-        const { data, error } = await supabaseAdmin
+    async handler({ slotId, teacherId }, ctx) {
+        const schoolId = ctx.user.schoolId;
+
+        // تحقق أن المعلم ينتمي لنفس مدرسة الـ persona (إلا لـ system_owner)
+        if (schoolId) {
+            const { count, error: checkErr } = await supabaseAdmin
+                .from('user_personas')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', teacherId)
+                .eq('school_id', schoolId)
+                .eq('role', 'teacher');
+
+            if (checkErr || !count) throw new Error('المعلم غير مسجل في هذه المدرسة');
+        }
+
+        const baseQuery = supabaseAdmin
             .from('timetable_slots')
             .update({ teacher_id: teacherId })
-            .eq('id', slotId)
-            .select()
-            .single();
+            .eq('id', slotId);
+
+        const { data, error } = schoolId
+            ? await baseQuery.eq('school_id', schoolId).select().single()
+            : await baseQuery.select().single();
 
         if (error) {
             console.error('[assignTeacherToSlot] Error:', error);

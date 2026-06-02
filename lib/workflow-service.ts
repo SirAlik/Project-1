@@ -139,6 +139,24 @@ export async function startWorkflow(
     };
   }
 
+  // فحص التكرار: هل يوجد workflow نشط لنفس subject_ref؟
+  const { data: existing } = await supabase
+    .from('workflow_instances')
+    .select('id')
+    .eq('school_id', persona.schoolId)
+    .eq('workflow_code', input.workflow_code)
+    .eq('subject_ref->>id', input.subject_ref.id)
+    .in('status', ['in_progress', 'pending'])
+    .limit(1)
+    .maybeSingle();
+
+  if (existing) {
+    return {
+      ok: false,
+      error: `يوجد workflow نشط مسبقاً لهذا العنصر (workflow_code: ${input.workflow_code})`,
+    };
+  }
+
   // إنشاء workflow_instance
   const { data: instance, error: instanceErr } = await supabase
     .from('workflow_instances')

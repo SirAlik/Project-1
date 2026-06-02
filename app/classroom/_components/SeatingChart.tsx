@@ -35,9 +35,9 @@ export function SeatingChart({
     };
 
     return (
-        <div className="relative w-full aspect-[4/3] bg-zinc-950/20 rounded-[3rem] border border-white/5 p-8 overflow-hidden">
+        <div className="relative w-full aspect-[4/3] bg-white/80 rounded-[3rem] border border-stone-200 p-8 overflow-hidden">
             {/* Teacher Desk Area */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-12 bg-zinc-900 border border-[var(--primary)]/20 rounded-b-3xl flex items-center justify-center">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-12 bg-stone-100 border border-[var(--primary)]/20 rounded-b-3xl flex items-center justify-center">
                 <span className="text-[10px] font-black text-[var(--text)] opacity-40 uppercase tracking-[0.3em]">منصة المعلم</span>
             </div>
 
@@ -65,31 +65,31 @@ export function SeatingChart({
                             onClick={() => onStudentClick(s.id)}
                             className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${isSelected
                                 ? "bg-[var(--primary)]/20 border-[var(--primary)] shadow-lg shadow-[var(--primary)]/20"
-                                : "bg-zinc-900/40 border-white/5 hover:border-white/10"
+                                : "bg-white/80 border-stone-200 hover:border-stone-200"
                                 }`}
                         >
                             <div className="relative">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-black transition-all ${isSelected ? "bg-[var(--primary)] text-white" : "bg-zinc-800 text-zinc-500 group-hover:bg-zinc-700 group-hover:text-zinc-300"
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-black transition-all ${isSelected ? "bg-[var(--primary)] text-white" : "bg-stone-200 text-stone-500 group-hover:bg-stone-300 group-hover:text-stone-600"
                                     }`}>
                                     {s.name[0]}
                                 </div>
 
                                 {/* Role Indicator */}
                                 {role && (
-                                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-[var(--accent)] rounded-lg flex items-center justify-center shadow-lg border-2 border-zinc-900">
+                                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-[var(--accent)] rounded-lg flex items-center justify-center shadow-lg border-2 border-stone-200">
                                         <Shield size={12} className="text-white fill-white" />
                                     </div>
                                 )}
 
                                 {/* Badge Count */}
                                 {studentBadges.length > 0 && (
-                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[var(--primary)] rounded-full flex items-center justify-center text-[8px] font-black text-white border-2 border-zinc-900">
+                                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[var(--primary)] rounded-full flex items-center justify-center text-[8px] font-black text-foreground border-2 border-stone-200">
                                         {studentBadges.length}
                                     </div>
                                 )}
                             </div>
 
-                            <span className={`mt-2 text-[10px] font-bold truncate w-full text-center ${isSelected ? "text-white" : "text-zinc-500 group-hover:text-zinc-300"}`}>
+                            <span className={`mt-2 text-[10px] font-bold truncate w-full text-center ${isSelected ? "text-white" : "text-stone-500 group-hover:text-stone-600"}`}>
                                 {s.name.split(' ')[0]}
                             </span>
 

@@ -53,32 +53,32 @@ export default function TripConsentPage() {
         if (!error) setSubmitted(true);
     };
 
-    if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-500">جاري التحميل...</div>;
-    if (!trip) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-rose-500">رابط غير صالح أو منتهي الصلاحية</div>;
+    if (loading) return <div className="min-h-screen bg-white flex items-center justify-center text-stone-500">جاري التحميل...</div>;
+    if (!trip) return <div className="min-h-screen bg-white flex items-center justify-center text-rose-500">رابط غير صالح أو منتهي الصلاحية</div>;
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-white text-stone-800 font-sans p-6" dir="rtl">
             <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-1000">
                 <header className="text-center space-y-4">
                     <div className="inline-block p-4 bg-[hsla(var(--gold),.10)] rounded-3xl border border-[hsla(var(--gold),.20)]">
                         <Bus className="w-10 h-10 text-[hsl(var(--gold))]" />
                     </div>
-                    <h1 className="text-3xl font-black text-white">نموذج موافقة ولي الأمر</h1>
-                    <p className="text-zinc-500 font-bold">بشأن المشاركة في الرحلات والزيارات الخارجية</p>
+                    <h1 className="text-3xl font-black text-foreground">نموذج موافقة ولي الأمر</h1>
+                    <p className="text-stone-500 font-bold">بشأن المشاركة في الرحلات والزيارات الخارجية</p>
                 </header>
 
-                <div className="bg-zinc-900 border border-zinc-800 rounded-[2.5rem] overflow-hidden shadow-2xl">
-                    <div className="p-8 border-b border-zinc-800 bg-zinc-900/50">
-                        <h2 className="text-xl font-black text-white">{trip.title}</h2>
-                        <div className="flex items-center gap-4 mt-4 text-xs font-bold text-zinc-500">
+                <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] overflow-hidden shadow-2xl">
+                    <div className="p-8 border-b border-stone-200 bg-white/80">
+                        <h2 className="text-xl font-black text-foreground">{trip.title}</h2>
+                        <div className="flex items-center gap-4 mt-4 text-xs font-bold text-stone-500">
                             <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {trip.destination}</span>
                             <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {trip.trip_date}</span>
                         </div>
                     </div>
 
                     <div className="p-8 space-y-6">
-                        <div className="p-6 bg-zinc-950 border border-zinc-800 rounded-3xl">
-                            <p className="text-sm text-zinc-400 leading-relaxed">
+                        <div className="p-6 bg-white border border-stone-200 rounded-3xl">
+                            <p className="text-sm text-stone-500 leading-relaxed">
                                 أنا ولي أمر الطالب <span className="text-[hsl(var(--gold))] font-black">({student?.name})</span>، أقر بموافقتي على مشاركة ابني في الرحلة المذكورة أعلاه، مع الالتزام بكافة التعليمات المنظمة للنشاط.
                             </p>
                         </div>
@@ -86,7 +86,7 @@ export default function TripConsentPage() {
                         {submitted || consent?.parent_consent ? (
                             <div className="p-8 bg-emerald-500/10 border border-emerald-500/20 rounded-3xl text-center space-y-4 animate-in zoom-in">
                                 <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto" />
-                                <h3 className="text-lg font-black text-white">تم استلام الموافقة بنجاح</h3>
+                                <h3 className="text-lg font-black text-foreground">تم استلام الموافقة بنجاح</h3>
                                 <p className="text-xs text-emerald-400/70 font-bold">شكراً لتعاونكم معنا</p>
                             </div>
                         ) : (
@@ -99,8 +99,8 @@ export default function TripConsentPage() {
                         )}
                     </div>
 
-                    <footer className="p-6 bg-zinc-900/50 text-center">
-                        <p className="text-[10px] text-zinc-600 font-black uppercase tracking-[0.2em]">نظام إدارة الأنشطة - مدارس الفلاح</p>
+                    <footer className="p-6 bg-white/80 text-center">
+                        <p className="text-[10px] text-stone-500 font-black uppercase tracking-[0.2em]">نظام إدارة الأنشطة - مدارس الفلاح</p>
                     </footer>
                 </div>
             </div>

@@ -75,32 +75,32 @@ export function LogVisitModal({ isOpen, onClose, student, className, classId, on
 
     return (
         <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${isOpen ? "visible" : "invisible"}`}>
-            <div className={`absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+            <div className={`absolute inset-0 bg-stone-200/70 backdrop-blur-md transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
 
-            <div className={`relative w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-all duration-500 ease-out ${isOpen ? "scale-100 translate-y-0 opacity-100" : "scale-90 translate-y-12 opacity-0"}`}>
+            <div className={`relative w-full max-w-2xl bg-white border border-stone-200 rounded-[2.5rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] transition-all duration-500 ease-out ${isOpen ? "scale-100 translate-y-0 opacity-100" : "scale-90 translate-y-12 opacity-0"}`}>
 
                 {/* Modal Header */}
-                <div className="p-8 border-b border-zinc-800/50 bg-gradient-to-l from-zinc-900/50 to-transparent flex justify-between items-start">
+                <div className="p-8 border-b border-stone-200 bg-gradient-to-l from-stone-100 to-transparent flex justify-between items-start">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <span className="px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-[10px] text-rose-400 font-bold uppercase tracking-widest">نموذج فحص</span>
-                            <span className="text-zinc-600 text-[10px]">•</span>
-                            <span className="text-zinc-500 text-[10px] font-mono">{currentTime}</span>
+                            <span className="text-stone-500 text-[10px]">•</span>
+                            <span className="text-stone-500 text-[10px] font-mono">{currentTime}</span>
                         </div>
-                        <h2 className="text-2xl font-bold text-white italic tracking-tight">توثيق مراجعة طبية</h2>
+                        <h2 className="text-2xl font-bold text-foreground italic tracking-tight">توثيق مراجعة طبية</h2>
                         <div className="flex items-center gap-4 mt-2">
-                            <div className="flex items-center gap-1.5 text-zinc-400 text-xs">
+                            <div className="flex items-center gap-1.5 text-stone-500 text-xs">
                                 <User className="w-3 h-3" />
                                 <span>{student.name}</span>
                             </div>
-                            <div className="flex items-center gap-1.5 text-zinc-400 text-xs">
+                            <div className="flex items-center gap-1.5 text-stone-500 text-xs">
                                 <Home className="w-3 h-3 text-emerald-500/50" />
                                 <span>{className || "الفصل المختار"}</span>
                             </div>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl transition-colors" aria-label="إغلاق النافذة">
-                        <X size={20} className="text-zinc-500" />
+                        <X size={20} className="text-stone-500" />
                     </button>
                 </div>
 
@@ -114,13 +114,13 @@ export function LogVisitModal({ isOpen, onClose, student, className, classId, on
                                     key={qa.label}
                                     type="button"
                                     onClick={() => applyQuickAction(qa)}
-                                    className="flex flex-col items-start gap-1 p-3 rounded-2xl bg-zinc-900/30 border border-zinc-800/50 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all group"
+                                    className="flex flex-col items-start gap-1 p-3 rounded-2xl bg-white/80 border border-stone-200 hover:border-emerald-500/40 hover:bg-emerald-500/5 transition-all group"
                                 >
                                     <div className="flex items-center gap-2">
-                                        <div className="p-1.5 rounded-lg bg-zinc-800 group-hover:bg-emerald-500/20 transition-colors">
-                                            <Zap className="w-3 h-3 text-zinc-500 group-hover:text-emerald-400" />
+                                        <div className="p-1.5 rounded-lg bg-stone-200 group-hover:bg-emerald-500/20 transition-colors">
+                                            <Zap className="w-3 h-3 text-stone-500 group-hover:text-emerald-400" />
                                         </div>
-                                        <span className="text-[11px] font-bold text-zinc-300 group-hover:text-white transition-colors">{qa.label}</span>
+                                        <span className="text-[11px] font-bold text-stone-600 group-hover:text-foreground transition-colors">{qa.label}</span>
                                     </div>
                                 </button>
                             ))}
@@ -130,11 +130,11 @@ export function LogVisitModal({ isOpen, onClose, student, className, classId, on
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">سبب الزيارة</label>
+                                <label className="block text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">سبب الزيارة</label>
                                 <select
                                     value={visitReason}
                                     onChange={(e) => setVisitReason(e.target.value)}
-                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-sm text-zinc-100 focus:ring-2 ring-emerald-500/20 outline-none appearance-none cursor-pointer"
+                                    className="w-full bg-stone-100 border border-stone-200 rounded-2xl p-4 text-sm text-stone-800 focus:ring-2 ring-emerald-500/20 outline-none appearance-none cursor-pointer"
                                     title="سبب الزيارة"
                                 >
                                     <option value="صداع">صداع</option>
@@ -147,12 +147,12 @@ export function LogVisitModal({ isOpen, onClose, student, className, classId, on
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">الشكوى الظاهرة</label>
+                                <label className="block text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">الشكوى الظاهرة</label>
                                 <input
                                     type="text"
                                     value={complaint}
                                     onChange={(e) => setComplaint(e.target.value)}
-                                    className="w-full bg-zinc-900 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-pink-500/50 transition-colors"
+                                    className="w-full bg-stone-100 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:border-pink-500/50 transition-colors"
                                     aria-label="اختر الفصل"
                                     placeholder="وصف الطالب للمشكلة..."
                                     required
@@ -161,11 +161,11 @@ export function LogVisitModal({ isOpen, onClose, student, className, classId, on
                         </div>
 
                         <div className="space-y-2">
-                            <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">الإجراء المتخذ والتوصيات</label>
+                            <label className="block text-[10px] font-black text-stone-500 uppercase tracking-widest px-1">الإجراء المتخذ والتوصيات</label>
                             <textarea
                                 value={actionTaken}
                                 onChange={(e) => setActionTaken(e.target.value)}
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-4 text-sm text-zinc-100 h-32 resize-none outline-none focus:border-zinc-700 transition-colors"
+                                className="w-full bg-stone-100 border border-stone-200 rounded-3xl p-4 text-sm text-stone-800 h-32 resize-none outline-none focus:border-stone-300 transition-colors"
                                 placeholder="صف الإجراءات التي قمت بها بالتفصيل..."
                                 required
                             />
@@ -180,7 +180,7 @@ export function LogVisitModal({ isOpen, onClose, student, className, classId, on
                                 {loading ? "جاري الحفظ..." : (
                                     <>
                                         <span>تأكيد وحفظ السجل</span>
-                                        <div className="w-5 h-5 rounded-full bg-black/10 flex items-center justify-center group-hover:translate-x-[-4px] transition-transform">
+                                        <div className="w-5 h-5 rounded-full bg-stone-200/70 flex items-center justify-center group-hover:translate-x-[-4px] transition-transform">
                                             <ChevronDown className="w-3 h-3 rotate-90" />
                                         </div>
                                     </>

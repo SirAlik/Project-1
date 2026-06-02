@@ -17,17 +17,17 @@ export default function TeacherArena() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-medium animate-pulse">جاري فحص مؤشرات الأداء للمعلمين...</p>
+                    <p className="text-stone-500 font-medium animate-pulse">جاري فحص مؤشرات الأداء للمعلمين...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[120px]" />
@@ -41,21 +41,21 @@ export default function TeacherArena() {
                         <div className="flex items-center gap-3 mb-2">
                             <Link
                                 href="/principal"
-                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-stone-200"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-400 rotate-180" />
+                                <ArrowLeft className="w-5 h-5 text-stone-500 rotate-180" />
                             </Link>
-                            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black bg-gradient-to-r from-stone-950 to-stone-500 bg-clip-text text-transparent">
                                 ساحة أداء المعلمين (The Arena)
                             </h1>
                         </div>
-                        <p className="text-zinc-500 mr-12 text-sm italic">
+                        <p className="text-stone-500 mr-12 text-sm italic">
                             المقارنة الجماعية لمؤشرات الكفاءة، انضباط الحضور، واكتمال المنهج
                         </p>
                     </div>
 
-                    <div className="bg-zinc-900/50 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
                             <div className="w-2 h-2 bg-rose-500 rounded-full animate-pulse" />
                             تحليل متقدم لأداء الهيئة التدريسية
                         </div>
@@ -69,13 +69,13 @@ export default function TeacherArena() {
                             <div className="space-y-4">
                                 {stats.teacherList.slice(0, 5).map((t, i) => (
                                     <Link key={t.id} href={`/principal/analytics/teachers/${t.id}`}>
-                                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all cursor-pointer group mb-3 last:mb-0">
+                                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-stone-200 hover:bg-indigo-500/10 hover:border-indigo-500/30 transition-all cursor-pointer group mb-3 last:mb-0">
                                             <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/40 text-[10px] font-black group-hover:bg-indigo-500 group-hover:text-black transition-colors">
                                                 #{i + 1}
                                             </div>
                                             <div className="flex-1 overflow-hidden">
                                                 <p className="text-xs font-bold truncate">{t.name}</p>
-                                                <div className="w-full h-1 bg-zinc-800 rounded-full mt-1">
+                                                <div className="w-full h-1 bg-stone-200 rounded-full mt-1">
                                                     <div className="h-full bg-indigo-500" style={{ width: `${t.avgScore}%` }} />
                                                 </div>
                                             </div>
@@ -92,10 +92,10 @@ export default function TeacherArena() {
                         <AnalyticsCard title="مؤشر الكفاءة العام" subtitle="ترتيب المعلمين بناءً على (التقييم، الحضور، إنجاز المنهج)">
                             <ChartContainer height={400} className="pt-4">
                                     <BarChart data={stats.teacherList.slice(0, 10)}>
-                                        <XAxis dataKey="name" stroke="#4b5563" fontSize={10} tick={{ fill: '#9ca3af' }} />
-                                        <YAxis stroke="#4b5563" fontSize={10} domain={[60, 100]} />
+                                        <XAxis dataKey="name" stroke="#78716c" fontSize={10} tick={{ fill: '#9ca3af' }} />
+                                        <YAxis stroke="#78716c" fontSize={10} domain={[60, 100]} />
                                         <Tooltip
-                                            contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                                            contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917' }}
                                         />
                                         <Legend />
                                         <Bar name="درجة التقييم" dataKey="avgScore" fill="var(--accent)" radius={[4, 4, 0, 0]} />
@@ -111,11 +111,11 @@ export default function TeacherArena() {
                     <AnalyticsCard title="خريطة توزيع الدرجات" subtitle="تحليل ميول المعلمين (متساهل vs متشدد)">
                         <ChartContainer height={300}>
                             <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                                <XAxis type="category" dataKey="name" name="المعلم" stroke="#4b5563" fontSize={10} hide />
-                                <YAxis type="number" dataKey="score" name="متوسط الدرجات" stroke="#4b5563" fontSize={10} domain={[60, 100]} />
+                                <XAxis type="category" dataKey="name" name="المعلم" stroke="#78716c" fontSize={10} hide />
+                                <YAxis type="number" dataKey="score" name="متوسط الدرجات" stroke="#78716c" fontSize={10} domain={[60, 100]} />
                                 <Tooltip
                                     cursor={{ strokeDasharray: '3 3' }}
-                                    contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917' }}
                                 />
                                 <Scatter name="المعلمين" data={stats.gradeDistribution}>
                                     {stats.gradeDistribution.map((entry, index) => (
@@ -145,32 +145,32 @@ export default function TeacherArena() {
                         <div className="grid grid-cols-8 gap-1.5 h-full content-start">
                             <div className="col-span-1" />
                             {[1, 2, 3, 4, 5, 6, 7].map(p => (
-                                <div key={p} className="text-center text-[9px] font-black text-zinc-500">ح{p}</div>
+                                <div key={p} className="text-center text-[9px] font-black text-stone-500">ح{p}</div>
                             ))}
 
                             {["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس"].map(day => (
                                 <React.Fragment key={day}>
-                                    <div className="text-[9px] font-bold text-zinc-500 flex items-center">{day}</div>
+                                    <div className="text-[9px] font-bold text-stone-500 flex items-center">{day}</div>
                                     {[1, 2, 3, 4, 5, 6, 7].map(p => {
                                         const cell = stats.heatMap.find(h => h.day === day && h.period === p);
                                         return (
                                             <div
                                                 key={p}
-                                                className={`aspect-square rounded-md border border-white/5 transition-all
+                                                className={`aspect-square rounded-md border border-stone-200 transition-all
                                                 ${cell?.status === 'free' ? 'bg-emerald-500/20 border-emerald-500/30' :
                                                         cell?.status === 'sub' ? 'bg-[hsla(var(--gold),.20)] border-[hsla(var(--gold),.30)] animate-pulse' :
-                                                            'bg-zinc-800/40'}`}
+                                                            'bg-stone-100/80'}`}
                                             />
                                         );
                                     })}
                                 </React.Fragment>
                             ))}
                         </div>
-                        <div className="mt-6 flex justify-between items-center text-[9px] text-zinc-500 uppercase font-black">
+                        <div className="mt-6 flex justify-between items-center text-[9px] text-stone-500 uppercase font-black">
                             <div className="flex gap-4">
                                 <span className="flex items-center gap-1"><div className="w-2 h-2 bg-emerald-500/20 rounded-sm" /> متاح</span>
                                 <span className="flex items-center gap-1"><div className="w-2 h-2 bg-[hsla(var(--gold),.20)] rounded-sm" /> انتظار</span>
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 bg-zinc-800/40 rounded-sm" /> مشغول</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-2 bg-stone-100/80 rounded-sm" /> مشغول</span>
                             </div>
                             <Link href="/classroom" className="text-indigo-400 hover:text-indigo-300">فتح الجدول الكامل ←</Link>
                         </div>

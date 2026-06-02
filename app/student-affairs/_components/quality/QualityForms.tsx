@@ -14,14 +14,14 @@ export function StudentAffairsQualityForms() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-wrap gap-3 border-b border-zinc-800 pb-4">
+            <div className="flex flex-wrap gap-3 border-b border-stone-200 pb-4">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveForm(tab.id)}
                         className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeForm === tab.id
                             ? "bg-[hsl(var(--gold))] text-white shadow-lg shadow-[hsla(var(--gold),.25)]"
-                            : "bg-zinc-900 text-zinc-500 hover:bg-zinc-800 border border-zinc-800"
+                            : "bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200"
                             }`}
                     >
                         {tab.name}
@@ -29,7 +29,7 @@ export function StudentAffairsQualityForms() {
                 ))}
             </div>
 
-            <div className="bg-zinc-900/20 rounded-2xl border border-zinc-800 p-1">
+            <div className="bg-white/80 rounded-2xl border border-stone-200 p-1">
                 {activeForm === "C-5-1" && <FormC51_MorningTardy />}
                 {activeForm === "C-5-3" && <FormC53_CounselorReferral />}
             </div>

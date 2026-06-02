@@ -40,7 +40,7 @@ export default function StudentAffairsDashboardLoading() {
                     <div className="relative z-10 space-y-8">
 
                         {/* Rotating Stats Hero - matches rounded-[3rem] p-10 */}
-                        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-zinc-900 to-zinc-950 border border-indigo-500/20 rounded-[3rem] p-10 min-h-[180px]">
+                        <div className="relative overflow-hidden bg-gradient-to-br from-indigo-500/10 via-white to-stone-100 border border-indigo-500/20 rounded-[3rem] p-10 min-h-[180px]">
                             <div className="relative z-10 flex items-center justify-between">
                                 <div>
                                     <div className="flex items-center gap-3 mb-4">
@@ -68,7 +68,7 @@ export default function StudentAffairsDashboardLoading() {
                             ].map((item, i) => (
                                 <div key={i} className={`bg-gradient-to-br ${item.color} border p-8 rounded-[2.5rem] min-h-[140px]`}>
                                     <div className="flex justify-between items-start mb-4">
-                                        <div className="p-3 bg-zinc-950/50 rounded-2xl border border-white/5">
+                                        <div className="p-3 bg-white/80 rounded-2xl border border-stone-200">
                                             <GlassSkeleton variant="circle" className="w-5 h-5" />
                                         </div>
                                     </div>
@@ -81,14 +81,14 @@ export default function StudentAffairsDashboardLoading() {
                         {/* Lateness Queue + Discipline Trends - 1+2 columns */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Lateness Queue */}
-                            <div className="lg:col-span-1 bg-zinc-900/50 border border-[hsla(var(--gold),.25)] rounded-[2.5rem] p-8 min-h-[380px]">
+                            <div className="lg:col-span-1 bg-white/80 border border-[hsla(var(--gold),.25)] rounded-[2.5rem] p-8 min-h-[380px]">
                                 <div className="flex items-center gap-2 mb-6">
                                     <GlassSkeleton variant="circle" className="w-4 h-4" />
                                     <GlassSkeleton variant="text" className="w-32 h-4" />
                                 </div>
                                 <div className="space-y-3 max-h-72">
                                     {[1, 2, 3, 4].map((i) => (
-                                        <div key={i} className="flex items-center justify-between p-4 bg-zinc-950/70 border border-zinc-800 rounded-2xl">
+                                        <div key={i} className="flex items-center justify-between p-4 bg-white/95 border border-stone-200 rounded-2xl">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 bg-[hsla(var(--gold),.15)] rounded-xl flex items-center justify-center">
                                                     <GlassSkeleton variant="circle" className="w-5 h-5" />
@@ -105,7 +105,7 @@ export default function StudentAffairsDashboardLoading() {
                             </div>
 
                             {/* Discipline Trends Chart */}
-                            <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-8 min-h-[380px]">
+                            <div className="lg:col-span-2 bg-white/80 border border-stone-200 rounded-[2.5rem] p-8 min-h-[380px]">
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center gap-2">
                                         <GlassSkeleton variant="circle" className="w-4 h-4" />
@@ -127,7 +127,7 @@ export default function StudentAffairsDashboardLoading() {
                         {/* Risk Radar + Action Stream - 2 columns */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* Risk Radar */}
-                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-8 min-h-[300px]">
+                            <div className="bg-white/80 border border-stone-200 rounded-[2.5rem] p-8 min-h-[300px]">
                                 <div className="flex items-center justify-between mb-6">
                                     <div className="flex items-center gap-2">
                                         <GlassSkeleton variant="circle" className="w-4 h-4" />
@@ -137,7 +137,7 @@ export default function StudentAffairsDashboardLoading() {
                                 </div>
                                 <div className="space-y-4">
                                     {[1, 2, 3].map((i) => (
-                                        <div key={i} className="flex items-center justify-between p-4 bg-zinc-950/50 border border-zinc-800/50 rounded-2xl">
+                                        <div key={i} className="flex items-center justify-between p-4 bg-white/80 border border-stone-200 rounded-2xl">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center">
                                                     <GlassSkeleton variant="text" className="w-4 h-4" />
@@ -157,14 +157,14 @@ export default function StudentAffairsDashboardLoading() {
                             </div>
 
                             {/* Action Stream */}
-                            <div className="bg-zinc-900/50 border border-zinc-800 rounded-[2.5rem] p-8 min-h-[300px]">
+                            <div className="bg-white/80 border border-stone-200 rounded-[2.5rem] p-8 min-h-[300px]">
                                 <div className="flex items-center gap-2 mb-6">
                                     <GlassSkeleton variant="circle" className="w-4 h-4" />
                                     <GlassSkeleton variant="text" className="w-28 h-4" />
                                 </div>
                                 <div className="space-y-4">
                                     {[1, 2, 3].map((i) => (
-                                        <div key={i} className="flex items-center justify-between p-4 bg-zinc-950/50 border border-zinc-800/50 rounded-2xl">
+                                        <div key={i} className="flex items-center justify-between p-4 bg-white/80 border border-stone-200 rounded-2xl">
                                             <GlassSkeleton variant="text" className="w-40 h-4" />
                                             <div className="flex items-center gap-2">
                                                 <GlassSkeleton variant="text" className="w-8 h-6 rounded-lg" />

@@ -101,7 +101,7 @@ export default function AddStaffPage() {
     };
 
     return (
-        <div className="min-h-screen bg-black text-white" dir="rtl">
+        <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]" dir="rtl">
             {/* الصفحة قابلة للتمرير + padding مريح */}
             <div className="p-6 lg:p-12 flex justify-center">
                 <div className="max-w-4xl w-full">
@@ -122,7 +122,7 @@ export default function AddStaffPage() {
                     {/* ✅ مهم: نعطي الفورم مساحة سفلية عشان الـ sticky bar ما يغطي المحتوى */}
                     <form onSubmit={handleSubmit} className="space-y-8 pb-32">
                         {/* Personal Info */}
-                        <div className="p-8 rounded-[2rem] border border-white/10 bg-white/[0.03]">
+                        <div className="p-8 rounded-[2rem] border border-stone-200 bg-white/[0.03]">
                             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm">1</span>
                                 البيانات الشخصية
@@ -134,7 +134,7 @@ export default function AddStaffPage() {
                                     <input
                                         type="text"
                                         required
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 focus:border-[var(--primary)] focus:outline-none transition-colors"
+                                        className="w-full bg-stone-200/70 border border-stone-200 rounded-xl p-4 focus:border-[var(--primary)] focus:outline-none transition-colors"
                                         placeholder="مثال: محمد عبدالله"
                                         value={formData.fullName}
                                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
@@ -146,7 +146,7 @@ export default function AddStaffPage() {
                                     <input
                                         type="text"
                                         required
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 focus:border-[var(--primary)] focus:outline-none transition-colors"
+                                        className="w-full bg-stone-200/70 border border-stone-200 rounded-xl p-4 focus:border-[var(--primary)] focus:outline-none transition-colors"
                                         placeholder="10xxxxxxxx"
                                         value={formData.nationalId}
                                         onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
@@ -158,7 +158,7 @@ export default function AddStaffPage() {
                                     <input
                                         type="email"
                                         required
-                                        className="w-full bg-black/40 border border-white/10 rounded-xl p-4 focus:border-[var(--primary)] focus:outline-none transition-colors"
+                                        className="w-full bg-stone-200/70 border border-stone-200 rounded-xl p-4 focus:border-[var(--primary)] focus:outline-none transition-colors"
                                         placeholder="email@example.com"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -168,7 +168,7 @@ export default function AddStaffPage() {
                         </div>
 
                         {/* Roles */}
-                        <div className="p-8 rounded-[2rem] border border-white/10 bg-white/[0.03]">
+                        <div className="p-8 rounded-[2rem] border border-stone-200 bg-white/[0.03]">
                             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
                                 <span className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">2</span>
                                 الصلاحيات والأدوار
@@ -183,7 +183,7 @@ export default function AddStaffPage() {
                                             type="button"
                                             onClick={() => toggleRole(role.id)}
                                             className={`text-right cursor-pointer relative p-4 rounded-xl border transition-all duration-200 w-full
-                        ${isSelected ? `${role.bg} ${role.border} ring-1 ring-[var(--primary)]` : 'bg-white/5 border-white/10 hover:bg-white/10'}
+                        ${isSelected ? `${role.bg} ${role.border} ring-1 ring-[var(--primary)]` : 'bg-white/5 border-stone-200 hover:bg-white/10'}
                       `}
                                         >
                                             <div className="flex items-center justify-between mb-2">
@@ -227,7 +227,7 @@ export default function AddStaffPage() {
             </div>
 
             {/* ✅ زر حفظ ثابت بأسفل الشاشة (الحل النهائي لمشكلة "ما فيه زر") */}
-            <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-white/10 bg-black/70 backdrop-blur-xl">
+            <div className="fixed bottom-0 left-0 right-0 z-[60] border-t border-stone-200 bg-stone-200/70 backdrop-blur-xl">
                 <div className="max-w-4xl mx-auto p-4">
                     <button
                         type="submit"

@@ -476,7 +476,7 @@ const createStaffSchema = z.object({
     // NATIONAL ID يبقى مطلوب
     nationalId: z.string().min(10, 'رقم الهوية غير صالح'),
 
-    // ✅ Optional for now (UI does not provide it yet)
+    // Optional because the current staff form contract does not submit it.
     mobileNumber: z.string().min(8, 'رقم الجوال غير صالح').optional(),
 
     roles: z.array(z.string()).min(1, 'يجب اختيار دور واحد على الأقل'),

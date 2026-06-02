@@ -39,46 +39,46 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
         <div className="space-y-6">
             {/* Top Row: Quick Analysis Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400 flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium text-stone-500 flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-emerald-500" />
                             نسبة الكتب المعادة
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-emerald-400">{stats.returnRate}%</div>
-                        <div className="w-full bg-zinc-800 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="w-full bg-stone-200 h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-emerald-500 h-full transition-all" style={{ width: `${stats.returnRate}%` }} />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400 flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium text-stone-500 flex items-center gap-2">
                             <Clock className="w-4 h-4 text-indigo-500" />
                             نسبة الكتب قيد الإعارة
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-indigo-400">{stats.activeRate}%</div>
-                        <div className="w-full bg-zinc-800 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="w-full bg-stone-200 h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-indigo-500 h-full transition-all" style={{ width: `${stats.activeRate}%` }} />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-400 flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium text-stone-500 flex items-center gap-2">
                             <AlertCircle className="w-4 h-4 text-rose-500" />
                             تنبيه التأخير (+7 أيام)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-rose-400">{stats.overdueRate}%</div>
-                        <div className="w-full bg-zinc-800 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="w-full bg-stone-200 h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-rose-500 h-full transition-all" style={{ width: `${stats.overdueRate}%` }} />
                         </div>
                     </CardContent>
@@ -88,7 +88,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Top 10 Students */}
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-lg font-bold flex items-center gap-2">
                             <Trophy className="w-5 h-5 text-[hsl(var(--gold))]" />
@@ -106,7 +106,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                     <CardContent>
                         <ChartContainer height={300}>
                             <BarChart data={stats.topStudents} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" horizontal={false} />
                                 <XAxis type="number" hide />
                                 <YAxis dataKey="name" type="category" width={100} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
                                 <Tooltip
@@ -124,7 +124,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                 </Card>
 
                 {/* Top 10 Books */}
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold flex items-center gap-2">
                             <Book className="w-5 h-5 text-indigo-500" />
@@ -134,7 +134,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                     <CardContent>
                         <ChartContainer height={300}>
                             <BarChart data={stats.topBooks} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" horizontal={false} />
                                 <XAxis type="number" hide />
                                 <YAxis dataKey="title" type="category" width={150} tick={{ fill: '#a1a1aa', fontSize: 11 }} />
                                 <Tooltip
@@ -151,7 +151,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
             {/* Bottom Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Top Authors */}
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold flex items-center gap-2">
                             <User className="w-5 h-5 text-emerald-500" />
@@ -161,8 +161,8 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                     <CardContent>
                         <div className="space-y-3">
                             {stats.topAuthors?.map((author: NameCount, idx: number) => (
-                                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-zinc-800/50">
-                                    <span className="text-sm text-zinc-300">{author.name}</span>
+                                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-stone-100/80">
+                                    <span className="text-sm text-stone-600">{author.name}</span>
                                     <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500">{author.count}</span>
                                 </div>
                             ))}
@@ -171,7 +171,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                 </Card>
 
                 {/* Class Ranking */}
-                <Card className="bg-zinc-900 border-zinc-800">
+                <Card className="bg-stone-100 border-stone-200">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold">ترتيب الفصول (الأكثر استعارة)</CardTitle>
                     </CardHeader>
@@ -179,15 +179,15 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                         <div className="space-y-3">
                             {stats.rankedClasses?.map((cls: NameCount, idx: number) => (
                                 <div key={idx} className="flex items-center gap-3">
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx < 3 ? 'bg-[hsl(var(--gold))] text-black' : 'bg-zinc-800 text-zinc-400'}`}>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx < 3 ? 'bg-[hsl(var(--gold))] text-black' : 'bg-stone-200 text-stone-500'}`}>
                                         {idx + 1}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between text-sm mb-1">
                                             <span>{cls.name}</span>
-                                            <span className="text-zinc-500">{cls.count}</span>
+                                            <span className="text-stone-500">{cls.count}</span>
                                         </div>
-                                        <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden">
                                             <div
                                                 className="bg-indigo-500 h-full transition-all"
                                                 style={{ width: `${(cls.count / (stats.rankedClasses[0]?.count || 1)) * 100}%` }}
@@ -201,7 +201,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                 </Card>
 
                 {/* Bottom Classes Area */}
-                <Card className="bg-zinc-900 border-zinc-800 border-dashed border-rose-500/20">
+                <Card className="bg-stone-100 border-stone-200 border-dashed border-rose-500/20">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold text-rose-400 flex items-center gap-2">
                             <TrendingDown className="w-5 h-5" />
@@ -209,7 +209,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-xs text-zinc-500 mb-4">هذه الفصول لديها أقل معدلات استعارة هذا الشهر.</p>
+                        <p className="text-xs text-stone-500 mb-4">هذه الفصول لديها أقل معدلات استعارة هذا الشهر.</p>
                         <div className="space-y-3">
                             {stats.bottomClasses?.map((cls: NameCount, idx: number) => (
                                 <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-rose-500/5 border border-rose-500/10">

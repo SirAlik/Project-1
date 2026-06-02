@@ -13,16 +13,16 @@ interface QualityFormWrapperProps {
 
 export function QualityFormWrapper({ children, id, title, code, fileName }: QualityFormWrapperProps) {
     return (
-        <div className="glass-panel p-6 md:p-10 rounded-[2.5rem] border border-white/5 shadow-2xl relative overflow-hidden">
+        <div className="glass-panel p-6 md:p-10 rounded-[2.5rem] border border-stone-200 shadow-2xl relative overflow-hidden">
             {/* Decorative official elements */}
-            <div className="absolute top-0 right-0 p-6 text-[10px] text-zinc-600 font-black tracking-[0.3em] hidden md:block uppercase opacity-50">
+            <div className="absolute top-0 right-0 p-6 text-[10px] text-stone-500 font-black tracking-[0.3em] hidden md:block uppercase opacity-50">
                 {code}
             </div>
 
-            <header className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-white/5 pb-8 gap-4">
+            <header className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-stone-200 pb-8 gap-4">
                 <div className="text-center md:text-right">
-                    <h2 className="text-xl font-black text-white mb-1 italic tracking-tighter">مدارس الفلاح الأهلية</h2>
-                    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Al-Falah Private Schools</p>
+                    <h2 className="text-xl font-black text-foreground mb-1 italic tracking-tighter">مدارس الفلاح الأهلية</h2>
+                    <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Al-Falah Private Schools</p>
                 </div>
 
                 <div className="text-center">
@@ -41,7 +41,7 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
                 </div>
 
                 <div className="text-center md:text-left">
-                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mb-1">QMS Standard</p>
+                    <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">QMS Standard</p>
                     <p className="text-[10px] text-purple-500 font-bold">{code}</p>
                 </div>
             </header>
@@ -50,8 +50,8 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
                 {children}
             </div>
 
-            <footer className="mt-10 pt-6 border-t border-white/5 flex justify-between items-center bg-white/5 -mx-10 -mb-10 p-8">
-                <div className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">
+            <footer className="mt-10 pt-6 border-t border-stone-200 flex justify-between items-center bg-white/5 -mx-10 -mb-10 p-8">
+                <div className="text-[10px] text-stone-500 font-black uppercase tracking-widest">
                     Generated via Antigravity School OS
                 </div>
                 <button

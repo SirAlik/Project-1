@@ -19,10 +19,10 @@ export default function TeacherDeepDive() {
 
     if (loading || !stats.individual) {
         return (
-            <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+            <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-violet-500/20 border-t-violet-500 rounded-full animate-spin" />
-                    <p className="text-zinc-500 font-medium animate-pulse">جاري تشريح بيانات المعلم...</p>
+                    <p className="text-stone-500 font-medium animate-pulse">جاري تشريح بيانات المعلم...</p>
                 </div>
             </div>
         );
@@ -31,7 +31,7 @@ export default function TeacherDeepDive() {
     const teacher = stats.individual;
 
     return (
-        <main className="min-h-screen bg-zinc-950 text-zinc-100 font-sans p-6" dir="rtl">
+        <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-violet-500/5 rounded-full blur-[120px]" />
@@ -45,21 +45,21 @@ export default function TeacherDeepDive() {
                         <div className="flex items-center gap-3 mb-2">
                             <Link
                                 href="/principal/analytics/teachers"
-                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-white/5"
+                                className="p-2 hover:bg-white/5 rounded-xl transition-colors border border-stone-200"
                             >
-                                <ArrowLeft className="w-5 h-5 text-zinc-400 rotate-180" />
+                                <ArrowLeft className="w-5 h-5 text-stone-500 rotate-180" />
                             </Link>
-                            <h1 className="text-3xl font-black bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black bg-gradient-to-r from-stone-950 to-stone-500 bg-clip-text text-transparent">
                                 ملف الكفاءة الفردي (Deep Dive)
                             </h1>
                         </div>
-                        <p className="text-zinc-500 mr-12 text-sm italic">
+                        <p className="text-stone-500 mr-12 text-sm italic">
                             تحليل تفصيلي لأداء المعلم: {teacher.name}
                         </p>
                     </div>
 
-                    <div className="bg-zinc-900/50 border border-white/5 px-4 py-2 rounded-2xl backdrop-blur-md">
-                        <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
+                        <div className="flex items-center gap-2 text-xs text-stone-500">
                             <ShieldCheck className="w-4 h-4 text-violet-400" />
                             بروفايل معتمد تقنياً
                         </div>
@@ -72,7 +72,7 @@ export default function TeacherDeepDive() {
                         <AnalyticsCard title="رادار الكفاءة" subtitle="تقييم سداسي للمهارات الأساسية">
                             <ChartContainer height={300} className="pt-4">
                                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={teacher.radarData}>
-                                        <PolarGrid stroke="#1f2937" />
+                                        <PolarGrid stroke="#e7e5e4" />
                                         <PolarAngleAxis dataKey="metric" tick={{ fill: '#9ca3af', fontSize: 10 }} />
                                         <PolarRadiusAxis angle={30} domain={[0, 100]} hide />
                                         <Radar
@@ -88,13 +88,13 @@ export default function TeacherDeepDive() {
 
                         <AnalyticsCard title="مؤشر رضا الطلاب" subtitle="بناءً على استطلاعات الرأي المباشرة">
                             <div className="flex flex-col items-center justify-center py-6">
-                                <div className="text-5xl font-black text-white mb-2">{teacher.studentSatisfaction}</div>
+                                <div className="text-5xl font-black text-foreground mb-2">{teacher.studentSatisfaction}</div>
                                 <div className="flex gap-1 mb-4">
                                     {[1, 2, 3, 4, 5].map(s => (
                                         <Zap key={s} className={`w-4 h-4 ${s <= 4 ? 'text-[hsl(var(--gold))] fill-[hsl(var(--gold))]' : 'text-zinc-800'}`} />
                                     ))}
                                 </div>
-                                <p className="text-[10px] text-zinc-500 text-center uppercase font-black">تقييم ممتاز</p>
+                                <p className="text-[10px] text-stone-500 text-center uppercase font-black">تقييم ممتاز</p>
                             </div>
                         </AnalyticsCard>
                     </div>
@@ -108,10 +108,10 @@ export default function TeacherDeepDive() {
                                     {teacher.curriculumDetails.map((c, i) => (
                                         <div key={i}>
                                             <div className="flex justify-between text-xs mb-2">
-                                                <span className="font-bold text-zinc-300">{c.subject}</span>
+                                                <span className="font-bold text-stone-600">{c.subject}</span>
                                                 <span className="text-violet-400 font-mono">%{c.progress}</span>
                                             </div>
-                                            <div className="w-full h-2 bg-zinc-900 rounded-full overflow-hidden border border-white/5">
+                                            <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden border border-stone-200">
                                                 <motion.div
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${c.progress}%` }}
@@ -121,7 +121,7 @@ export default function TeacherDeepDive() {
                                             </div>
                                         </div>
                                     ))}
-                                    <p className="text-[9px] text-zinc-500 italic">ملاحظة: البيانات تتوافق مع الخطط المسجلة في Classroom.</p>
+                                    <p className="text-[9px] text-stone-500 italic">ملاحظة: البيانات تتوافق مع الخطط المسجلة في Classroom.</p>
                                 </div>
                             </AnalyticsCard>
 
@@ -135,21 +135,21 @@ export default function TeacherDeepDive() {
                                                     <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                                                 </linearGradient>
                                             </defs>
-                                            <XAxis dataKey="date" stroke="#4b5563" fontSize={10} hide />
+                                            <XAxis dataKey="date" stroke="#78716c" fontSize={10} hide />
                                             <YAxis domain={[0, 100]} hide />
                                             <Tooltip
-                                                contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '1rem', color: '#fff' }}
+                                                contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e7e5e4', borderRadius: '1rem', color: '#1c1917' }}
                                             />
                                             <Area type="monotone" dataKey="score" stroke="var(--primary)" fillOpacity={1} fill="url(#colorVisit)" />
                                         </AreaChart>
                                     </ChartContainer>
                                 <div className="mt-4 flex justify-between items-center px-2">
                                     <div className="text-center">
-                                        <p className="text-[10px] text-zinc-500 uppercase">آخر تقييم</p>
+                                        <p className="text-[10px] text-stone-500 uppercase">آخر تقييم</p>
                                         <p className="text-lg font-black text-emerald-400">%{teacher.visitHistory[teacher.visitHistory.length - 1]?.score || 0}</p>
                                     </div>
                                     <div className="text-center">
-                                        <p className="text-[10px] text-zinc-500 uppercase">التحسن</p>
+                                        <p className="text-[10px] text-stone-500 uppercase">التحسن</p>
                                         <p className="text-lg font-black text-indigo-400">+%١٢</p>
                                     </div>
                                 </div>
@@ -164,14 +164,14 @@ export default function TeacherDeepDive() {
                                     { icon: GraduationCap, text: 'حضور دورة التدريب على التقنيات الحديثة', time: 'منذ أسبوع' },
                                     { icon: User, text: 'استلام تعميم رقم (٤٠٢) بشأن الاختبارات', time: 'منذ ٣ ساعات' },
                                 ].map((item, i) => (
-                                    <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 group hover:bg-violet-500/5 transition-all">
+                                    <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-stone-200 group hover:bg-violet-500/5 transition-all">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5">
-                                                <item.icon className="w-5 h-5 text-zinc-400" />
+                                            <div className="w-10 h-10 rounded-xl bg-stone-200 flex items-center justify-center border border-stone-200">
+                                                <item.icon className="w-5 h-5 text-stone-500" />
                                             </div>
-                                            <p className="text-xs font-medium text-zinc-200">{item.text}</p>
+                                            <p className="text-xs font-medium text-stone-700">{item.text}</p>
                                         </div>
-                                        <span className="text-[10px] text-zinc-500">{item.time}</span>
+                                        <span className="text-[10px] text-stone-500">{item.time}</span>
                                     </div>
                                 ))}
                             </div>

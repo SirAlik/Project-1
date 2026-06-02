@@ -17,40 +17,40 @@ export function ActionRecorder({ referralId, studentName, isOpen, onClose, onRec
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-[3rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/95 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="w-full max-w-md bg-stone-100 border border-stone-200 rounded-[3rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-4">
                         <div className="p-4 bg-emerald-500 text-white rounded-3xl">
                             <CheckCircle className="w-6 h-6" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-white">تسجيل إجراء إرشادي</h3>
-                            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{studentName}</p>
+                            <h3 className="text-xl font-black text-foreground">تسجيل إجراء إرشادي</h3>
+                            <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">{studentName}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-zinc-500 hover:text-white transition-colors" aria-label="إغلاق النافذة">
+                    <button onClick={onClose} className="p-2 text-stone-500 hover:text-foreground transition-colors" aria-label="إغلاق النافذة">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase px-2">الإجراء المتخذ (Action Taken)</label>
+                        <label className="text-[10px] font-black text-stone-500 uppercase px-2">الإجراء المتخذ (Action Taken)</label>
                         <textarea
                             value={action}
                             onChange={(e) => setAction(e.target.value)}
                             required
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none min-h-[100px]"
+                            className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:ring-2 focus:ring-emerald-500 focus:outline-none min-h-[100px]"
                             placeholder="Describe the intervention..."
                         />
                     </div>
                     <div className="space-y-2">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase px-2">ملاحظات إضافية (Optional Notes)</label>
+                        <label className="text-[10px] font-black text-stone-500 uppercase px-2">ملاحظات إضافية (Optional Notes)</label>
                         <input
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-4 text-sm text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                            className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                             placeholder="Extra details..."
                         />
                     </div>
@@ -59,7 +59,7 @@ export function ActionRecorder({ referralId, studentName, isOpen, onClose, onRec
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 bg-zinc-800 text-white py-4 rounded-2xl font-bold text-sm hover:bg-zinc-700 transition-all"
+                            className="flex-1 bg-stone-200 text-stone-700 py-4 rounded-2xl font-bold text-sm hover:bg-stone-300 transition-all"
                         >
                             إلغاء
                         </button>

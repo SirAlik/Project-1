@@ -87,16 +87,16 @@ export function ExportButtons({ data }: ExportButtonsProps) {
             {reports.map((report) => (
                 <div
                     key={report.id}
-                    className="group bg-zinc-900/50 border border-zinc-800 p-8 rounded-[2.5rem] hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden"
+                    className="group bg-white/80 border border-stone-200 p-8 rounded-[2.5rem] hover:border-orange-500/30 transition-all duration-500 relative overflow-hidden"
                 >
                     <div className="flex justify-between items-start mb-6">
-                        <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800">
-                            <FileDown className="w-5 h-5 text-zinc-400 group-hover:text-[hsl(var(--gold))] transition-colors" />
+                        <div className="p-4 bg-white rounded-2xl border border-stone-200">
+                            <FileDown className="w-5 h-5 text-stone-500 group-hover:text-[hsl(var(--gold))] transition-colors" />
                         </div>
-                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{report.code}</span>
+                        <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">{report.code}</span>
                     </div>
-                    <h4 className="text-sm font-black text-white mb-2">{report.label}</h4>
-                    <p className="text-[10px] text-zinc-500 font-bold mb-6">استخراج النموذج الرسمي المعتمد من وزارة التعليم</p>
+                    <h4 className="text-sm font-black text-foreground mb-2">{report.label}</h4>
+                    <p className="text-[10px] text-stone-500 font-bold mb-6">استخراج النموذج الرسمي المعتمد من وزارة التعليم</p>
 
                     <PDFDownloadLink
                         document={report.document}
@@ -106,7 +106,7 @@ export function ExportButtons({ data }: ExportButtonsProps) {
                         {({ loading }) => (
                             <button
                                 disabled={loading}
-                                className="w-full py-4 bg-zinc-950 border border-zinc-800 hover:border-white/20 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group-hover:shadow-2xl disabled:opacity-50"
+                                className="w-full py-4 bg-white border border-stone-200 hover:border-stone-200 text-foreground rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group-hover:shadow-2xl disabled:opacity-50"
                             >
                                 {loading ? (
                                     <>جاري التوليد... <Loader2 className="w-3 h-3 animate-spin" /></>
@@ -122,15 +122,15 @@ export function ExportButtons({ data }: ExportButtonsProps) {
 
             {/* Special Main Record */}
             <div className="lg:col-span-1 group bg-gradient-to-br from-[hsl(var(--gold-strong))] to-[hsl(var(--gold))] p-8 rounded-[2.5rem] shadow-xl shadow-[hsla(var(--gold),.20)] transition-all duration-500 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute top-0 left-0 w-full h-full bg-stone-200/70 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex justify-between items-start mb-6">
-                    <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl border border-white/10">
+                    <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl border border-stone-200">
                         <ClipboardList className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-[10px] font-black text-white/50 uppercase tracking-widest">QF71-G-3-2</span>
+                    <span className="text-[10px] font-black text-stone-400 uppercase tracking-widest">QF71-G-3-2</span>
                 </div>
-                <h4 className="text-sm font-black text-white mb-2">السجل التراكمي الشامل</h4>
-                <p className="text-[10px] text-white/70 font-bold mb-6">توليد ملف كامل يحتوي على كافة بيانات النشاط للفصل الدراسي</p>
+                <h4 className="text-sm font-black text-foreground mb-2">السجل التراكمي الشامل</h4>
+                <p className="text-[10px] text-stone-500 font-bold mb-6">توليد ملف كامل يحتوي على كافة بيانات النشاط للفصل الدراسي</p>
 
                 <PDFDownloadLink
                     document={<FullActivityRecord events={events} honors={honors} stats={stats} />}

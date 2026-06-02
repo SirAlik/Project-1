@@ -34,14 +34,14 @@ export function BadgesModal({ isOpen, onClose, studentName, studentId, onAward }
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                        className="absolute inset-0 bg-stone-200/70 backdrop-blur-md"
                     />
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-2xl bg-zinc-900 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl"
+                        className="relative w-full max-w-2xl bg-stone-100 border border-stone-200 rounded-[32px] overflow-hidden shadow-2xl"
                         dir="rtl"
                     >
                         <div className="p-8">
@@ -51,11 +51,11 @@ export function BadgesModal({ isOpen, onClose, studentName, studentId, onAward }
                                         <Award className="w-6 h-6 icon-morph" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black text-white">تقليد الأوسمة الاستحقاقية</h3>
-                                        <p className="text-xs text-zinc-500 font-bold">تكريم الطالب: {studentName}</p>
+                                        <h3 className="text-xl font-black text-foreground">تقليد الأوسمة الاستحقاقية</h3>
+                                        <p className="text-xs text-stone-500 font-bold">تكريم الطالب: {studentName}</p>
                                     </div>
                                 </div>
-                                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl text-zinc-500 transition-colors" aria-label="إغلاق النافذة">
+                                <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-xl text-stone-500 transition-colors" aria-label="إغلاق النافذة">
                                     <X size={20} />
                                 </button>
                             </div>
@@ -80,7 +80,7 @@ export function BadgesModal({ isOpen, onClose, studentName, studentId, onAward }
                                 ))}
                             </div>
 
-                            <p className="text-[10px] text-center text-zinc-600 font-bold mt-4 uppercase tracking-[0.2em]">سيتم إضافة 5 نقاط تلقائية لرصيد الطالب عند منحه أي وسام</p>
+                            <p className="text-[10px] text-center text-stone-500 font-bold mt-4 uppercase tracking-[0.2em]">سيتم إضافة 5 نقاط تلقائية لرصيد الطالب عند منحه أي وسام</p>
                         </div>
                     </motion.div>
                 </div>

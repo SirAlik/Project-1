@@ -124,19 +124,19 @@ export function ReportsCenter({ state }: Props) {
                 {reportCategories.map((category, idx) => (
                     <div key={idx} className="space-y-4">
                         <div className="flex items-center gap-3 px-2">
-                            <div className={`p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-${category.color}-400`}>
+                            <div className={`p-2 rounded-xl bg-stone-100 border border-stone-200 text-${category.color}-400`}>
                                 <category.icon className="w-4 h-4" />
                             </div>
-                            <h3 className="text-sm font-black text-white uppercase tracking-wider">{category.title}</h3>
+                            <h3 className="text-sm font-black text-foreground uppercase tracking-wider">{category.title}</h3>
                         </div>
 
-                        <div className="bg-zinc-900/40 border border-zinc-800 rounded-[2.5rem] overflow-hidden">
+                        <div className="bg-white/80 border border-stone-200 rounded-[2.5rem] overflow-hidden">
                             {category.reports.map((report, rIdx) => (
-                                <div key={rIdx} className="p-5 border-b border-zinc-800/50 last:border-0 hover:bg-zinc-800/30 transition-all group">
+                                <div key={rIdx} className="p-5 border-b border-stone-200 last:border-0 hover:bg-stone-100/80 transition-all group">
                                     <div className="flex justify-between items-center mb-2">
                                         <div>
-                                            <p className="text-[10px] font-black text-zinc-500 mb-1">{report.id}</p>
-                                            <h4 className="text-xs font-bold text-white group-hover:text-indigo-400 transition-colors">{report.name}</h4>
+                                            <p className="text-[10px] font-black text-stone-500 mb-1">{report.id}</p>
+                                            <h4 className="text-xs font-bold text-foreground group-hover:text-indigo-400 transition-colors">{report.name}</h4>
                                         </div>
                                         <div className="flex gap-2">
                                             {report.data ? (
@@ -145,23 +145,23 @@ export function ReportsCenter({ state }: Props) {
                                                     fileName={`${report.id}-${new Date().toISOString().split('T')[0]}.pdf`}
                                                 >
                                                     {({ loading }) => (
-                                                        <span className={`p-3 bg-zinc-950 text-zinc-400 hover:text-white hover:bg-indigo-500 transition-all rounded-2xl border border-zinc-800 flex items-center justify-center ${loading ? 'opacity-50' : 'cursor-pointer'}`}>
+                                                        <span className={`p-3 bg-white text-stone-500 hover:text-foreground hover:bg-indigo-500 transition-all rounded-2xl border border-stone-200 flex items-center justify-center ${loading ? 'opacity-50' : 'cursor-pointer'}`}>
                                                             <Download className="w-4 h-4" />
                                                         </span>
                                                     )}
                                                 </PDFDownloadLink>
                                             ) : (
-                                                <button className="p-3 bg-zinc-950 text-zinc-600 cursor-not-allowed rounded-2xl border border-zinc-800 opacity-50 shadow-inner" title="بانتظار توفر البيانات">
+                                                <button className="p-3 bg-white text-stone-500 cursor-not-allowed rounded-2xl border border-stone-200 opacity-50 shadow-inner" title="بانتظار توفر البيانات">
                                                     <Download className="w-4 h-4" />
                                                 </button>
                                             )}
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-2 mt-3">
-                                        <div className="h-1 flex-1 bg-zinc-950 rounded-full overflow-hidden">
-                                            <div className={`h-full transition-all duration-1000 ${report.data ? 'bg-indigo-500 w-full' : 'bg-zinc-800 w-1/4'}`}></div>
+                                        <div className="h-1 flex-1 bg-white rounded-full overflow-hidden">
+                                            <div className={`h-full transition-all duration-1000 ${report.data ? 'bg-indigo-500 w-full' : 'bg-stone-200 w-1/4'}`}></div>
                                         </div>
-                                        <span className="text-[8px] font-black text-zinc-600 uppercase italic">
+                                        <span className="text-[8px] font-black text-stone-500 uppercase italic">
                                             {report.data ? 'جاهز للتصدير' : 'بانتظار بيانات'}
                                         </span>
                                     </div>
@@ -179,7 +179,7 @@ export function ReportsCenter({ state }: Props) {
                     </div>
                     <div>
                         <h4 className="text-white font-bold text-lg leading-tight text-center md:text-right">التصدير الشامل للتقارير السنوية</h4>
-                        <p className="text-zinc-500 text-xs mt-1 text-center md:text-right font-medium">يمكنك تحميل جميع السجلات والمحاضر في ملف واحد مضغوط للإرسال إلى قسم الجودة.</p>
+                        <p className="text-stone-500 text-xs mt-1 text-center md:text-right font-medium">يمكنك تحميل جميع السجلات والمحاضر في ملف واحد مضغوط للإرسال إلى قسم الجودة.</p>
                     </div>
                 </div>
                 <button className="px-8 py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase hover:bg-zinc-200 transition-all shadow-xl shadow-white/5 active:scale-95">

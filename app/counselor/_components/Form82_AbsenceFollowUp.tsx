@@ -43,13 +43,13 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
             code="QF-71-F-8-2"
             fileName={`متابعة_غياب_${student?.name || "طالب"}`}
         >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 bg-zinc-900/40 p-6 rounded-xl border border-zinc-800">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 bg-white/80 p-6 rounded-xl border border-stone-200">
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">اختيار الطالب</label>
+                    <label className="text-xs text-stone-500 block">اختيار الطالب</label>
                     <select
                         value={selectedStudent}
                         onChange={(e) => { setSelectedStudent(e.target.value); setSelectedCaseId(""); }}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
                         title="اختيار الطالب"
                     >
                         <option value="">-- اختر طالب --</option>
@@ -58,11 +58,11 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">المعاملة المرتبطة</label>
+                    <label className="text-xs text-stone-500 block">المعاملة المرتبطة</label>
                     <select
                         value={selectedCaseId}
                         onChange={(e) => setSelectedCaseId(e.target.value)}
-                        className="w-full bg-zinc-900/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm focus:border-emerald-500 outline-none"
+                        className="w-full bg-white/80 border border-stone-200 rounded-lg px-4 py-3 text-sm focus:border-emerald-500 outline-none"
                         aria-label="نوع الغياب"
                         disabled={!selectedStudent}
                     >
@@ -72,8 +72,8 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-xs text-zinc-500 block">الصف الدراسي</label>
-                    <div className="bg-zinc-950/50 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-400">
+                    <label className="text-xs text-stone-500 block">الصف الدراسي</label>
+                    <div className="bg-white/80 border border-stone-200 rounded-lg px-3 py-2 text-sm text-stone-500">
                         {className}
                     </div>
                 </div>
@@ -89,30 +89,30 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
             </div>
 
             <div className="space-y-8">
-                <div className="bg-zinc-900/40 p-6 rounded-xl border border-zinc-800">
-                    <h3 className="text-sm font-bold text-zinc-300 mb-4 flex items-center gap-2">
+                <div className="bg-white/80 p-6 rounded-xl border border-stone-200">
+                    <h3 className="text-sm font-bold text-stone-600 mb-4 flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
                         أسباب الغياب وخطوات المعالجة
                     </h3>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-xs text-zinc-500">تسويغ الغياب (رأي ولي الأمر/الطالب)</label>
+                            <label className="text-xs text-stone-500">تسويغ الغياب (رأي ولي الأمر/الطالب)</label>
                             <textarea
                                 rows={3}
                                 value={justification}
                                 onChange={(e) => setJustification(e.target.value)}
-                                className="w-full h-32 bg-zinc-900/50 border border-zinc-800 rounded-lg p-4 text-sm focus:border-emerald-500 outline-none resize-none"
+                                className="w-full h-32 bg-white/80 border border-stone-200 rounded-lg p-4 text-sm focus:border-emerald-500 outline-none resize-none"
                                 placeholder="اكتب تفاصيل التواصل..."
                                 aria-label="تفاصيل التواصل"
                             ></textarea>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs text-zinc-500">الإجراء المتخذ من قبل التوجيه الطلابي</label>
+                            <label className="text-xs text-stone-500">الإجراء المتخذ من قبل التوجيه الطلابي</label>
                             <textarea
                                 rows={3}
                                 value={actionTaken}
                                 onChange={(e) => setActionTaken(e.target.value)}
-                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-sm focus:border-purple-500 outline-none transition-all resize-none"
+                                className="w-full bg-white border border-stone-200 rounded-lg px-4 py-2 text-sm focus:border-purple-500 outline-none transition-all resize-none"
                                 aria-label="الإجراء المتخذ"
                             />
                         </div>
@@ -120,24 +120,24 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="bg-zinc-900/40 p-6 rounded-xl border border-zinc-800">
-                        <h3 className="text-sm font-bold text-zinc-300 mb-4">بيانات التواصل مع ولي الأمر</h3>
+                    <div className="bg-white/80 p-6 rounded-xl border border-stone-200">
+                        <h3 className="text-sm font-bold text-stone-600 mb-4">بيانات التواصل مع ولي الأمر</h3>
                         <div className="space-y-3">
-                            <div className="flex justify-between text-xs py-2 border-b border-zinc-800">
-                                <span className="text-zinc-500">تاريخ الاتصال الأولى:</span>
-                                <span className="text-zinc-400">.... / .... / 1447هـ</span>
+                            <div className="flex justify-between text-xs py-2 border-b border-stone-200">
+                                <span className="text-stone-500">تاريخ الاتصال الأولى:</span>
+                                <span className="text-stone-500">.... / .... / 1447هـ</span>
                             </div>
-                            <div className="flex justify-between text-xs py-2 border-b border-zinc-800">
-                                <span className="text-zinc-500">النتيجة:</span>
-                                <span className="text-zinc-400">........................</span>
+                            <div className="flex justify-between text-xs py-2 border-b border-stone-200">
+                                <span className="text-stone-500">النتيجة:</span>
+                                <span className="text-stone-500">........................</span>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-zinc-900/40 p-6 rounded-xl border border-zinc-800 flex flex-col justify-center items-center text-center">
-                        <p className="text-xs text-zinc-500 mb-6 font-bold">تعهد الطالب بالمواظبة</p>
-                        <div className="w-full border-b border-zinc-800 mb-2"></div>
-                        <p className="text-[10px] text-zinc-600">توقيع الطالب المعني</p>
+                    <div className="bg-white/80 p-6 rounded-xl border border-stone-200 flex flex-col justify-center items-center text-center">
+                        <p className="text-xs text-stone-500 mb-6 font-bold">تعهد الطالب بالمواظبة</p>
+                        <div className="w-full border-b border-stone-200 mb-2"></div>
+                        <p className="text-[10px] text-stone-500">توقيع الطالب المعني</p>
                     </div>
                 </div>
             </div>

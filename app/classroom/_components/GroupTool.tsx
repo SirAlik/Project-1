@@ -38,14 +38,14 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="absolute inset-0 bg-zinc-950/90 backdrop-blur-xl"
+                        className="absolute inset-0 bg-white/95 backdrop-blur-xl"
                     />
 
                     <motion.div
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.95, opacity: 0 }}
-                        className="relative w-full max-w-5xl glass-panel p-8 rounded-[2.5rem] border border-white/10 shadow-3xl flex flex-col max-h-[90vh]"
+                        className="relative w-full max-w-5xl glass-panel p-8 rounded-[2.5rem] border border-stone-200 shadow-3xl flex flex-col max-h-[90vh]"
                     >
                         <header className="flex justify-between items-center mb-8">
                             <div className="flex items-center gap-4">
@@ -53,11 +53,11 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                                     <Users2 size={24} />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-black text-white">توزيع المجموعات الذكي</h2>
-                                    <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest mt-1">تقسيم الفصل إلى فرق عمل</p>
+                                    <h2 className="text-xl font-black text-foreground">توزيع المجموعات الذكي</h2>
+                                    <p className="text-stone-500 text-xs font-bold uppercase tracking-widest mt-1">تقسيم الفصل إلى فرق عمل</p>
                                 </div>
                             </div>
-                            <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-500 hover:text-white transition-all" aria-label="إغلاق أداة المجموعات">
+                            <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-stone-500 hover:text-foreground transition-all" aria-label="إغلاق أداة المجموعات">
                                 <X size={20} />
                             </button>
                         </header>
@@ -66,17 +66,17 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                             {/* Controls */}
                             <aside className="w-full lg:w-72 space-y-8">
                                 <section className="space-y-4">
-                                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">نوع التوزيع</label>
-                                    <div className="flex bg-zinc-900/50 p-1 rounded-2xl border border-white/5">
+                                    <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest">نوع التوزيع</label>
+                                    <div className="flex bg-white/80 p-1 rounded-2xl border border-stone-200">
                                         <button
                                             onClick={() => setDistType("count")}
-                                            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${distType === 'count' ? 'bg-indigo-600 text-white shadow-lg' : 'text-zinc-500 hover:text-white'}`}
+                                            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${distType === 'count' ? 'bg-indigo-600 text-white shadow-lg' : 'text-stone-500 hover:text-foreground'}`}
                                         >
                                             عدد المجموعات
                                         </button>
                                         <button
                                             onClick={() => setDistType("size")}
-                                            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${distType === 'size' ? 'bg-indigo-600 text-white shadow-lg' : 'text-zinc-500 hover:text-white'}`}
+                                            className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${distType === 'size' ? 'bg-indigo-600 text-white shadow-lg' : 'text-stone-500 hover:text-foreground'}`}
                                         >
                                             عدد الطلاب
                                         </button>
@@ -84,7 +84,7 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                                 </section>
 
                                 <section className="space-y-4">
-                                    <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                                    <label className="text-[10px] font-black text-stone-500 uppercase tracking-widest">
                                         {distType === 'count' ? "عدد المجموعات المطلوبة" : "عدد الطلاب في كل مجموعة"}
                                     </label>
                                     <div className="flex items-center gap-4">
@@ -97,7 +97,7 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                                             className="flex-1 accent-indigo-500"
                                             aria-label="عدد المجموعات أو الطلاب"
                                         />
-                                        <span className="text-xl font-black text-white w-8">{groupCount}</span>
+                                        <span className="text-xl font-black text-foreground w-8">{groupCount}</span>
                                     </div>
                                 </section>
 
@@ -118,20 +118,20 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                             {/* Groups Grid */}
                             <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 pb-8 h-full">
                                 {groups.length === 0 ? (
-                                    <div className="h-full flex flex-col items-center justify-center text-zinc-600 gap-4 opacity-50">
+                                    <div className="h-full flex flex-col items-center justify-center text-stone-500 gap-4 opacity-50">
                                         <LayoutGrid size={64} strokeWidth={1} />
                                         <p className="text-sm font-bold">لم يتم توزيع المجموعات بعد</p>
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {groups.map((group) => (
-                                            <div key={group.id} className="glass-panel p-5 rounded-3xl border border-white/5 bg-zinc-900/40">
-                                                <div className="flex justify-between items-center mb-4 pb-3 border-b border-white/5">
-                                                    <h3 className="text-xs font-black text-white flex items-center gap-2">
+                                            <div key={group.id} className="glass-panel p-5 rounded-3xl border border-stone-200 bg-white/80">
+                                                <div className="flex justify-between items-center mb-4 pb-3 border-b border-stone-200">
+                                                    <h3 className="text-xs font-black text-foreground flex items-center gap-2">
                                                         <span className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-[10px]">{group.id}</span>
                                                         المجموعة {group.id}
                                                     </h3>
-                                                    <span className="text-[10px] font-bold text-zinc-500">{group.studentIds.length} طلاب</span>
+                                                    <span className="text-[10px] font-bold text-stone-500">{group.studentIds.length} طلاب</span>
                                                 </div>
 
                                                 <div className="space-y-2">
@@ -139,11 +139,11 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                                                         const student = students.find(s => s.id === sid);
                                                         const isPinned = pinnedIds.includes(sid);
                                                         return (
-                                                            <div key={sid} className="flex items-center justify-between p-2 rounded-xl bg-zinc-950/50 border border-white/5 hover:border-white/10 transition-all group/item">
-                                                                <span className="text-xs font-bold text-zinc-300">{student?.name}</span>
+                                                            <div key={sid} className="flex items-center justify-between p-2 rounded-xl bg-white/80 border border-stone-200 hover:border-stone-200 transition-all group/item">
+                                                                <span className="text-xs font-bold text-stone-600">{student?.name}</span>
                                                                 <button
                                                                     onClick={() => togglePin(sid)}
-                                                                    className={`p-1.5 rounded-lg transition-all ${isPinned ? 'text-[hsl(var(--gold))] bg-[hsla(var(--gold),.10)]' : 'text-zinc-600 hover:text-white opacity-0 group-hover/item:opacity-100'}`}
+                                                                    className={`p-1.5 rounded-lg transition-all ${isPinned ? 'text-[hsl(var(--gold))] bg-[hsla(var(--gold),.10)]' : 'text-stone-500 hover:text-foreground opacity-0 group-hover/item:opacity-100'}`}
                                                                 >
                                                                     {isPinned ? <Lock size={12} /> : <Unlock size={12} />}
                                                                 </button>

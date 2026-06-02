@@ -34,7 +34,7 @@ export default function PrincipalDashboardLoading() {
                 {/* Top KPI Strip - 4 columns */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="glass-card p-6 rounded-[2rem] border border-white/10 min-h-[120px]">
+                        <div key={i} className="glass-card p-6 rounded-[2rem] border border-stone-200 min-h-[120px]">
                             <GlassSkeleton variant="text" className="w-24 h-3 mb-2" />
                             <GlassSkeleton variant="text" className="w-20 h-8 mb-2" />
                             <GlassSkeleton variant="text" className="w-16 h-4" />
@@ -45,7 +45,7 @@ export default function PrincipalDashboardLoading() {
                 {/* Operational Command Grid - 8+4 columns */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-10">
                     {/* Hotspots Map - spans 8 columns */}
-                    <div className="lg:col-span-8 glass-card p-6 rounded-2xl border border-white/10 min-h-[320px]">
+                    <div className="lg:col-span-8 glass-card p-6 rounded-2xl border border-stone-200 min-h-[320px]">
                         <GlassSkeleton variant="text" className="w-64 h-5 mb-6" />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                             <div className="space-y-5">
@@ -79,7 +79,7 @@ export default function PrincipalDashboardLoading() {
                     </div>
 
                     {/* Transparency & Audit - spans 4 columns */}
-                    <div className="lg:col-span-4 glass-card p-6 rounded-2xl border border-white/10 min-h-[320px]">
+                    <div className="lg:col-span-4 glass-card p-6 rounded-2xl border border-stone-200 min-h-[320px]">
                         <GlassSkeleton variant="text" className="w-40 h-5 mb-6" />
                         <div className="space-y-6 pt-4">
                             {[1, 2, 3].map((i) => (
@@ -99,7 +99,7 @@ export default function PrincipalDashboardLoading() {
                 </div>
 
                 {/* Sentinel Dashboard Skeleton */}
-                <div className="mb-10 glass-card p-6 rounded-2xl border border-white/10 min-h-[200px]">
+                <div className="mb-10 glass-card p-6 rounded-2xl border border-stone-200 min-h-[200px]">
                     <div className="flex items-center gap-3 mb-6">
                         <GlassSkeleton variant="circle" className="w-10 h-10" />
                         <GlassSkeleton variant="text" className="w-48 h-6" />
@@ -123,7 +123,7 @@ export default function PrincipalDashboardLoading() {
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                            <div key={i} className="glass-card p-6 rounded-2xl border border-white/10 min-h-[100px]">
+                            <div key={i} className="glass-card p-6 rounded-2xl border border-stone-200 min-h-[100px]">
                                 <GlassSkeleton variant="text" className="w-24 h-5 mb-2" />
                                 <GlassSkeleton variant="text" className="w-40 h-3" />
                             </div>
@@ -135,7 +135,7 @@ export default function PrincipalDashboardLoading() {
                 <section className="mb-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {[1, 2, 3].map((i) => (
-                            <div key={i} className="glass-card p-6 rounded-2xl border border-white/10 min-h-[280px]">
+                            <div key={i} className="glass-card p-6 rounded-2xl border border-stone-200 min-h-[280px]">
                                 <GlassSkeleton variant="text" className="w-40 h-5 mb-6" />
                                 <div className="space-y-6 pt-4">
                                     {[1, 2, 3].map((j) => (

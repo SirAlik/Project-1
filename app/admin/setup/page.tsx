@@ -136,7 +136,7 @@ export default function AdminSetupPage() {
                                     ) : schools.length === 0 ? (
                                         <div className="text-center p-6 bg-[hsla(var(--gold),.15)] border border-[hsla(var(--gold),.25)] rounded-2xl">
                                             <AlertCircle size={32} className="mx-auto mb-3 text-[hsl(var(--gold))]" />
-                                            <p className="font-bold text-[hsl(var(--gold))] dark:text-[hsl(var(--gold))]">لا توجد مدارس مسجلة</p>
+                                            <p className="font-bold text-[hsl(var(--gold))]">لا توجد مدارس مسجلة</p>
                                             <p className="text-sm text-muted-foreground mt-1">قم بإضافة مدرسة جديدة أولاً من لوحة التحكم</p>
                                         </div>
                                     ) : (

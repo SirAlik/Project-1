@@ -67,13 +67,13 @@ function TicketCard({ ticket }: { ticket: HRTicketRow }) {
       </div>
 
       {ticket.violation_details && (
-        <p className="text-xs opacity-70 bg-black/5 rounded-lg px-2.5 py-1.5 leading-relaxed">
+        <p className="text-xs opacity-70 bg-stone-200/70 rounded-lg px-2.5 py-1.5 leading-relaxed">
           {ticket.violation_details}
         </p>
       )}
 
       {ticket.employee_response && (
-        <div className="text-xs bg-black/5 rounded-lg px-2.5 py-1.5 space-y-0.5">
+        <div className="text-xs bg-stone-200/70 rounded-lg px-2.5 py-1.5 space-y-0.5">
           <p className="font-bold opacity-70">رد الموظف:</p>
           <p className="leading-relaxed">{ticket.employee_response}</p>
         </div>

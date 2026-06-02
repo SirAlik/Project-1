@@ -20,9 +20,11 @@ All destructive operations (DROP, TRUNCATE, ALTER, DELETE) are **fully permitted
 | ------ | ------ |
 | `db/migrations/` | ✅ Authoritative — read this |
 | Live Supabase database | ✅ Reflects migrations applied so far |
-| `schema.sql` | ⚠️ Baseline snapshot — may be outdated |
-| `rls.sql` | ⚠️ Legacy — do not apply directly |
-| `indexes.sql` | ⚠️ May contain obsolete entries |
+| `schema.sql` | ❌ Does not exist — removed. Schema is defined by migrations. |
+| `rls.sql` | ❌ Does not exist — removed. RLS is declared in each migration. |
+| `indexes.sql` | ❌ Does not exist — removed. Indexes are declared in each migration. |
+| `verify_after.sql` | ✅ Post-migration verification — raises exception on failure |
+| `verify_deployment.sql` | ✅ Full deployment audit — raises exception on failure |
 
 There is no production database to protect. If a migration contradicts an older file, the migration wins.
 
@@ -81,6 +83,7 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260601_schools_timezone` | M74: schools.timezone NOT NULL DEFAULT 'Asia/Riyadh' — لحساب generated_date بتوقيت المدرسة |
 | `20260602_gamification_multitenant` | M75: Gamification Metaverse V4 — 19 جدول (student_wallet · transaction_logs · sentinel_flags · seasons · quest_nodes · quest_progress · marketplace_items · inventory · raid_bosses · streaks · loot_chests · corruption_states · phantom_merchant_sessions · auctions · ar_glyphs · student_glyph_finds · student_dorms · dorm_furniture · hall_of_legends) مع school_id NOT NULL + RLS + 2 RPC functions |
 | `20260602_pg_cron_daily_feed` | M76: pg_cron + pg_net — تفعيل الإضافتين + دالة `cron_trigger_daily_feed()` (SECURITY DEFINER) + job يومي 00:00 UTC يستدعي `/api/cron/daily-feed` عبر `net.http_post`. الإعداد بعد النشر: `ALTER DATABASE postgres SET app.cron_site_url = '...'` و `app.cron_secret = '...'` |
+| `20260603_m77_student_national_id_school_scoped` | M77: student_profiles — حُذف `national_id_key` unique عالمي، أُضيف `UNIQUE(school_id, national_id)` scoped per tenant + performance index. يمنع تعارض الأرقام الوطنية عبر المدارس. |
 
 Migrations are applied **once, in order**. To fix a mistake: write a new migration. Never edit an already-applied migration.
 

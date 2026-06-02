@@ -53,17 +53,17 @@ export function ExportButtons({ state }: ExportButtonsProps) {
                     key={idx}
                     document={report.document}
                     fileName={report.fileName}
-                    className="flex items-center justify-between p-3 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-sm group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-white/80 border border-stone-200 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-sm group"
                 >
                     {({ loading }) => (
                         <>
-                            <span className="text-zinc-300 group-hover:text-emerald-300 transition-colors">
+                            <span className="text-stone-600 group-hover:text-emerald-300 transition-colors">
                                 {report.label}
                             </span>
                             {loading ? (
                                 <Loader2 className="w-4 h-4 text-emerald-500 animate-spin" />
                             ) : (
-                                <FileDown className="w-4 h-4 text-zinc-500 group-hover:text-emerald-500 transition-colors" />
+                                <FileDown className="w-4 h-4 text-stone-500 group-hover:text-emerald-500 transition-colors" />
                             )}
                         </>
                     )}

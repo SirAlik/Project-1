@@ -55,13 +55,6 @@ function normalizeMobile(mobile: string): string {
 }
 
 /**
- * Escape/sanitize input (placeholder for future sanitization logic).
- */
-function escapeInput<T>(input: T): T {
-    return input;
-}
-
-/**
  * Validate legacy invite (for transition period).
  */
 function validateLegacy(invite: {
@@ -315,7 +308,7 @@ export async function validateInvite(rawToken: string): Promise<ValidateInviteRe
  * Public action - used on join page.
  */
 export async function joinSchool(input: ConsumeInviteInput): Promise<JoinSchoolResult> {
-    const { token, password } = escapeInput(input);
+    const { token, password } = input;
 
     if (!token || token.length < 10) {
         return { success: false, error: 'رمز الدعوة غير صالح' };
@@ -380,7 +373,6 @@ export async function joinSchool(input: ConsumeInviteInput): Promise<JoinSchoolR
             email: authEmail,
             full_name: resolvedInvite.full_name,
             mobile_number: resolvedInvite.mobile_number,
-            system_role: 'system_user',
             is_onboarded: false,
         });
 
