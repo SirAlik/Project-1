@@ -37,7 +37,7 @@
 
 ## 🧹 حالة جودة الكود (Code Quality Status)
 
-> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **61/61 صفحة** بدون أي خطأ TypeScript. **Virtual-Swimming-Wave (2026-06-03):** تأمين 9 نقاط أمنية + M77 compound unique + 3 layout guards جديدة.
+> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **74/74 صفحة** بدون أي خطأ TypeScript. **Virtual-Swimming-Wave (2026-06-03): 100% مكتمل** — تأمين 9 نقاط أمنية + M77 compound unique + layout guards (lrc/qa/science/student-affairs/educational/staff-evaluation/metaverse/admin) + Phase 6 browser hooks → Server Actions + Phase 8c/8e/8f hardening.
 
 ### ✅ المرحلة الأولى — مكتملة
 
@@ -55,7 +55,7 @@
 | ------- | ------ |
 | إجمالي المشاكل عند البداية | ~700 |
 | `npm run lint` الآن | **0 أخطاء · 0 تحذيرات** |
-| `npm run build` الآن | ✅ **61/61 صفحة** · صفر أخطاء TypeScript · `ƒ Proxy (Middleware)` |
+| `npm run build` الآن | ✅ **74/74 صفحة** · صفر أخطاء TypeScript · `ƒ Proxy (Middleware)` |
 | `@typescript-eslint/no-explicit-any` المتبقية | **صفر** |
 
 ### ✅ المرحلة الرابعة — مكتملة
@@ -278,6 +278,10 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 | إصلاح activity_leader path | `lib/auth/roles.ts`: `ROLE_DASHBOARD_MAP` صُحِّح من `/activities` إلى `/activity` |
 | Layout guards جديدة | `app/lrc/layout.tsx` (school_librarian) · `app/qa/layout.tsx` (quality_coordinator) · `app/science/layout.tsx` (lab_technician) |
 | Phase 6 — 8 browser hooks → Server Actions | `app/{qa,science,health,lrc,activity,classroom,secretary}/_actions.ts` منشأة + `app/student-affairs/_actions.ts` مُوسَّع — كل mutation تضيف `school_id: persona.schoolId` من server-side عبر `createSupabaseServerClient()` + `getActivePersona()`. لا browser writes لبيانات محمية. |
+| Admin layout guard | `app/admin/layout.tsx` — role: `system_owner` يغطي جميع مسارات `/admin/*` التي كانت مكشوفة. commit `0bf76d8`. |
+| Phase 7b — layout guards إضافية | `app/student-affairs/layout.tsx` · `app/educational/layout.tsx` · `app/staff-evaluation/layout.tsx` · `app/student/metaverse/layout.tsx` — أدوار: student_affairs_vp / academic_vp / school_principal / student. commits `fc1748b` + `3b44d1b`. |
+| Phase 8c — timetable Server Component | `app/admin/timetable/page.tsx` → async Server Component + `TimetableClient.tsx`. يُصلح query legacy `profiles.role='teacher'` → `user_personas!inner(full_name)`. commit `3b44d1b`. |
+| Phase 8e/8f — school_id hardening | `period-attendance-service.ts` + `meeting-service.ts`: explicit `.eq('school_id', persona.schoolId)` defense-in-depth على جميع UPDATE queries. commit `0bf76d8`. |
 
 ---
 

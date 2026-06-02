@@ -71,7 +71,7 @@ The following issues are **already resolved**. Do not report them as new finding
 | `/api/cron/daily-feed` | Route exists at `app/api/cron/daily-feed/route.ts`, protected by `Authorization: Bearer <CRON_SECRET>`. |
 | Migration count | 80 migrations total: M01–M77 + R00–R12. `db/migrations/` is the single source of truth. |
 | `npm run lint` | Zero errors, zero warnings (ESLint 9.x, phases 1–5 complete). |
-| `npm run build` | 61/61 pages, zero TypeScript errors, zero warnings. |
+| `npm run build` | 74/74 pages, zero TypeScript errors, zero warnings. |
 | `BulkUploadModal` | Uses Server Action with `school_id` — no direct browser write to DB. |
 | Notifications Center | `components/layout/NotificationsMenu.tsx` wired in `GlobalHeader` — bell icon, unread badge, dropdown (last 10 items, mark-all-read). `lib/services/notification-service.ts` + `app/notifications/` (page + client + actions) complete. |
 | Period Attendance service layer | `lib/services/period-attendance-service.ts` uses `period_id` UUID throughout (no `period_number`). `lib/types/academic.ts` + `lib/services/academic-service.ts` created post-M59. No hardcoded timing — `app/classroom/page.tsx` uses DB lookup. |
@@ -87,6 +87,12 @@ The following issues are **already resolved**. Do not report them as new finding
 | activity_leader route fix | `lib/auth/roles.ts` `ROLE_DASHBOARD_MAP`: corrected `activity_leader` path from `/activities` (non-existent) to `/activity`. |
 | Layout guards — lrc / qa / science | `app/lrc/layout.tsx` (role: `school_librarian`) · `app/qa/layout.tsx` (role: `quality_coordinator`) · `app/science/layout.tsx` (role: `lab_technician`) created — these routes were previously accessible to any authenticated user. |
 | Phase 6 — 8 browser hooks → Server Actions | `app/{qa,science,health,lrc,activity,classroom,secretary}/_actions.ts` created; `app/student-affairs/_actions.ts` extended with 8 behavioral actions. All protected mutations now go through `createSupabaseServerClient()` + `getActivePersona()` with explicit `school_id: persona.schoolId`. No browser Supabase writes for protected data. commit `b128997`. |
+| Admin layout guard | `app/admin/layout.tsx` created — role: `system_owner`. All `/admin/*` sub-routes (dashboard, timetable, automation, bulk-upload, setup, schools, verify-phase2) were previously reachable by any authenticated user. commit `0bf76d8`. |
+| Phase 7b — additional layout guards | `app/student-affairs/layout.tsx` (student_affairs_vp) · `app/educational/layout.tsx` (academic_vp) · `app/staff-evaluation/layout.tsx` (school_principal) · `app/student/metaverse/layout.tsx` (student). commits `fc1748b` + `3b44d1b`. |
+| Phase 8c — timetable Server Component | `app/admin/timetable/page.tsx` converted to async Server Component; `app/admin/timetable/TimetableClient.tsx` extracted as `'use client'`. Fixes legacy `profiles.select('*').eq('role', 'teacher')` → `user_personas!inner(full_name)`. Data fetched server-side via `createSupabaseServerClient()`. commit `3b44d1b`. |
+| Phase 8e — period-attendance-service school_id | `lib/services/period-attendance-service.ts`: three queries hardened with explicit `.eq('school_id', persona.schoolId)` on `timetable_slots` and `classes` (defense-in-depth alongside RLS). commit `0bf76d8`. |
+| Phase 8f — meeting-service school_id | `lib/services/meeting-service.ts`: four UPDATE operations (`startMeeting`, `endMeeting`, `signMinutes` ×2) now include `.eq('school_id', persona.schoolId)`. commit `0bf76d8`. |
+| Virtual-Swimming-Wave — 100% complete | All Phase 9 verification checks passed: zero unofficial roles · zero mock IDs · zero .bak files · zero dark classes. Build: 74/74 pages, lint: zero errors. |
 
 **When auditing these areas:** verify the fix is complete and no regression was introduced. Do not flag the original problem as open.
 
