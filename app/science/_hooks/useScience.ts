@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, startTransition } from "react
 
 import { useAuth } from "@/app/_context/AuthContext";
 import { InventoryItem, LabBooking, Experiment } from "@/lib/types/science";
+import { requestLabBookingAction, updateLabBookingStatusAction } from "@/app/science/_actions";
 
 export function useScience() {
     const { user, role, supabase } = useAuth();
@@ -67,7 +68,6 @@ export function useScience() {
     async function requestBooking(date: string, period: number, experimentId?: string) {
         setMsg("");
 
-        // Find existing to prevent double booking?
         const existing = bookings.find(b => b.booking_date === date && b.period === period);
         if (existing) {
             setMsg("Error: This slot is already booked.");
@@ -75,19 +75,16 @@ export function useScience() {
         }
 
         const exp = experiments.find(e => e.id === experimentId);
-
-        const { error } = await supabase.from("lab_bookings").insert([{
+        const result = await requestLabBookingAction({
             booking_date: date,
             period,
-            teacher_id: user?.id,
             teacher_name: currentUserName,
             experiment_id: experimentId,
             experiment_title: exp?.title,
-            status: "pending"
-        }]);
+        });
 
-        if (error) {
-            setMsg(error.message);
+        if (!result.ok) {
+            setMsg(result.error ?? "خطأ");
             return false;
         }
 
@@ -97,12 +94,8 @@ export function useScience() {
     }
 
     async function updateBookingStatus(id: string, status: LabBooking["status"]) {
-        const { error } = await supabase
-            .from("lab_bookings")
-            .update({ status })
-            .eq("id", id);
-
-        if (error) setMsg(error.message);
+        const result = await updateLabBookingStatusAction(id, status);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else {
             setMsg(`✅ Booking ${status}`);
             loadBookings();

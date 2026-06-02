@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, startTransition } from "react";
 import { supabase } from "@/lib/db/supabase";
 import { QAObservation, StudentRiskFlag, Intervention, DailyKPI } from "@/lib/types/qa";
+import { addObservationAction } from "@/app/qa/_actions";
 
 type ObsRow = QAObservation & { profiles: { name: string } | null; classes: { name: string } | null };
 type RiskRow = StudentRiskFlag & { students: { name: string } | null };
@@ -52,8 +53,8 @@ export function useQA() {
     }, []);
 
     async function addObservation(obs: { teacher_id: string; class_id: string; overall_score: number; notes: string }) {
-        const { error } = await supabase.from("qa_observations").insert([obs]);
-        if (error) setMsg(error.message);
+        const result = await addObservationAction(obs);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Observation Added"); loadData(); }
     }
 

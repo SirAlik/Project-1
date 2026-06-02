@@ -11,6 +11,20 @@ import {
     TripConsent,
     ActivityEvent
 } from "@/lib/types/activity";
+import {
+    addBudgetItemAction,
+    addExpenseAction,
+    deleteFinancialAction,
+    addClubAction,
+    assignTeacherToClubAction,
+    evaluatePerformanceAction,
+    submitWishAction,
+    awardStudentAction,
+    createTripAction,
+    scheduleActivityEventAction,
+    updateActivityEventAction,
+    deleteActivityEventAction,
+} from "@/app/activity/_actions";
 
 // أنواع دقيقة تعكس ما ترسله النماذج فعلياً
 export type FinancialInput = {
@@ -175,133 +189,80 @@ export function useActivities() {
 
     // --- Financial Actions ---
     async function addBudgetItem(item: FinancialInput) {
-        const { error } = await supabase.from("activity_financials").insert([{ ...item, type: 'budget' }]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم إضافة بند الميزانية بنجاح");
-            loadData();
-        }
+        const result = await addBudgetItemAction(item);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم إضافة بند الميزانية بنجاح"); loadData(); }
     }
 
     async function addExpense(expense: FinancialInput) {
-        const { error } = await supabase.from("activity_financials").insert([{ ...expense, type: 'expense' }]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تسجيل المصروف بنجاح");
-            loadData();
-        }
+        const result = await addExpenseAction(expense);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تسجيل المصروف بنجاح"); loadData(); }
     }
 
     async function deleteFinancial(id: string) {
-        const { error } = await supabase.from("activity_financials").delete().eq("id", id);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("🗑️ تم حذف السجل المالي");
-            loadData();
-        }
+        const result = await deleteFinancialAction(id);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("🗑️ تم حذف السجل المالي"); loadData(); }
     }
 
     // --- Club & Staff Actions ---
     async function addClub(club: AddClubInput) {
-        const { error } = await supabase.from("activity_clubs").insert([club]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم إنشاء النادي بنجاح");
-            loadData();
-        }
+        const result = await addClubAction(club);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم إنشاء النادي بنجاح"); loadData(); }
     }
 
     async function assignTeacher(assignment: AssignTeacherInput) {
-        const { error } = await supabase.from("club_assignments").insert([assignment]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تعيين المعلم للنادي");
-            loadData();
-        }
+        const result = await assignTeacherToClubAction(assignment);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تعيين المعلم للنادي"); loadData(); }
     }
 
     async function evaluatePerformance(evaluation: EvalInput) {
-        const { error } = await supabase.from("club_evaluations").insert([evaluation]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تسجيل التقييم بنجاح");
-            loadData();
-        }
+        const result = await evaluatePerformanceAction(evaluation);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تسجيل التقييم بنجاح"); loadData(); }
     }
 
     // --- Student Participation Actions ---
     async function submitWish(wish: SubmitWishInput) {
-        const { error } = await supabase.from("student_wishes").upsert([wish]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تسجيل رغبة الطالب");
-            loadData();
-        }
+        const result = await submitWishAction(wish);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تسجيل رغبة الطالب"); loadData(); }
     }
 
     async function awardStudent(honor: AwardInput) {
-        const { error } = await supabase.from("student_honors").insert([honor]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تكريم الطالب بنجاح");
-            loadData();
-        }
+        const result = await awardStudentAction(honor);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تكريم الطالب بنجاح"); loadData(); }
     }
 
     async function createTrip(trip: CreateTripInput) {
-        const { data, error } = await supabase.from("activity_trips").insert([trip]).select().single();
-        if (error) {
-            setMsg(error.message);
-            return null;
-        } else {
-            // Generate consents for all students in target classes
-            const { data: studentsInClasses } = await supabase
-                .from("student_profiles")
-                .select("id")
-                .in("class_id", trip.target_classes);
-
-            if (studentsInClasses && studentsInClasses.length > 0) {
-                const newConsents = studentsInClasses.map((s: { id: string }) => ({
-                    trip_id: data.id,
-                    student_id: s.id,
-                    unique_link: crypto.randomUUID(),
-                    parent_consent: false
-                }));
-                await supabase.from("trip_consents").insert(newConsents);
-            }
-
-            setMsg("✅ تم إنشاء الرحلة وتوليد روابط الموافقات بنجاح");
-            loadData();
-            return data;
-        }
+        const result = await createTripAction(trip);
+        if (!result.ok) { setMsg(result.error ?? "خطأ"); return null; }
+        setMsg("✅ تم إنشاء الرحلة وتوليد روابط الموافقات بنجاح");
+        loadData();
+        return result.data ?? null;
     }
 
     // --- Event Actions ---
     async function scheduleEvent(event: Omit<ActivityEvent, "id" | "created_at" | "participants_count">) {
-        const { error } = await supabase.from("activity_events").insert([event]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم جدولة الفعالية بنجاح");
-            loadData();
-        }
+        const result = await scheduleActivityEventAction(event);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم جدولة الفعالية بنجاح"); loadData(); }
     }
 
     async function updateEvent(id: string, updates: Partial<ActivityEvent>) {
-        const { error } = await supabase.from("activity_events").update(updates).eq("id", id);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تحديث الفعالية");
-            loadData();
-        }
+        const result = await updateActivityEventAction(id, updates);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تحديث الفعالية"); loadData(); }
     }
 
     async function deleteEvent(id: string) {
-        const { error } = await supabase.from("activity_events").delete().eq("id", id);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("🗑️ تم حذف الفعالية");
-            loadData();
-        }
+        const result = await deleteActivityEventAction(id);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("🗑️ تم حذف الفعالية"); loadData(); }
     }
 
     // --- Lifecycle ---

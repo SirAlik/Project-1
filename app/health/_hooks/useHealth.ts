@@ -8,6 +8,16 @@ import {
     CanteenCheck,
     HygieneLog
 } from "@/lib/types/health";
+import {
+    addVisitAction,
+    addReferralAction,
+    addAwarenessAction,
+    addHygieneLogAction,
+    addCanteenCheckAction,
+    addSupplyItemAction,
+    updateSupplyAction,
+    deleteSupplyItemAction,
+} from "@/app/health/_actions";
 
 export function useHealth() {
     const [loading, setLoading] = useState(false);
@@ -64,83 +74,55 @@ export function useHealth() {
         date?: string;
         status: "completed" | "referred"
     }) {
-        const { data, error } = await supabase.from("health_visits").insert([visit]).select().single();
-        if (error) {
-            setMsg(error.message);
-            return null;
-        }
+        const result = await addVisitAction(visit);
+        if (!result.ok) { setMsg(result.error ?? "خطأ"); return null; }
         setMsg("✅ تم تسجيل الزيارة بنجاح");
         loadData();
-        return data;
+        return null;
     }
 
     async function addReferral(referral: { visit_id: string; student_name: string; destination: string; reason: string; parent_notified: boolean; notes: string }) {
-        const { error } = await supabase.from("health_referrals").insert([referral]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم إصدار مستند التحويل");
-            loadData();
-        }
+        const result = await addReferralAction(referral);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم إصدار مستند التحويل"); loadData(); }
     }
 
     async function addAwareness(event: { title: string; target_audience: string; date: string; description: string }) {
-        const { error } = await supabase.from("health_awareness").insert([event]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تسجيل الفعالية التوعوية");
-            loadData();
-        }
+        const result = await addAwarenessAction(event);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تسجيل الفعالية التوعوية"); loadData(); }
     }
 
     async function addHygieneLog(log: Omit<HygieneLog, "id" | "created_at">) {
-        const { error } = await supabase.from("hygiene_logs").insert([log]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم حفظ نتائج فحص النظافة");
-            loadData();
-        }
+        const result = await addHygieneLogAction(log as Record<string, unknown>);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم حفظ نتائج فحص النظافة"); loadData(); }
     }
 
     async function addCanteenCheck(check: Omit<CanteenCheck, "id" | "created_at">) {
-        const { error } = await supabase.from("canteen_checks").insert([check]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تسجيل فحص المقصف المدرسي");
-            loadData();
-        }
+        const result = await addCanteenCheckAction(check as Record<string, unknown>);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تسجيل فحص المقصف المدرسي"); loadData(); }
     }
 
     // --- Inventory Management ---
 
     async function addSupplyItem(item: Pick<HealthSupply, "item_name" | "quantity" | "category">) {
-        const { error } = await supabase.from("health_supplies").insert([item]);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم إضافة مادة جديدة للمخزون");
-            loadData();
-        }
+        const result = await addSupplyItemAction(item);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم إضافة مادة جديدة للمخزون"); loadData(); }
     }
 
     async function updateSupply(id: string, updates: Partial<HealthSupply>) {
-        const { error } = await supabase.from("health_supplies").update({
-            ...updates,
-            last_updated: new Date().toISOString()
-        }).eq("id", id);
-
-        if (error) setMsg(error.message);
-        else {
-            setMsg("✅ تم تحديث بيانات المخزون");
-            loadData();
-        }
+        const result = await updateSupplyAction(id, updates);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("✅ تم تحديث بيانات المخزون"); loadData(); }
     }
 
     async function deleteSupplyItem(id: string) {
-        const { error } = await supabase.from("health_supplies").delete().eq("id", id);
-        if (error) setMsg(error.message);
-        else {
-            setMsg("🗑️ تم حذف المادة من المخزون");
-            loadData();
-        }
+        const result = await deleteSupplyItemAction(id);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else { setMsg("🗑️ تم حذف المادة من المخزون"); loadData(); }
     }
 
     useEffect(() => {

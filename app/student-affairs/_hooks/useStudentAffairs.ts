@@ -10,6 +10,16 @@ import {
     AttendanceStatus,
     ReferralStatus
 } from "@/lib/types/student-affairs";
+import {
+    markAttendanceAction,
+    sendToCounselorAction,
+    resolveReferralAction,
+    escalateReferralAction,
+    issueAssetAction,
+    returnAssetAction,
+    updateStudentProfileAction,
+    signContractAction,
+} from "@/app/student-affairs/_actions";
 
 export function useStudentAffairs() {
     const { user, supabase } = useAuth();
@@ -109,19 +119,11 @@ export function useStudentAffairs() {
 
     // 2. Attendance Actions
     const markAttendance = async (studentId: string, status: AttendanceStatus, metadata: Partial<StudentAttendance> = {}) => {
-        const { error } = await supabase.from('student_attendance').upsert({
-            student_id: studentId,
-            attendance_date: new Date().toISOString().split('T')[0],
-            status,
-            ...metadata,
-            recorded_by: user?.id
-        });
-
-        if (error) setMsg({ text: error.message, type: 'error' });
+        const result = await markAttendanceAction(studentId, status, metadata as Record<string, unknown>);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
         else {
             setMsg({ text: "✅ Attendance updated successfully", type: 'success' });
             loadAttendance();
-            // Re-load referrals as they might be auto-created by trigger
             loadReferrals();
         }
     };
@@ -137,66 +139,27 @@ export function useStudentAffairs() {
 
     // 3. Referral Actions
     const sendToCounselor = async (referralId: string, vpNotes: string) => {
-        const { error } = await supabase
-            .from('behavioral_referrals')
-            .update({
-                vp_notes: vpNotes,
-                vp_sent_at: new Date().toISOString(),
-                status: 'pending_counselor'
-            })
-            .eq('id', referralId);
-
-        if (error) setMsg({ text: error.message, type: 'error' });
-        else {
-            setMsg({ text: "✅ Referral sent to Counselor", type: 'success' });
-            loadReferrals();
-        }
+        const result = await sendToCounselorAction(referralId, vpNotes);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
+        else { setMsg({ text: "✅ Referral sent to Counselor", type: 'success' }); loadReferrals(); }
     };
 
     const resolveReferral = async (referralId: string, counselorAction: string, counselorNotes?: string) => {
-        const { error } = await supabase
-            .from('behavioral_referrals')
-            .update({
-                counselor_action: counselorAction,
-                counselor_notes: counselorNotes,
-                counselor_resolved_at: new Date().toISOString(),
-                status: 'resolved'
-            })
-            .eq('id', referralId);
-
-        if (error) setMsg({ text: error.message, type: 'error' });
-        else {
-            setMsg({ text: "✅ Referral resolved", type: 'success' });
-            loadReferrals();
-        }
+        const result = await resolveReferralAction(referralId, counselorAction, counselorNotes);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
+        else { setMsg({ text: "✅ Referral resolved", type: 'success' }); loadReferrals(); }
     };
 
     const escalateReferral = async (referralId: string, reason: string) => {
-        const { error } = await supabase
-            .from('behavioral_referrals')
-            .update({
-                status: 'escalated',
-                vp_notes: `Escalated: ${reason}`
-            })
-            .eq('id', referralId);
-
-        if (error) setMsg({ text: error.message, type: 'error' });
-        else {
-            setMsg({ text: "⚠️ Referral escalated to Principal", type: 'success' });
-            loadReferrals();
-        }
+        const result = await escalateReferralAction(referralId, reason);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
+        else { setMsg({ text: "⚠️ Referral escalated to Principal", type: 'success' }); loadReferrals(); }
     };
 
     // 4. Asset Actions
     const issueAsset = async (studentId: string, assetName: string, assetType: string = 'book') => {
-        const { error } = await supabase.from('student_assets').insert({
-            student_id: studentId,
-            asset_name: assetName,
-            asset_type: assetType,
-            handover_by: user?.id
-        });
-
-        if (error) setMsg({ text: error.message, type: 'error' });
+        const result = await issueAssetAction(studentId, assetName, assetType);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
         else {
             setMsg({ text: "✅ Asset issued", type: 'success' });
             loadAssets(studentId);
@@ -204,52 +167,21 @@ export function useStudentAffairs() {
     };
 
     const returnAsset = async (assetId: string, condition: string) => {
-        const { error } = await supabase
-            .from('student_assets')
-            .update({
-                return_date: new Date().toISOString().split('T')[0],
-                return_condition: condition,
-                status: 'returned',
-                return_by: user?.id
-            })
-            .eq('id', assetId);
-
-        if (error) setMsg({ text: error.message, type: 'error' });
-        else {
-            setMsg({ text: "✅ Asset returned", type: 'success' });
-            loadAssets();
-        }
+        const result = await returnAssetAction(assetId, condition);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
+        else { setMsg({ text: "✅ Asset returned", type: 'success' }); loadAssets(); }
     };
 
     const updateProfile = async (studentId: string, updates: Partial<StudentProfile>) => {
-        const { error } = await supabase
-            .from('student_profiles')
-            .update(updates)
-            .eq('id', studentId);
-
-        if (error) setMsg({ text: error.message, type: 'error' });
-        else {
-            setMsg({ text: "✅ Profile updated successfully", type: 'success' });
-            loadStudents();
-        }
+        const result = await updateStudentProfileAction(studentId, updates);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
+        else { setMsg({ text: "✅ Profile updated successfully", type: 'success' }); loadStudents(); }
     };
 
     const signContract = async (contractId: string) => {
-        const { error } = await supabase
-            .from('behavioral_contracts')
-            .update({
-                parent_signature_date: new Date().toISOString()
-            })
-            .eq('id', contractId);
-
-        if (error) setMsg({ text: error.message, type: 'error' });
-        else {
-            setMsg({ text: "✍️ Contract signed successfully", type: 'success' });
-            // Re-load contracts if we had a loader for it, 
-            // but for now we often load them per student.
-            // Let's add loadContracts for completeness.
-            loadAll();
-        }
+        const result = await signContractAction(contractId);
+        if (!result.ok) setMsg({ text: result.error ?? "خطأ", type: 'error' });
+        else { setMsg({ text: "✍️ Contract signed successfully", type: 'success' }); loadAll(); }
     };
 
     // Initial Load

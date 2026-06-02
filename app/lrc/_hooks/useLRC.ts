@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback, startTransition } from "react";
 import { supabase } from "@/lib/db/supabase";
 import { BookRow, LoanRow, VisitRow, BookingRow } from "@/lib/types/lrc";
+import {
+    addBookAction,
+    borrowBookAction,
+    returnBookAction,
+    startClassVisitAction,
+    requestLrcBookingAction,
+    updateLrcBookingStatusAction,
+} from "@/app/lrc/_actions";
 
 export function useLRC() {
     const [loading, setLoading] = useState(false);
@@ -56,8 +64,8 @@ export function useLRC() {
 
     // Book Actions
     async function addBook(book: Omit<BookRow, "id" | "school_id">) {
-        const { error } = await supabase.from("lrc_books").insert([book]);
-        if (error) setMsg(error.message);
+        const result = await addBookAction(book);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ تم إضافة الكتاب للفهرس"); loadData(); }
     }
 
@@ -65,20 +73,23 @@ export function useLRC() {
     async function borrowBook(bookTitleOrId: string, borrowerId: string, type: "student" | "teacher") {
         let book = books.find(b => b.id === bookTitleOrId || b.title === bookTitleOrId);
 
-        // Smart Indexing: If book doesn't exist, create it
+        // Smart Indexing: If book doesn't exist, create it via server action
         if (!book) {
-            const { data: newBook, error: bErr } = await supabase.from("lrc_books").insert([{
+            const newBookResult = await addBookAction({
                 title: bookTitleOrId,
                 total_copies: 1,
-                available_copies: 0, // Will be 0 after this borrow
-                category: "عام"
-            }]).select().single();
+                available_copies: 0,
+                category: "عام",
+                author: null,
+                isbn: null,
+                location: null,
+            });
 
-            if (bErr || !newBook) {
+            if (!newBookResult.ok || !newBookResult.data) {
                 setMsg("❌ فشل تسجيل الكتاب الجديد");
                 return;
             }
-            book = newBook as BookRow;
+            book = { id: newBookResult.data.id, available_copies: 0 } as BookRow;
         } else if (book.available_copies < 1) {
             setMsg("❌ الكتاب غير متوفر حالياً");
             return;
@@ -88,23 +99,15 @@ export function useLRC() {
         const dueDate = new Date();
         dueDate.setDate(loanDate.getDate() + 7);
 
-        // 1. Create Loan
-        const { error: loanErr } = await supabase.from("lrc_loans").insert([{
-            book_id: book.id,
-            borrower_id: borrowerId,
-            borrower_type: type,
-            loan_date: loanDate.toISOString(),
-            due_date: dueDate.toISOString(),
-            status: "active"
-        }]);
+        const result = await borrowBookAction({
+            bookId: book.id,
+            borrowerId,
+            borrowerType: type,
+            loanDate: loanDate.toISOString(),
+            dueDate: dueDate.toISOString(),
+        });
 
-        if (loanErr) { setMsg(loanErr.message); return; }
-
-        // 2. Decrement Copy
-        if (book.id) {
-            await supabase.from("lrc_books").update({ available_copies: Math.max(0, book.available_copies - 1) }).eq("id", book.id);
-        }
-
+        if (!result.ok) { setMsg(result.error ?? "خطأ"); return; }
         setMsg("✅ تم تسجيل الإعارة بنجاح");
         loadData();
     }
@@ -113,83 +116,50 @@ export function useLRC() {
         const loan = loans.find(l => l.id === loanId);
         if (!loan) return;
 
-        // 1. Update Loan
-        const { error } = await supabase.from("lrc_loans").update({
-            status: "returned",
-            return_date: new Date().toISOString()
-        }).eq("id", loanId);
-
-        if (error) { setMsg(error.message); return; }
-
-        // 2. Increment Copy
-        const { data: book } = await supabase.from("lrc_books").select("available_copies").eq("id", loan.book_id).single();
-        if (book) {
-            await supabase.from("lrc_books").update({ available_copies: book.available_copies + 1 }).eq("id", loan.book_id);
-        }
-
+        const result = await returnBookAction(loanId, loan.book_id);
+        if (!result.ok) { setMsg(result.error ?? "خطأ"); return; }
         setMsg("✅ تم استلام الكتاب");
         loadData();
     }
 
     // Visit Actions
-    async function startClassVisit(classId: string, teacherId: string, period: number, topic: string) {
-        const cls = classes.find(c => c.id === classId);
-        const teacher = teachers.find(t => t.id === teacherId);
+    async function startClassVisit(classId: string, teacherPersonaId: string, period: number, topic: string) {
+        // جلب الطلاب للفصل من النسخة المحلية من state
+        const classStudents = students
+            .filter(s => s.class_id === classId)
+            .map(s => ({ id: s.id, name: s.name }));
 
-        const { data: visit, error: vErr } = await supabase.from("lrc_visits").insert([{
-            class_id: classId,
-            class_name: cls?.name,
-            teacher_id: teacherId,
-            teacher_name: teacher?.name,
+        const result = await startClassVisitAction({
+            classId,
+            teacherPersonaId,
             period,
-            topic
-        }]).select().single();
+            topic,
+            visitDate: new Date().toISOString().split('T')[0],
+            studentIds: classStudents,
+        });
 
-        if (vErr || !visit) { setMsg(vErr?.message || "Error creating visit"); return; }
-
-        const { data: classStudents } = await supabase.from("student_profiles").select("id, name").eq("class_id", classId);
-
-        if (classStudents && classStudents.length > 0) {
-            const attendanceRows = classStudents.map((s: { id: string; name: string }) => ({
-                visit_id: visit.id,
-                student_id: s.id,
-                student_name: s.name,
-                is_present: true
-            }));
-
-            const { error: aErr } = await supabase.from("lrc_visit_attendance").insert(attendanceRows);
-            if (aErr) setMsg("تنبيه: تم إنشاء الزيارة ولكن فشل تسجيل الحضور");
-            else setMsg("✅ بدأت زيارة الفصل وتم إنشاء كشف الحضور");
-        } else {
-            setMsg("✅ بدأت الزيارة (لا يوجد طلاب في هذا الفصل)");
-        }
-
+        if (!result.ok) setMsg(result.error ?? "خطأ");
+        else setMsg(classStudents.length > 0 ? "✅ بدأت زيارة الفصل وتم إنشاء كشف الحضور" : "✅ بدأت الزيارة (لا يوجد طلاب في هذا الفصل)");
         loadData();
     }
 
     // Booking Actions
     async function requestBooking(data: { teacherId: string; classId: string; period: number; subject: string; date: string }) {
-        const cls = classes.find(c => c.id === data.classId);
-        const teacher = teachers.find(t => t.id === data.teacherId);
-
-        const { error } = await supabase.from("lrc_bookings").insert([{
-            teacher_id: data.teacherId,
-            teacher_name: teacher?.name || "معلم",
-            class_id: data.classId,
-            class_name: cls?.name,
-            booking_date: data.date,
+        const result = await requestLrcBookingAction({
+            teacherPersonaId: data.teacherId,
+            classId: data.classId,
+            bookingDate: data.date,
             period: data.period,
             subject: data.subject,
-            status: "pending"
-        }]);
+        });
 
-        if (error) setMsg(error.message);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ تم إرسال طلب الحجز"); loadData(); }
     }
 
     async function updateBookingStatus(bookingId: string, status: "approved" | "rejected" | "rescheduled") {
-        const { error } = await supabase.from("lrc_bookings").update({ status }).eq("id", bookingId);
-        if (error) setMsg(error.message);
+        const result = await updateLrcBookingStatusAction(bookingId, status);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg(`✅ تم ${status === "approved" ? "قبول" : "تغيير حالة"} الحجز`); loadData(); }
     }
 

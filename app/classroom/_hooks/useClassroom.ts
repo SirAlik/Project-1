@@ -2,6 +2,17 @@ import { useState, useEffect, useMemo, useCallback, startTransition } from "reac
 
 import { useAuth } from "@/app/_context/AuthContext";
 import { Subject, EventRow, StudentOption, EventType, GradebookItem, ParentNote } from "@/lib/types/classroom";
+import {
+    saveAttendanceAction,
+    addEventAction,
+    undoEventsAction,
+    submitCleaningReportAction,
+    saveStarsAction,
+    saveParentNoteAction,
+    saveSeatingMapAction,
+    saveStudentRolesAction,
+    syncOfflineQueueAction,
+} from "@/app/classroom/_actions";
 
 export function useClassroom() {
     const { user, role, supabase } = useAuth();
@@ -208,7 +219,6 @@ export function useClassroom() {
         setSavingAttendance(true);
         const now = new Date();
 
-        // Only record non-present students
         const absentOrLate = Object.entries(attendance).filter(([, status]) => status !== 'present');
 
         if (absentOrLate.length === 0) {
@@ -218,23 +228,19 @@ export function useClassroom() {
             return;
         }
 
-        const payload = absentOrLate.map(([id, status]) => {
+        const rows = absentOrLate.map(([id, status]) => {
             const student = students.find(s => s.id === id);
             return {
-                student_id: id,
-                student_name_cached: student?.name,
-                type: status === 'absent' ? 'غائب' : 'متأخر',
-                actor_role_cached: role,
-                created_by: user?.id,
-                note: status === 'late' ? `دخل في ${now.toLocaleTimeString('ar-SA')}` : null,
-                event_date: now.toISOString().split('T')[0]
+                studentId: id,
+                studentName: student?.name,
+                status: status as 'absent' | 'late',
+                note: status === 'late' ? `دخل في ${now.toLocaleTimeString('ar-SA')}` : undefined,
             };
         });
 
-        const { error } = await supabase.from("events").insert(payload);
-
-        if (error) {
-            setMsg(`خطأ حفظ الحضور: ${error.message}`);
+        const result = await saveAttendanceAction(rows);
+        if (!result.ok) {
+            setMsg(`خطأ حفظ الحضور: ${result.error ?? "خطأ"}`);
         } else {
             setMsg("✅ تم اعتماد كشف الحضور وإرساله لوكيل الطلاب.");
             setClassStarted(false);
@@ -247,17 +253,15 @@ export function useClassroom() {
         const student = students.find(s => s.id === studentId);
         if (!student) return;
 
-        const { error } = await supabase.from("events").insert([{
+        const result = await addEventAction([{
             student_id: studentId,
             student_name_cached: student.name,
             type: status === 'absent' ? 'غائب' : (status === 'late' ? 'متأخر' : 'تحويل لحاضر'),
-            actor_role_cached: role,
-            created_by: user?.id,
             note: `تحديث يدوي للحالة إلى ${status} في ${new Date().toLocaleTimeString('ar-SA')}`,
-            event_date: new Date().toISOString().split('T')[0]
+            event_date: new Date().toISOString().split('T')[0],
         }]);
 
-        if (error) setMsg(`خطأ في التحديث: ${error.message}`);
+        if (!result.ok) setMsg(`خطأ في التحديث: ${result.error ?? "خطأ"}`);
         else {
             setAttendance(prev => ({ ...prev, [studentId]: status }));
             setMsg(`✅ تم تحديث حالة ${student.name} إلى ${status === 'late' ? 'متأخر' : status}`);
@@ -266,15 +270,8 @@ export function useClassroom() {
     }
 
     async function submitCleaningReport(rating: number, comment: string) {
-        const { error } = await supabase.from("cleaning_reports").insert([{
-            teacher_id: user?.id,
-            rating,
-            comment,
-            status: 'open',
-            created_at: new Date().toISOString()
-        }]);
-
-        if (error) {
+        const result = await submitCleaningReportAction(user?.id ?? '', rating, comment);
+        if (!result.ok) {
             await addEvent("بلاغ نظافة" as EventType, `التقييم: ${rating}/5 - ${comment}`);
         } else {
             setMsg("🚨 تم إرسال بلاغ النظافة لمدير المدرسة.");
@@ -301,21 +298,19 @@ export function useClassroom() {
                 student_name_cached: st?.name,
                 type,
                 note: note?.trim() || null,
-                created_by: user?.id,
-                actor_role_cached: role,
+                actor_role_cached: role ?? undefined,
                 action_category: category,
                 points_delta: pointsDelta || 0,
-                event_date: new Date().toISOString().split('T')[0]
+                event_date: new Date().toISOString().split('T')[0],
             };
         });
 
-        // Offline Resilience: Try Supabase, if fail, queue locally
+        // Offline Resilience: Try Server Action, if fail, queue locally
         try {
-            const { data, error } = await supabase.from("events").insert(payload).select('id');
-            if (error) throw error;
+            const result = await addEventAction(payload);
+            if (!result.ok) throw new Error(result.error ?? 'خطأ');
 
-            const insertedIds = (data as { id: string }[]).map(d => d.id);
-            setLastAction({ type: 'batch_event', ids: insertedIds });
+            setLastAction({ type: 'batch_event', ids: result.data?.ids ?? [] });
             await loadEvents();
         } catch {
             setOfflineQueue(prev => [...prev, ...payload]);
@@ -342,9 +337,9 @@ export function useClassroom() {
         if (!lastAction) return;
 
         if (lastAction.type === 'batch_event') {
-            const { error } = await supabase.from("events").delete().in('id', lastAction.ids);
-            if (error) {
-                setMsg(`⚠️ فشل التراجع: ${error.message}`);
+            const result = await undoEventsAction(lastAction.ids);
+            if (!result.ok) {
+                setMsg(`⚠️ فشل التراجع: ${result.error ?? "خطأ"}`);
             } else {
                 setMsg("🔄 تم التراجع عن الإجراء الأخير.");
                 setLastAction(null);
@@ -361,20 +356,17 @@ export function useClassroom() {
             [studentId]: { startTime: new Date().toISOString(), type }
         }));
 
-        // Log the exit event to track frequency
         const st = students.find(s => s.id === studentId);
-        const { error } = await supabase.from("events").insert([{
+        const result = await addEventAction([{
             student_id: studentId,
             student_name_cached: st?.name,
             type,
-            created_by: user?.id,
-            actor_role_cached: role,
             action_category: 'exit',
-            event_date: new Date().toISOString().split('T')[0]
+            event_date: new Date().toISOString().split('T')[0],
         }]);
 
-        if (error) {
-            console.error("Exit log failed", error);
+        if (!result.ok) {
+            console.error("Exit log failed", result.error);
         } else {
             loadEvents();
         }
@@ -390,18 +382,16 @@ export function useClassroom() {
         const endTime = new Date();
         const duration = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
 
-        const { error } = await supabase.from("events").insert([{
+        const result = await addEventAction([{
             student_id: studentId,
             student_name_cached: students.find(s => s.id === studentId)?.name,
             type: exit.type === "دورة مياه" ? "دورة مياه - عاد" : "عودة من العيادة",
             note: `المدة: ${duration} دقيقة`,
-            actor_role_cached: role,
-            created_by: user?.id,
             action_category: 'utility',
-            event_date: endTime.toISOString().split('T')[0]
+            event_date: endTime.toISOString().split('T')[0],
         }]);
 
-        if (error) setMsg(`خطأ في تسجيل العودة: ${error.message}`);
+        if (!result.ok) setMsg(`خطأ في تسجيل العودة: ${result.error ?? "خطأ"}`);
         else {
             setActiveExits(prev => {
                 const updated = { ...prev };
@@ -465,15 +455,8 @@ export function useClassroom() {
     }
 
     async function saveParentNote(studentId: string, content: string, urgency: "low" | "medium" | "high") {
-        const { error } = await supabase.from("parent_notes").insert([{
-            student_id: studentId,
-            teacher_id: user?.id,
-            content,
-            urgency,
-            created_at: new Date().toISOString()
-        }]);
-
-        if (error) setMsg(`⚠️ فشل إرسال الملاحظة: ${error.message}`);
+        const result = await saveParentNoteAction(studentId, content, urgency);
+        if (!result.ok) setMsg(`⚠️ فشل إرسال الملاحظة: ${result.error ?? "خطأ"}`);
         else setMsg("📧 تم إرسال الملاحظة لولي الأمر بنجاح.");
     }
 
@@ -516,21 +499,15 @@ export function useClassroom() {
         }
         setSavingStars(true);
 
-        const payload = stars.map((name, i) => {
+        const starsPayload = stars.map(name => {
             const sObj = students.find(s => s.name === name);
-            return {
-                student_name_cached: name,
-                student_id: sObj?.id,
-                type: `نجم الحصة ${i + 1}` as EventType,
-                actor_role_cached: role,
-                event_date: new Date().toISOString().split('T')[0]
-            };
+            return { studentId: sObj?.id ?? '', studentName: name };
         });
 
-        const { error } = await supabase.from("events").insert(payload);
+        const result = await saveStarsAction(starsPayload);
         setSavingStars(false);
 
-        if (error) setMsg(`خطأ حفظ النجوم: ${error.message}`);
+        if (!result.ok) setMsg(`خطأ حفظ النجوم: ${result.error ?? "خطأ"}`);
         else {
             setMsg("✅ تم حفظ النجوم.");
             setStars([]);
@@ -542,8 +519,10 @@ export function useClassroom() {
     useEffect(() => {
         if (navigator.onLine && offlineQueue.length > 0) {
             const sync = async () => {
-                const { error } = await supabase.from("events").insert(offlineQueue);
-                if (!error) {
+                const result = await syncOfflineQueueAction(
+                    offlineQueue as Parameters<typeof syncOfflineQueueAction>[0]
+                );
+                if (result.ok) {
                     setOfflineQueue([]);
                     setMsg("📡 تم مزامنة البيانات المخزنة محلياً.");
                     loadEvents();
@@ -551,7 +530,7 @@ export function useClassroom() {
             };
             sync();
         }
-    }, [offlineQueue, loadEvents, supabase]);
+    }, [offlineQueue, loadEvents]);
 
     const loadPhase2Data = useCallback(async () => {
         try {
@@ -576,21 +555,15 @@ export function useClassroom() {
 
     async function saveSeatingMap(newMap: Record<string, { x: number; y: number }>) {
         setSeatingMap(newMap);
-        const { error } = await supabase
-            .from("classroom_metadata")
-            .upsert({ seating_map: newMap, updated_at: new Date().toISOString() });
-
-        if (error) setMsg(`⚠️ فشل حفظ الخريطة: ${error.message}`);
+        const result = await saveSeatingMapAction(undefined, newMap);
+        if (!result.ok) setMsg(`⚠️ فشل حفظ الخريطة: ${result.error ?? "خطأ"}`);
         else setMsg("✅ تم حفظ مخطط الجلوس.");
     }
 
     async function saveStudentRoles(newRoles: Record<string, string>) {
         setStudentRoles(newRoles);
-        const { error } = await supabase
-            .from("classroom_metadata")
-            .upsert({ student_roles: newRoles, updated_at: new Date().toISOString() });
-
-        if (error) setMsg(`⚠️ فشل حفظ الأدوار: ${error.message}`);
+        const result = await saveStudentRolesAction(undefined, newRoles);
+        if (!result.ok) setMsg(`⚠️ فشل حفظ الأدوار: ${result.error ?? "خطأ"}`);
         else setMsg("✅ تم تحديث أدوار الطلاب.");
     }
 

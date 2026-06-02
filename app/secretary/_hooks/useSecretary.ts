@@ -11,6 +11,18 @@ import {
     ProcurementRequest,
     MeetingAttendee
 } from "@/lib/types/secretary";
+import {
+    addLetterAction,
+    updateLetterStatusAction,
+    deleteLetterAction,
+    logAttendanceAction,
+    updateInquiryAction,
+    scheduleMeetingAction,
+    addLeaveAction,
+    updateLeaveStatusAction,
+    submitProcurementAction,
+    addAssignmentAction,
+} from "@/app/secretary/_actions";
 
 type LeaveFormInput = {
     employee_name: string;
@@ -152,82 +164,79 @@ export function useSecretary() {
 
     // Actions
     const addLetter = async (letter: Omit<CorrespondenceRow, "id" | "created_at" | "attachment_url" | "status">) => {
-        const { error } = await supabase.from("secretary_correspondence").insert([{
-            ...letter,
-            status: letter.type === "incoming" ? "received" : "sent"
-        }]);
-        if (error) setMsg(error.message);
+        const result = await addLetterAction(letter);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Letter registered"); loadLetters(); }
     };
 
     const updateLetterStatus = async (id: string, status: string) => {
-        const { error } = await supabase.from("secretary_correspondence").update({ status }).eq("id", id);
-        if (error) setMsg(error.message);
+        const result = await updateLetterStatusAction(id, status);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else loadLetters();
     };
 
-    const logAttendance = async (log: Omit<AttendanceLog, "id" | "created_at" | "is_late">) => {
-        const { error } = await supabase.from("attendance_logs").insert([log]);
-        if (error) setMsg(error.message);
+    const logAttendance = async (log: Omit<AttendanceLog, "id" | "created_at" | "is_late" | "employee">) => {
+        const result = await logAttendanceAction(log);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Attendance logged"); loadAttendance(log.log_date); loadInquiries(); }
     };
 
     const updateInquiry = async (id: string, updates: Partial<HRInquiry>) => {
-        const { error } = await supabase.from("hr_inquiries").update(updates).eq("id", id);
-        if (error) setMsg(error.message);
+        const result = await updateInquiryAction(id, updates as Partial<Omit<HRInquiry, 'id' | 'employee'>>);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Inquiry updated"); loadInquiries(); }
     };
 
     const scheduleMeeting = async (meeting: MeetingScheduleInput, attendeeIds: string[]) => {
-        const { data: meetingData, error: mError } = await supabase
-            .from("meetings")
-            .insert([meeting])
-            .select()
-            .single();
-
-        if (mError) { setMsg(mError.message); return; }
-
-        if (attendeeIds.length > 0) {
-            const attendees = attendeeIds.map(eid => ({
-                meeting_id: meetingData.id,
-                employee_id: eid
-            }));
-            const { error: aError } = await supabase.from("meeting_attendees").insert(attendees);
-            if (aError) setMsg(aError.message);
-        }
-
+        const result = await scheduleMeetingAction({
+            title: String(meeting.title ?? ''),
+            meeting_date: String(meeting.meeting_date ?? ''),
+            meeting_time: meeting.meeting_time != null ? String(meeting.meeting_time) : null,
+            location: meeting.location != null ? String(meeting.location) : null,
+            description: meeting.description != null ? String(meeting.description) : null,
+            meeting_type: meeting.meeting_type,
+            status: meeting.status,
+        }, attendeeIds);
+        if (!result.ok) { setMsg(result.error ?? "خطأ"); return; }
         setMsg("✅ Meeting scheduled");
         loadMeetings();
     };
 
     const deleteLetter = async (id: string) => {
         if (!confirm("Are you sure?")) return;
-        const { error } = await supabase.from("secretary_correspondence").delete().eq("id", id);
-        if (error) setMsg(error.message);
+        const result = await deleteLetterAction(id);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else loadLetters();
     };
 
     const addLeave = async (leave: LeaveFormInput) => {
-        const { error } = await supabase.from("employee_leaves").insert([leave]);
-        if (error) setMsg(error.message);
+        const result = await addLeaveAction(leave);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Leave request submitted"); loadLeaves(); }
     };
 
     const updateLeaveStatus = async (id: string, status: string) => {
-        const { error } = await supabase.from("employee_leaves").update({ status }).eq("id", id);
-        if (error) setMsg(error.message);
+        const result = await updateLeaveStatusAction(id, status);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else loadLeaves();
     };
 
     const submitProcurement = async (request: ProcurementFormInput) => {
-        const { error } = await supabase.from("procurement_requests").insert([request]);
-        if (error) setMsg(error.message);
+        const result = await submitProcurementAction({
+            request_number: request.request_number,
+            request_date: request.request_date,
+            urgency: request.urgency != null ? String(request.urgency) : null,
+            justification: request.justification != null ? String(request.justification) : null,
+            items: request.items,
+            status: request.status,
+        });
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Request submitted"); loadProcurement(); }
     };
 
     const addAssignment = async (letter: Omit<AssignmentLetter, "id" | "created_at">) => {
-        const { error } = await supabase.from("assignment_letters").insert([letter]);
-        if (error) setMsg(error.message);
+        const result = await addAssignmentAction(letter);
+        if (!result.ok) setMsg(result.error ?? "خطأ");
         else { setMsg("✅ Assignment letter created"); loadAssignments(); }
     };
 

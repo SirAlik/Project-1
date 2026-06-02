@@ -148,3 +148,166 @@ export async function bulkInsertStudentsDirect(
 
     return { success: successCount, errors };
 }
+
+// ============================================================
+// Behavioral & Attendance Actions
+// ============================================================
+
+import type { StudentProfile, AttendanceStatus } from '@/lib/types/student-affairs';
+import { createSupabaseServerClient } from '@/lib/db/supabase-server';
+
+type AR = { ok: boolean; error?: string };
+
+export async function markAttendanceAction(
+    studentId: string,
+    status: AttendanceStatus,
+    metadata: Record<string, unknown> = {},
+): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.from('student_attendance').upsert({
+        student_id: studentId,
+        attendance_date: new Date().toISOString().split('T')[0],
+        status,
+        ...metadata,
+        recorded_by: persona.userId,
+        school_id: persona.schoolId,
+    });
+
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function sendToCounselorAction(referralId: string, vpNotes: string): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.from('behavioral_referrals')
+        .update({
+            vp_notes: vpNotes,
+            vp_sent_at: new Date().toISOString(),
+            status: 'pending_counselor',
+        })
+        .eq('id', referralId);
+    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
+
+    const { error } = await query;
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function resolveReferralAction(
+    referralId: string,
+    counselorAction: string,
+    counselorNotes?: string,
+): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.from('behavioral_referrals')
+        .update({
+            counselor_action: counselorAction,
+            counselor_notes: counselorNotes,
+            counselor_resolved_at: new Date().toISOString(),
+            status: 'resolved',
+        })
+        .eq('id', referralId);
+    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
+
+    const { error } = await query;
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function escalateReferralAction(referralId: string, reason: string): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.from('behavioral_referrals')
+        .update({ status: 'escalated', vp_notes: `Escalated: ${reason}` })
+        .eq('id', referralId);
+    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
+
+    const { error } = await query;
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function issueAssetAction(
+    studentId: string,
+    assetName: string,
+    assetType: string = 'book',
+): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.from('student_assets').insert([{
+        student_id: studentId,
+        asset_name: assetName,
+        asset_type: assetType,
+        handover_by: persona.userId,
+        school_id: persona.schoolId,
+    }]);
+
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function returnAssetAction(assetId: string, condition: string): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.from('student_assets')
+        .update({
+            return_date: new Date().toISOString().split('T')[0],
+            return_condition: condition,
+            status: 'returned',
+            return_by: persona.userId,
+        })
+        .eq('id', assetId);
+    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
+
+    const { error } = await query;
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function updateStudentProfileAction(
+    studentId: string,
+    updates: Partial<Omit<StudentProfile, 'id' | 'school_id'>>,
+): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.from('student_profiles')
+        .update(updates)
+        .eq('id', studentId);
+    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
+
+    const { error } = await query;
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
+
+export async function signContractAction(contractId: string): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    let query = supabase.from('behavioral_contracts')
+        .update({ parent_signature_date: new Date().toISOString() })
+        .eq('id', contractId);
+    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
+
+    const { error } = await query;
+    if (error) return { ok: false, error: error.message };
+    return { ok: true };
+}
