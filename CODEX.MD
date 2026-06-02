@@ -71,7 +71,7 @@ The following issues are **already resolved**. Do not report them as new finding
 | `/api/cron/daily-feed` | Route exists at `app/api/cron/daily-feed/route.ts`, protected by `Authorization: Bearer <CRON_SECRET>`. |
 | Migration count | 80 migrations total: M01–M77 + R00–R12. `db/migrations/` is the single source of truth. |
 | `npm run lint` | Zero errors, zero warnings (ESLint 9.x, phases 1–5 complete). |
-| `npm run build` | 74/74 pages, zero TypeScript errors, zero warnings. |
+| `npm run build` | 77/77 pages, zero TypeScript errors, zero warnings. |
 | `BulkUploadModal` | Uses Server Action with `school_id` — no direct browser write to DB. |
 | Notifications Center | `components/layout/NotificationsMenu.tsx` wired in `GlobalHeader` — bell icon, unread badge, dropdown (last 10 items, mark-all-read). `lib/services/notification-service.ts` + `app/notifications/` (page + client + actions) complete. |
 | Period Attendance service layer | `lib/services/period-attendance-service.ts` uses `period_id` UUID throughout (no `period_number`). `lib/types/academic.ts` + `lib/services/academic-service.ts` created post-M59. No hardcoded timing — `app/classroom/page.tsx` uses DB lookup. |
@@ -92,7 +92,8 @@ The following issues are **already resolved**. Do not report them as new finding
 | Phase 8c — timetable Server Component | `app/admin/timetable/page.tsx` converted to async Server Component; `app/admin/timetable/TimetableClient.tsx` extracted as `'use client'`. Fixes legacy `profiles.select('*').eq('role', 'teacher')` → `user_personas!inner(full_name)`. Data fetched server-side via `createSupabaseServerClient()`. commit `3b44d1b`. |
 | Phase 8e — period-attendance-service school_id | `lib/services/period-attendance-service.ts`: three queries hardened with explicit `.eq('school_id', persona.schoolId)` on `timetable_slots` and `classes` (defense-in-depth alongside RLS). commit `0bf76d8`. |
 | Phase 8f — meeting-service school_id | `lib/services/meeting-service.ts`: four UPDATE operations (`startMeeting`, `endMeeting`, `signMinutes` ×2) now include `.eq('school_id', persona.schoolId)`. commit `0bf76d8`. |
-| Virtual-Swimming-Wave — 100% complete | All Phase 9 verification checks passed: zero unofficial roles · zero mock IDs · zero .bak files · zero dark classes. Build: 74/74 pages, lint: zero errors. |
+| Virtual-Swimming-Wave — 100% complete | All Phase 9 verification checks passed: zero unofficial roles · zero mock IDs · zero .bak files · zero dark classes. Build: 77/77 pages, lint: zero errors. |
+| Edge Functions + LRC Maintenance | `supabase/functions/validate-bulk-upload/` (CSV validation, JWT-auth) · `supabase/functions/generate-qms-pdf/` (PDF generation via `npm:pdf-lib` → `qms-forms` Storage) · `supabase/functions/daily-maintenance/` (proxy → Next.js). `lib/jobs/lrc-maintenance-service.ts` (overdue loans + reminders, idempotent). `app/api/cron/daily-maintenance/route.ts` (CRON_SECRET-protected). commit `c05b95a`. |
 
 **When auditing these areas:** verify the fix is complete and no regression was introduced. Do not flag the original problem as open.
 
