@@ -86,6 +86,7 @@ The following issues are **already resolved**. Do not report them as new finding
 | invite.ts system_role fix | `app/_actions/invite.ts`: removed `system_role: 'system_user'` from `profiles.upsert()`. DB default handles new users; `system_owner` accounts are no longer at risk of overwrite during invite acceptance. |
 | activity_leader route fix | `lib/auth/roles.ts` `ROLE_DASHBOARD_MAP`: corrected `activity_leader` path from `/activities` (non-existent) to `/activity`. |
 | Layout guards — lrc / qa / science | `app/lrc/layout.tsx` (role: `school_librarian`) · `app/qa/layout.tsx` (role: `quality_coordinator`) · `app/science/layout.tsx` (role: `lab_technician`) created — these routes were previously accessible to any authenticated user. |
+| Phase 6 — 8 browser hooks → Server Actions | `app/{qa,science,health,lrc,activity,classroom,secretary}/_actions.ts` created; `app/student-affairs/_actions.ts` extended with 8 behavioral actions. All protected mutations now go through `createSupabaseServerClient()` + `getActivePersona()` with explicit `school_id: persona.schoolId`. No browser Supabase writes for protected data. commit `b128997`. |
 
 **When auditing these areas:** verify the fix is complete and no regression was introduced. Do not flag the original problem as open.
 

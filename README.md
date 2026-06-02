@@ -277,6 +277,7 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 | إزالة system_role من invite | `app/_actions/invite.ts`: حُذف `system_role: 'system_user'` من upsert لحماية قيمة system_owner |
 | إصلاح activity_leader path | `lib/auth/roles.ts`: `ROLE_DASHBOARD_MAP` صُحِّح من `/activities` إلى `/activity` |
 | Layout guards جديدة | `app/lrc/layout.tsx` (school_librarian) · `app/qa/layout.tsx` (quality_coordinator) · `app/science/layout.tsx` (lab_technician) |
+| Phase 6 — 8 browser hooks → Server Actions | `app/{qa,science,health,lrc,activity,classroom,secretary}/_actions.ts` منشأة + `app/student-affairs/_actions.ts` مُوسَّع — كل mutation تضيف `school_id: persona.schoolId` من server-side عبر `createSupabaseServerClient()` + `getActivePersona()`. لا browser writes لبيانات محمية. |
 
 ---
 
