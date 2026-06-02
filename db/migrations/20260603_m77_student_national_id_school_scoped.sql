@@ -21,9 +21,4 @@ ALTER TABLE public.student_profiles
   ADD CONSTRAINT student_profiles_school_national_unique
   UNIQUE (school_id, national_id);
 
--- 3. تحسين أداء lookup بـ national_id داخل المدرسة
-CREATE INDEX IF NOT EXISTS idx_student_profiles_school_national_id
-  ON public.student_profiles (school_id, national_id)
-  WHERE national_id IS NOT NULL;
-
 COMMIT;
