@@ -1,13 +1,17 @@
 # تقرير الفجوة المعمارية — Smart School OS
 **التاريخ:** 2026-05-24  
-**آخر تحديث:** 2026-06-02 — تأكيد اكتمال: Notifications Center + Period Attendance Service + db/ cleanup + Phase +11-12  
+**آخر تحديث:** 2026-06-03 — مراجعة شاملة للتنفيذ الكامل + تحديد البنود الثلاثة المتبقية  
 **المراجع:** Claude Sonnet 4.6  
-**نطاق المراجعة:** db/migrations (79 ملف SQL) · lib/jobs/ · app/principal/analytics/ · pg_cron · pg_net
+**نطاق المراجعة:** db/migrations (80 ملف SQL) · lib/jobs/ · app/principal/analytics/ · pg_cron · pg_net · supabase/functions/
 
 ---
 
-> **🔄 تحديث 2026-06-01** — الفجوات الـ26 الموثقة أدناه أُغلقت جميعها بترحيلات migration بعد تاريخ التقرير الأصلي.  
-> التفاصيل في قسم "حالة التحديث" أدناه. بقية التقرير موثقة كسجل تاريخي.
+> **🔄 تحديث 2026-06-01** — الفجوات الـ26 الموثقة أدناه أُغلقت جميعها بترحيلات migration بعد تاريخ التقرير الأصلي. التفاصيل في قسم "حالة التحديث" أدناه. بقية التقرير موثقة كسجل تاريخي.
+>
+> **✅ تحديث 2026-06-03** — مراجعة شاملة للحالة الكاملة. **نسبة الجاهزية: 96/100**.  
+> تأكيد تنفيذ: Virtual-Swimming-Wave (9 إصلاحات أمنية) + Phase 6 (8 hooks→Server Actions) + Admin/7b/8c/8e/8f layout guards + 3 Edge Functions + LRC Maintenance.  
+> **البنود المتبقية (3 فقط):** ❌ trigger جودة period_attendance→quality_evidence · ❌ Scheduled AI Insights · ❌ E2E Tests.  
+> راجع قسم "البنود المتبقية 2026-06-03" أدناه.
 
 ---
 
@@ -65,37 +69,38 @@
 **نعم — بنية البيانات اكتملت. ما يتبقى هو طبقة المنطق والربط الآلي.**  
 الكود يمتلك الآن هيكلاً أمنياً متكاملاً (RLS + PBAC + RBAC + JWT) مع قاعدة بيانات كاملة تغطي جميع السيناريوهات، وlint/build نظيف تماماً.
 
-### نسبة الجاهزية: **92 / 100** *(كانت 28/100 في 2026-05-24)*
+### نسبة الجاهزية: **96 / 100** *(كانت 28/100 في 2026-05-24)*
 
-| المحور | 2026-05-24 | 2026-06-01 | 2026-06-02 (مُؤكَّد) |
-|--------|------------|------------|----------------------|
-| البنية الأكاديمية الأساسية | 58% | ✅ 95% | ✅ 95% |
-| الهوية / الأدوار / العلاقات | 52% | ✅ 90% | ✅ 90% |
-| طبقة الأحداث الموحدة (Events Layer) | 22% | ✅ 80% | ✅ 80% |
-| سيناريو الحضور اليومي وحضور الحصص | 15% | ✅ 82% | ✅ 95% |
-| سيناريو الإحالات الآلية | 5% | ✅ 70% | ✅ 70% |
-| سيناريو زيارات المكتبة (LRC) | 28% | ✅ 88% | ✅ 88% |
-| سيناريو العيادة الصحية | 32% | ✅ 82% | ✅ 82% |
-| سيناريو مغادرة الفصل | 8% | ✅ 78% | ✅ 78% |
-| طبقة التحليلات والمؤشرات | 18% | ✅ 88% | ✅ 98% |
-| مركز الإشعارات (Notifications) | 0% | 30% | ✅ 98% |
-| جاهزية طبقة الذكاء الاصطناعي | 0% | ✅ 55% | ✅ 55% |
-| أتمتة الجودة + workflow_instances | 12% | ✅ 72% | ✅ 88% |
-| Gamification Multi-tenant | 40% | 40% | ✅ 95% |
-| بنية تحتية الوظائف الخلفية (jobs) | 0% | 15% | ✅ 85% |
-| **الإجمالي** | **28%** | **✅ 82%** | **✅ 92%** |
+| المحور | 2026-05-24 | 2026-06-01 | 2026-06-02 | 2026-06-03 (مُؤكَّد) |
+|--------|------------|------------|------------|----------------------|
+| البنية الأكاديمية الأساسية | 58% | ✅ 95% | ✅ 95% | ✅ 95% |
+| الهوية / الأدوار / العلاقات | 52% | ✅ 90% | ✅ 90% | ✅ 100% |
+| طبقة الأحداث الموحدة (Events Layer) | 22% | ✅ 80% | ✅ 80% | ✅ 80% |
+| سيناريو الحضور اليومي وحضور الحصص | 15% | ✅ 82% | ✅ 95% | ✅ 95% |
+| سيناريو الإحالات الآلية | 5% | ✅ 70% | ✅ 70% | ✅ 95% |
+| سيناريو زيارات المكتبة (LRC) | 28% | ✅ 88% | ✅ 88% | ✅ 95% |
+| سيناريو العيادة الصحية | 32% | ✅ 82% | ✅ 82% | ✅ 82% |
+| سيناريو مغادرة الفصل | 8% | ✅ 78% | ✅ 78% | ✅ 78% |
+| طبقة التحليلات والمؤشرات | 18% | ✅ 88% | ✅ 98% | ✅ 98% |
+| مركز الإشعارات (Notifications) | 0% | 30% | ✅ 98% | ✅ 98% |
+| جاهزية طبقة الذكاء الاصطناعي | 0% | ✅ 55% | ✅ 55% | ⚠️ 70% |
+| أتمتة الجودة + workflow_instances | 12% | ✅ 72% | ✅ 88% | ⚠️ 90% |
+| Gamification Multi-tenant | 40% | 40% | ✅ 95% | ✅ 95% |
+| بنية تحتية الوظائف الخلفية (jobs) | 0% | 15% | ✅ 85% | ✅ 98% |
+| الأمان والعزل متعدد المستأجرين | — | — | ✅ 80% | ✅ 100% |
+| **الإجمالي** | **28%** | **✅ 82%** | **✅ 92%** | **✅ 96%** |
 
-### الفجوات المعمارية الخمس الكبرى
+### ~~الفجوات المعمارية الخمس الكبرى~~ ✅ مُغلقة بالكامل (2026-06-03)
 
-1. **غياب جدول `period_attendance`** — لا يوجد تسجيل فعلي لحضور الطالب على مستوى الحصة الدراسية مرتبطاً بـ timetable_slot + teacher + subject، وهو جوهر كل السيناريوهات.
+1. ✅ ~~**غياب جدول `period_attendance`**~~ — أُضيف في M58. `lib/services/period-attendance-service.ts` مُنشأ ومُحصَّن بـ `school_id`.
 
-2. **ضعف بنية جدول `events`** — الجدول موجود لكنه يفتقر إلى `teacher_id`, `period_id`, `timetable_slot_id`, `subject_id`, `source_module`, `metadata JSONB`، مما يجعله غير قابل لتغذية التحليلات أو الجودة.
+2. ✅ ~~**ضعف بنية جدول `events`**~~ — أُضيفت الحقول الناقصة في M70: `teacher_id` · `subject_id` · `period_id` · `timetable_slot_id` · `term_id` · `source_module` · `metadata JSONB` · `event_timestamp`.
 
-3. **قطيعة كاملة بين `guardians` و`profiles`** — ولي الأمر الذي يملك حساب تسجيل دخول لا يوجد رابط بين سجله في جدول `guardians` وحسابه في `profiles`، مما يكسر ربط الإشعارات الآلية.
+3. ✅ ~~**قطيعة كاملة بين `guardians` و`profiles`**~~ — أُضيف FK `profile_id` في M60 (`guardian_profile_link.sql`).
 
-4. **عشرات الجداول مفقودة رغم وجود أنواع TypeScript لها** — `lrc_visits`, `lrc_loans`, `classroom_exits`, `period_attendance`, `health_referrals`, `behavioral_referrals`, `quality_indicators` كلها موجودة كأنواع في TypeScript لكن لا جداول مقابلة في قاعدة البيانات.
+4. ✅ ~~**عشرات الجداول مفقودة رغم وجود أنواع TypeScript لها**~~ — جميع الجداول الـ26 موجودة الآن (M57–M73): `lrc_visits` · `lrc_loans` · `classroom_exits` · `period_attendance` · `health_referrals` · `behavioral_referrals` · `quality_indicators` وغيرها.
 
-5. **لا يوجد محرك قواعد (Rules Engine) ولا طبقة أتمتة** — كل منطق "3 غيابات = تنبيه" أو "4+ غيابات = إحالة آلية" مكتوب في الواجهة أو غير موجود أصلاً، بدلاً من وجود خدمة مركزية.
+5. ✅ ~~**لا يوجد محرك قواعد (Rules Engine) ولا طبقة أتمتة**~~ — `automation_rules` + `notification_queue` في M61. `lib/jobs/automation-service.ts` يعالج `absence_count` + `period_absence` + إحالات آلية + تنبيهات أولياء الأمور.
 
 ---
 
@@ -588,14 +593,16 @@ ai_prompt_templates (
 
 ---
 
-### ~~الخطر 8~~: لا طبقة أتمتة مركزية ✅ جداول أُضيفت (`automation_engine.sql`) — منطق الـ engine يتبقى للتنفيذ
+### ~~الخطر 8~~: لا طبقة أتمتة مركزية ✅ مُحلول بالكامل (2026-06-03)
 
 ```
-الخطأ: منطق "3 غيابات = تنبيه، 4+ = إحالة آلية"
-       إما مكتوب في مكوّنات الواجهة (React) أو غير موجود.
-النتيجة: - لا إحالات آلية حقيقية
-         - إذا فتح المستخدم الصفحة تعمل، إذا لم يفتحها لا تعمل
-         - المنطق مكرر ومتناثر عبر ملفات متعددة
+الحل المنفَّذ:
+  - M61: automation_rules + notification_queue
+  - lib/jobs/automation-service.ts: يعالج absence_count + period_absence
+  - يُنشئ behavioral_referrals آلياً عند تجاوز الحد
+  - يُنتج student_risk_flags للطلاب عالي الخطورة
+  - يُدرج في notification_queue (idempotent عبر UNIQUE constraint)
+  - يُستدعى من /api/cron/daily-maintenance عبر daily-maintenance Edge Function
 ```
 
 ---
@@ -724,11 +731,10 @@ CREATE INDEX IF NOT EXISTS idx_guardians_profile ON guardians(profile_id);
 
 ---
 
-## سادساً: ~~خطة التعديل الآمنة~~ — منجزة ✅
+## سادساً: ~~خطة التعديل الآمنة~~ — منجزة جزئياً
 
-> **ملاحظة 2026-06-01:** هذه الخطة كانت مصممة للحفاظ على بيانات حية.  
-> لأن المشروع لا يحتوي على بيانات إنتاج، نُفِّذت التعديلات مباشرة بدون cautious migration.  
-> جميع المراحل 0–9 مكتملة عبر الترحيلات الـ16 الموثقة في "حالة التحديث" أعلاه.
+> **ملاحظة 2026-06-01:** هذه الخطة كانت مصممة للحفاظ على بيانات حية.
+> لأن المشروع لا يحتوي على بيانات إنتاج، نُفِّذت التعديلات مباشرة بدون cautious migration.
 
 ### ~~المرحلة 0~~: التوثيق والتحقق ✅
 - [x] ~~تشغيل `00_preflight_checks.sql`~~ — الملف حُذف (لا بيانات للتحقق منها)
@@ -736,82 +742,63 @@ CREATE INDEX IF NOT EXISTS idx_guardians_profile ON guardians(profile_id);
 - [x] توثيق الفجوات — هذا الملف
 - [x] RLS policies محدّثة لتستخدم `auth.jwt()->'app_metadata'` عبر R00–R12
 
-### المرحلة 1: إضافة الجداول الهيكلية (أسبوعان)
-**بدون تعديل أي جدول موجود:**
-```sql
--- 1. terms
--- 2. school_stages
--- 3. periods
--- 4. guardian profile_id FK
-```
-اختبار: التحقق من أن الجداول القديمة تعمل بدون تغيير.
+### ~~المرحلة 1~~: إضافة الجداول الهيكلية ✅
+- [x] `terms` — M59
+- [x] `school_stages` — M59
+- [x] `periods` — M59
+- [x] `guardian profile_id FK` — M60
 
-### المرحلة 2: إضافة الجداول التشغيلية (أسبوعان)
-```sql
--- 5. period_attendance (الأعلى أولوية)
--- 6. classroom_exits
--- 7. student_daily_attendance (منفصل عن events)
--- 8. behavioral_referrals + behavioral_contracts
--- 9. student_assets
-```
-اختبار: التحقق من أن إدخالات الواجهة الحالية لا تتأثر.
+### ~~المرحلة 2~~: إضافة الجداول التشغيلية ✅
+- [x] `period_attendance` — M58
+- [x] `classroom_exits` — M65
+- [x] `student_daily_attendance` — M57
+- [x] `behavioral_referrals` + `behavioral_contracts` — M62 + R02
+- [x] `student_assets` — M66
 
-### المرحلة 3: إضافة جداول الوحدات الناقصة (3 أسابيع)
-```sql
--- 10. lrc_visits + lrc_visit_attendance + lrc_bookings + lrc_loans
--- 11. health_referrals + health_supplies + canteen_checks + hygiene_logs
--- 12. توسعة health_visits بإضافة الحقول الناقصة
--- 13. counselor_sessions
--- 14. interventions + student_risk_flags
-```
-اختبار: التأكد من أن الصفحات الحالية تعمل (لأن التغييرات إضافية).
+### ~~المرحلة 3~~: إضافة جداول الوحدات الناقصة ✅
+- [x] `lrc_visits` + `lrc_visit_attendance` + `lrc_bookings` + `lrc_loans` — M67
+- [x] `health_referrals` + `health_supplies` + `canteen_checks` + `hygiene_logs` — M68
+- [x] توسعة `health_visits` بالحقول الناقصة — M68
+- [x] `counselor_sessions` — M62
+- [x] `interventions` + `student_risk_flags` — M69
 
-### المرحلة 4: توسعة Events Layer (أسبوعان)
-```sql
--- 15. إضافة الأعمدة الناقصة لـ events
--- 16. Backfill: تحديث السجلات القديمة بـ teacher_id و timetable_slot_id
-```
-اختبار: الاستعلامات القديمة لا تتغير (أعمدة جديدة nullable).
+### ~~المرحلة 4~~: توسعة Events Layer ✅
+- [x] إضافة الأعمدة الناقصة لـ `events` — M70
 
-### المرحلة 5: محرك القواعد والإشعارات (3 أسابيع)
-```sql
--- 17. automation_rules
--- 18. notification_queue
-```
-- بناء خدمة `lib/automation-engine.ts` كـ Server Action
-- Supabase Edge Functions أو cron job للمعالجة الدورية
-- اختبار: قاعدة واحدة (3 غيابات → تنبيه)
+### ~~المرحلة 5~~: محرك القواعد والإشعارات ✅
+- [x] `automation_rules` + `notification_queue` — M61
+- [x] `lib/jobs/automation-service.ts` — يعالج absence_count + period_absence + إحالات آلية
+- [x] `supabase/functions/daily-maintenance/` + `/api/cron/daily-maintenance` — commit `c05b95a`
 
-### المرحلة 6: طبقة الجودة (أسبوعان)
-```sql
--- 19. quality_indicators
--- 20. quality_evidence
--- 21. qa_rubrics
-```
-- Trigger: كل إدخال في `period_attendance` → يولّد سجل `quality_evidence`
-- اختبار: التحقق من التوليد الآلي لأدلة الجودة
+### ~~المرحلة 6~~: طبقة الجودة ✅ جزئياً
+- [x] `quality_indicators` + `quality_evidence` + `qa_rubrics` — M63 + M71
+- [ ] ❌ **Trigger أتمتة**: `period_attendance` → `quality_evidence` تلقائياً — **غير مُنفَّذ** (مذكور في M63 كـ "مستقبلاً")
 
-### المرحلة 7: طبقة التحليلات والكاش (أسبوعان)
-```sql
--- 22. daily_kpis
--- 23. class_weekly_summary
--- 24. student_analytics_cache
-```
-- تحويل استعلامات `/principal/analytics/*` لتقرأ من الكاش
-- اختبار: مقارنة أداء الصفحات قبل وبعد
+### ~~المرحلة 7~~: طبقة التحليلات والكاش ✅
+- [x] `daily_kpis` + `class_weekly_summary` + `student_analytics_cache` — M72
+- [x] جميع hooks تقرأ من الكاش — `analytics-feeder.ts` + pg_cron M76
 
-### المرحلة 8: طبقة الذكاء الاصطناعي (أسبوعان)
-```sql
--- 25. ai_insights
--- 26. ai_prompt_templates
-```
-- بناء `lib/ai-service.ts` لجلب البيانات غير الحساسة وإرسالها للـ LLM
-- تخزين الرؤى بصلاحية القراءة حسب الدور
+### المرحلة 8: طبقة الذكاء الاصطناعي ✅ جزئياً
+- [x] `ai_insights` + `ai_prompt_templates` — M73 (seed 5 قوالب)
+- [x] `lib/services/ai-service.ts` (492 سطر) — يستدعي Anthropic API + `generateInsight()`
+- [ ] ❌ **Scheduled AI Insights**: لا يوجد cron job يُشغّل `generateInsight()` تلقائياً يومياً
 
-### المرحلة 9: الاختبار الشامل والتوثيق (أسبوعان)
-- E2E tests للسيناريوهات الخمسة
-- مراجعة RLS الكاملة
-- توثيق API الجديد
+### المرحلة 9: الاختبار الشامل والتوثيق ⚠️ جزئي
+- [x] `tests/security/safe-action.test.ts` — اختبار الأمان
+- [x] مراجعة RLS الكاملة — R00–R12 + Virtual-Swimming-Wave
+- [ ] ❌ **E2E Tests للسيناريوهات الخمسة** — غير مُنفَّذة (حضور حصص · زيارات LRC · عيادة · مغادرة الفصل · إحالات آلية)
+
+---
+
+## البنود المتبقية — 2026-06-03
+
+> هذه البنود الثلاثة هي الوحيدة غير المُنفَّذة من الخطة الكاملة.
+
+| # | البند | الملفات المعنية | الأولوية |
+|---|-------|----------------|---------|
+| 1 | ❌ **Trigger جودة**: توليد `quality_evidence` تلقائياً عند كل إدخال في `period_attendance` | migration جديد M78 + `quality_evidence` INSERT | متوسطة |
+| 2 | ❌ **Scheduled AI Insights**: cron job يومي يستدعي `generateInsight()` لكل مدرسة | `lib/jobs/` + `/api/cron/` أو Edge Function | منخفضة |
+| 3 | ❌ **E2E Tests**: اختبارات للسيناريوهات الخمسة (حضور · LRC · صحة · مغادرة · إحالات) | `tests/e2e/` بـ Vitest | منخفضة |
 
 ---
 
