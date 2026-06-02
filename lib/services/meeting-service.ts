@@ -390,7 +390,8 @@ export async function startMeeting(
   await supabase
     .from('meeting_sessions')
     .update({ status: 'in_progress', actual_start_time: new Date().toISOString() })
-    .eq('id', meetingId);
+    .eq('id', meetingId)
+    .eq('school_id', persona.schoolId);
 
   if (meeting.workflow_instance_id) {
     await advanceWorkflow({
@@ -500,7 +501,8 @@ export async function endMeeting(
       decisions:       (input.decisions ?? []).map((text, i) => ({ idx: i, text })),
       recommendations: (input.recommendations ?? []).map((text, i) => ({ idx: i, text })),
     })
-    .eq('id', meetingId);
+    .eq('id', meetingId)
+    .eq('school_id', persona.schoolId);
 
   // إضافة بنود الإجراء
   if (input.action_items?.length) {
@@ -594,7 +596,8 @@ export async function signMinutes(
       signature_hash: signatureHash,
     })
     .eq('meeting_session_id', meetingId)
-    .eq('persona_id', personaRow.id);
+    .eq('persona_id', personaRow.id)
+    .eq('school_id', persona.schoolId);
 
   if (error) return { ok: false, error: `فشل التوقيع: ${error.message}` };
 
@@ -603,6 +606,7 @@ export async function signMinutes(
     .from('meeting_session_attendees')
     .select('id')
     .eq('meeting_session_id', meetingId)
+    .eq('school_id', persona.schoolId)
     .eq('is_invited', true)
     .is('signature_time', null);
 

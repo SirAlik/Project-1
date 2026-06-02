@@ -70,7 +70,8 @@ export async function getClassesForTeacher(): Promise<WorkflowResult<ClassOption
     const { data: slots } = await supabase
       .from('timetable_slots')
       .select('class_id')
-      .eq('teacher_id', persona.userId);
+      .eq('teacher_id', persona.userId)
+      .eq('school_id', persona.schoolId);
 
     if (!slots?.length) return { ok: true, data: [] };
     classIds = [...new Set(slots.map(s => s.class_id as string))];
@@ -117,6 +118,7 @@ export async function getPeriodsForClassAndDay(
     .from('classes')
     .select('stage_id')
     .eq('id', classId)
+    .eq('school_id', persona.schoolId)
     .maybeSingle();
 
   if (classErr) return { ok: false, error: classErr.message };
@@ -136,7 +138,8 @@ export async function getPeriodsForClassAndDay(
     .from('timetable_slots')
     .select('id, period_id, subject_id, subjects(name_ar)')
     .eq('class_id', classId)
-    .eq('day', dayOfWeek);
+    .eq('day', dayOfWeek)
+    .eq('school_id', persona.schoolId);
 
   type SlotRow = { id: string; period_id: string | null; subject_id: string | null; subjects: { name_ar: string } | null };
   const slotMap = new Map<string, SlotRow>();
