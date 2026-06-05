@@ -471,6 +471,93 @@ export async function generateInsight(
 }
 
 /**
+ * يُولّد رؤية على مستوى النظام — بدون persona مطلوبة.
+ * مُصدَّرة لـ cron jobs فقط — لا تُستخدم في user-facing flows.
+ */
+export async function generateInsightSystem(
+  schoolId:    string,
+  contextType: AIContextType,
+  scope:       AIScope,
+  scopeId:     string,
+  roleTarget:  AIRoleTarget,
+): Promise<WorkflowResult<AIInsight>> {
+  const { data: school } = await supabaseAdmin
+    .from('schools')
+    .select('timezone')
+    .eq('id', schoolId)
+    .maybeSingle();
+
+  const timezone      = (school?.timezone as string | null) ?? 'Asia/Riyadh';
+  const generatedDate = getTodayInTimezone(timezone);
+
+  const { data: yearRow } = await supabaseAdmin
+    .from('academic_years')
+    .select('id')
+    .eq('school_id', schoolId)
+    .eq('is_active', true)
+    .limit(1)
+    .maybeSingle();
+
+  const { data: template, error: tErr } = await supabaseAdmin
+    .from('ai_prompt_templates')
+    .select('*')
+    .eq('role_target',  roleTarget)
+    .eq('context_type', contextType)
+    .eq('is_active',    true)
+    .maybeSingle();
+
+  if (tErr || !template) {
+    return { ok: false, error: `لا يوجد قالب نشط لـ ${roleTarget} / ${contextType}` };
+  }
+
+  const tmpl = template as AIPromptTemplate;
+
+  let payload: PayloadData = {};
+  try {
+    payload = await buildPayload(schoolId, contextType, scope, scopeId, generatedDate);
+  } catch (err) {
+    console.error('[ai-service:system] buildPayload خطأ:', err);
+  }
+
+  const MODEL        = process.env.AI_MODEL ?? 'claude-sonnet-4-6';
+  const rendered     = renderPrompt(tmpl.template_text, payload);
+  const claudeResult = await callClaudeAPI(rendered, tmpl.max_tokens, MODEL);
+
+  if (!claudeResult) {
+    return { ok: false, error: 'فشل توليد الرؤية من Claude API' };
+  }
+
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+  const row = {
+    school_id:        schoolId,
+    scope,
+    scope_id:         scopeId,
+    role_target:      roleTarget,
+    context_type:     contextType,
+    summary_ar:       claudeResult.summary_ar,
+    recommendations:  claudeResult.recommendations,
+    data_snapshot:    payload,
+    generated_at:     new Date().toISOString(),
+    generated_date:   generatedDate,
+    expires_at:       expiresAt,
+    academic_year_id: yearRow?.id ?? null,
+    model_version:    MODEL,
+  };
+
+  const { data: saved, error: insErr } = await supabaseAdmin
+    .from('ai_insights')
+    .upsert(row, {
+      onConflict: 'school_id,scope,scope_id,role_target,context_type,generated_date',
+    })
+    .select()
+    .single();
+
+  if (insErr) return { ok: false, error: insErr.message };
+  return { ok: true, data: saved as AIInsight };
+}
+
+/**
  * جلب كل الرؤى النشطة لدور المستخدم الحالي (للـ dashboard).
  */
 export async function getAllInsightsForRole(): Promise<WorkflowResult<AIInsight[]>> {
