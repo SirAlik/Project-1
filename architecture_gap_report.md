@@ -796,9 +796,9 @@ CREATE INDEX IF NOT EXISTS idx_guardians_profile ON guardians(profile_id);
 
 | # | البند | الملفات المعنية | الأولوية |
 |---|-------|----------------|---------|
-| 1 | ❌ **Trigger جودة**: توليد `quality_evidence` تلقائياً عند كل إدخال في `period_attendance` | migration جديد M78 + `quality_evidence` INSERT | متوسطة |
-| 2 | ❌ **Scheduled AI Insights**: cron job يومي يستدعي `generateInsight()` لكل مدرسة | `lib/jobs/` + `/api/cron/` أو Edge Function | منخفضة |
-| 3 | ❌ **E2E Tests**: اختبارات للسيناريوهات الخمسة (حضور · LRC · صحة · مغادرة · إحالات) | `tests/e2e/` بـ Vitest | منخفضة |
+| 1 | ✅ **Trigger جودة**: توليد `quality_evidence` تلقائياً عند كل إدخال في `period_attendance` | `db/migrations/20260605_m78_quality_trigger.sql` — AFTER INSERT trigger + UNIQUE partial index | متوسطة |
+| 2 | ✅ **Scheduled AI Insights**: cron job يومي يستدعي `generateInsightSystem()` لكل مدرسة | `lib/jobs/ai-insights-job.ts` + `app/api/cron/ai-insights/route.ts` + M79 | منخفضة |
+| 3 | ✅ **E2E Tests**: اختبارات للسيناريوهات الخمسة (حضور · LRC · صحة · مغادرة · إحالات) | `tests/e2e/` — 5 ملفات × 25 اختبار — جميعها نجح | منخفضة |
 
 ---
 
