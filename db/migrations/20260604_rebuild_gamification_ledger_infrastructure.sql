@@ -1,29 +1,46 @@
 -- =================================================================
--- Migration: Gamification/Ledger Infrastructure Rebuild
--- التاريخ: 2026-06-04
--- الهدف:
---   1. ضمان وجود vault schema + vault.secrets مع RLS مُقفَلة
---   2. ضمان وجود system_config مع RLS صحيحة (system_owner فقط مباشرةً)
---   3. إعادة بناء rpc_process_transaction — multi-tenant safe:
---      - school_id مُستخرَج من student_profiles (tamper-proof)
---      - cross-tenant validation مقابل JWT
---      - school_id في جميع INSERT (schema M75 يتطلبه NOT NULL)
---      - الحد الساعي مُقيَّد بالمدرسة لا عالمياً
---   4. إعادة بناء rpc_reconcile_wallets — مُقيَّدة بمدرسة المُستدعِي
---   5. إعادة بناء rpc_complete_quest — explicit p_student_id (حذف النسخة القديمة)
---   6. تأكيد REVOKE anon من جميع gamification RPCs الحساسة
+-- Migration: Gamification/Ledger Infrastructure Rebuild — v2
+-- التاريخ: 2026-06-05 (مراجعة بعد فشل Phase 4 الأول)
+-- =================================================================
+-- سبب الفشل السابق (مُوثَّق من فحص DB الحية):
+--   CREATE TABLE vault.secrets → 42501 permission denied for schema vault
+--   postgres لديه USAGE فقط على vault (لا CREATE)
+--   vault.secrets الأصلية = ميزة Supabase — postgres لا يستطيع INSERT فيها
 --
--- التبعيات (يجب تطبيقها أولاً):
---   ✅ 20260602_gamification_multitenant.sql (M75):
---       student_wallet + transaction_logs + sentinel_flags بـ school_id NOT NULL
---   ✅ 20260121_ledger_hardening.sql: v1 rpc_process_transaction
---   ✅ 20260121_quest_security.sql:   v1 rpc_complete_quest(uuid)
+-- الحل: app_private schema (مملوكة لـ postgres) بدلاً من vault
+--
+-- الهدف:
+--   1. إنشاء app_private.secrets + قفل كامل — بديل vault.secrets
+--   2. إنشاء system_config + RLS (system_owner فقط)
+--   3. partial unique index على transaction_logs (source_event_id nullable)
+--   4. rpc_process_transaction v2 — يقرأ app_private.secrets
+--   5. rpc_reconcile_wallets — مُقيَّدة بمدرسة المُستدعِي
+--   6. rpc_complete_quest(uuid, uuid) — جديدة (لم تكن موجودة في DB)
+--   7. REVOKE anon من gamification RPCs الموجودة فعلاً
+--
+-- نتائج الفحص المباشر (2026-06-05):
+--   vault.can_create    = false (سبب الفشل)
+--   vault.can_insert    = false (لا يمكن استخدام vault.secrets حتى لو أمكن الوصول)
+--   app_private schema  = غير موجود → سيُنشَأ
+--   system_config       = غير موجود → سيُنشَأ
+--   pgcrypto 1.3        = مثبَّت → CREATE EXTENSION IF NOT EXISTS آمنة
+--   rpc_complete_quest  = غير موجود → DROP IF EXISTS(uuid) آمنة + CREATE جديدة
+--   student_profiles.school_id = nullable → فحص صريح مُضاف في rpc_process_transaction
+--   unique_student_source_event = غير موجود + source_event_id nullable
+--                                → partial index WHERE source_event_id IS NOT NULL
+--   REVOKE/GRANT: توقيعات مُتحقَّق منها من pg_proc:
+--     rpc_scan_ar_glyph(text, uuid) ✓
+--     rpc_purchase_furniture(uuid, uuid) ✓
+--
+-- التبعيات (مطبَّقة بالفعل):
+--   ✅ 20260602_gamification_multitenant.sql (M75)
+--   ✅ Phase 3 (rate_limit_tracker مُنشَأ، get_my_role() محذوفة)
 -- =================================================================
 
 BEGIN;
 
 -- ════════════════════════════════════════════════════════════════
--- Preflight: التحقق من اكتمال M75 قبل المتابعة
+-- Preflight: التحقق من وجود M75
 -- ════════════════════════════════════════════════════════════════
 DO $$
 BEGIN
@@ -36,27 +53,24 @@ BEGIN
 
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name   = 'student_wallet'
-          AND column_name  = 'school_id'
+        WHERE table_schema = 'public' AND table_name = 'student_wallet'
+          AND column_name = 'school_id'
     ) THEN
         RAISE EXCEPTION 'PREFLIGHT FAILED: student_wallet.school_id مفقود — طبِّق M75 أولاً';
     END IF;
 
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name   = 'transaction_logs'
-          AND column_name  = 'school_id'
+        WHERE table_schema = 'public' AND table_name = 'transaction_logs'
+          AND column_name = 'school_id'
     ) THEN
         RAISE EXCEPTION 'PREFLIGHT FAILED: transaction_logs.school_id مفقود — طبِّق M75 أولاً';
     END IF;
 
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name   = 'sentinel_flags'
-          AND column_name  = 'school_id'
+        WHERE table_schema = 'public' AND table_name = 'sentinel_flags'
+          AND column_name = 'school_id'
     ) THEN
         RAISE EXCEPTION 'PREFLIGHT FAILED: sentinel_flags.school_id مفقود — طبِّق M75 أولاً';
     END IF;
@@ -68,45 +82,74 @@ BEGIN
         RAISE EXCEPTION 'PREFLIGHT FAILED: student_profiles غير موجود';
     END IF;
 
-    RAISE NOTICE 'Preflight ✓';
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'quest_nodes'
+    ) THEN
+        RAISE EXCEPTION 'PREFLIGHT FAILED: quest_nodes غير موجود';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.tables
+        WHERE table_schema = 'public' AND table_name = 'quest_progress'
+    ) THEN
+        RAISE EXCEPTION 'PREFLIGHT FAILED: quest_progress غير موجود';
+    END IF;
+
+    RAISE NOTICE '✓ Preflight: جميع جداول M75 موجودة';
 END $$;
 
 -- ════════════════════════════════════════════════════════════════
--- 1. pgcrypto (مطلوب لـ SHA256 في hash chain)
+-- 1. pgcrypto (مثبَّت مسبقاً 1.3 — IF NOT EXISTS آمنة)
 -- ════════════════════════════════════════════════════════════════
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ════════════════════════════════════════════════════════════════
--- 2. vault schema + vault.secrets
+-- 2. app_private schema + app_private.secrets
 --
--- vault.secrets تحتوي على مفتاح الـ SHA256 لسلسلة hash المحاسبية.
+-- لماذا app_private وليس vault؟
+--   vault مملوك لـ supabase_admin — postgres لا يملك CREATE عليه.
+--   app_private سيُنشَأ بملكية postgres = صلاحيات كاملة.
 --
--- ⚠️  MANDATORY BEFORE LAUNCH:
---   استبدل قيمة 'ledger_secret_salt' في vault.secrets عبر
---   Supabase Dashboard قبل أول معاملة طالب حقيقية.
---   القيمة الموجودة حالياً placeholder للبيئة المحلية فقط.
+-- آلية الأمان:
+--   REVOKE ALL على المخطط والجدول من public/anon/authenticated.
+--   RLS مُفعَّلة بدون سياسات = حجب كامل للوصول المباشر.
+--   الدوال SECURITY DEFINER تعمل بصلاحيات postgres وتتجاوز RLS.
+--   التوصيف الكامل app_private.secrets مطلوب داخل الدوال
+--   لأن SET search_path = public لا يشمل app_private.
 -- ════════════════════════════════════════════════════════════════
-CREATE SCHEMA IF NOT EXISTS vault;
+CREATE SCHEMA IF NOT EXISTS app_private;
 
-CREATE TABLE IF NOT EXISTS vault.secrets (
+REVOKE ALL ON SCHEMA app_private FROM PUBLIC, anon, authenticated;
+
+CREATE TABLE IF NOT EXISTS app_private.secrets (
     name       text        PRIMARY KEY,
     secret     text        NOT NULL,
     created_at timestamptz NOT NULL DEFAULT now()
 );
 
-INSERT INTO vault.secrets (name, secret)
+REVOKE ALL ON TABLE app_private.secrets FROM PUBLIC, anon, authenticated, service_role;
+
+ALTER TABLE app_private.secrets ENABLE ROW LEVEL SECURITY;
+-- لا سياسات = حجب كامل لجميع الأدوار في الوصول المباشر
+-- SECURITY DEFINER تعمل بصلاحيات postgres وتتجاوز RLS تلقائياً
+
+INSERT INTO app_private.secrets (name, secret)
 VALUES ('ledger_secret_salt', 'ROTATE_BEFORE_LAUNCH___dev_placeholder_salt_2026')
 ON CONFLICT (name) DO NOTHING;
 
--- قفل vault.secrets من الوصول المباشر لجميع المستخدمين.
--- الدوال SECURITY DEFINER تعمل بصلاحيات postgres (superuser)
--- وتتجاوز RLS تلقائياً — فتستطيع القراءة بدون سياسة صريحة.
-ALTER TABLE vault.secrets ENABLE ROW LEVEL SECURITY;
--- لا سياسة SELECT/INSERT/UPDATE = حجب كامل للمستخدمين العاديين
+DO $$ BEGIN
+    RAISE NOTICE '✓ app_private.secrets: schema + table + RLS + placeholder salt';
+    RAISE NOTICE '  ⚠️  يجب استبدال ledger_secret_salt قبل الإطلاق';
+END $$;
 
 -- ════════════════════════════════════════════════════════════════
 -- 3. system_config (حدود الاقتصاد + circuit breaker)
 -- ════════════════════════════════════════════════════════════════
+-- الجدول غير موجود في DB الحية (مُؤكَّد من الفحص المباشر).
+-- الدوال SECURITY DEFINER تقرأ/تكتب هنا مباشرةً بتجاوز RLS.
+-- أي وصول مباشر من العميل يتطلب system_owner.
+
 CREATE TABLE IF NOT EXISTS public.system_config (
     key        text        PRIMARY KEY,
     value_json jsonb       NOT NULL,
@@ -119,57 +162,55 @@ VALUES
     ('circuit_breaker', '{"is_active": false, "reason": "none"}')
 ON CONFLICT (key) DO NOTHING;
 
--- ════════════════════════════════════════════════════════════════
--- 4. system_config RLS — system_owner فقط للوصول المباشر
---
--- الدوال SECURITY DEFINER (rpc_process_transaction، rpc_reconcile_wallets)
--- تتجاوز RLS وتقرأ/تكتب system_config داخلياً بلا قيود.
--- أي مستخدم يحاول القراءة المباشرة (REST/browse) محظور إلا system_owner.
---
--- يُلغِي سياسة "USING (true)" الخاطئة المُنشأة في Phase 3.
--- ════════════════════════════════════════════════════════════════
 ALTER TABLE public.system_config ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "system_config_select"   ON public.system_config;
-DROP POLICY IF EXISTS "system_config_update"   ON public.system_config;
+DROP POLICY IF EXISTS "system_config_select"    ON public.system_config;
+DROP POLICY IF EXISTS "system_config_update"    ON public.system_config;
 DROP POLICY IF EXISTS "system_config_admin_all" ON public.system_config;
-DROP POLICY IF EXISTS "sc_admin_all"           ON public.system_config;
+DROP POLICY IF EXISTS "sc_admin_all"            ON public.system_config;
 
 CREATE POLICY "sc_admin_all" ON public.system_config
-    FOR ALL
-    TO authenticated
+    FOR ALL TO authenticated
     USING  ((auth.jwt() -> 'app_metadata' ->> 'role') = 'system_owner')
     WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'system_owner');
 
+DO $$ BEGIN
+    RAISE NOTICE '✓ system_config: إنشاء + RLS (system_owner فقط للوصول المباشر)';
+END $$;
+
 -- ════════════════════════════════════════════════════════════════
--- 5. Idempotency constraint على transaction_logs
---    يمنع مكافأة مزدوجة لنفس الحدث ونفس الطالب.
+-- 4. Idempotency index على transaction_logs
+--
+-- source_event_id: uuid, nullable (مُؤكَّد من information_schema.columns)
+-- Partial index (WHERE source_event_id IS NOT NULL):
+--   النية هي منع مكافأة مزدوجة لنفس الحدث — لا منع صفوف متعددة بـ NULL.
+--   هذا أوضح معمارياً من UNIQUE constraint العادية على nullable.
 -- ════════════════════════════════════════════════════════════════
 DO $$
 BEGIN
     IF NOT EXISTS (
-        SELECT 1 FROM information_schema.table_constraints
-        WHERE table_schema    = 'public'
-          AND table_name      = 'transaction_logs'
-          AND constraint_name = 'unique_student_source_event'
+        SELECT 1 FROM pg_indexes
+        WHERE schemaname = 'public'
+          AND tablename  = 'transaction_logs'
+          AND indexname  = 'unique_student_source_event'
     ) THEN
-        ALTER TABLE public.transaction_logs
-            ADD CONSTRAINT unique_student_source_event UNIQUE (student_id, source_event_id);
-        RAISE NOTICE '✓ unique_student_source_event: constraint مُضاف';
+        CREATE UNIQUE INDEX unique_student_source_event
+            ON public.transaction_logs (student_id, source_event_id)
+            WHERE source_event_id IS NOT NULL;
+        RAISE NOTICE '✓ unique_student_source_event: partial index created';
     ELSE
-        RAISE NOTICE '✓ unique_student_source_event: موجود بالفعل';
+        RAISE NOTICE '✓ unique_student_source_event: already exists';
     END IF;
 END $$;
 
 -- ════════════════════════════════════════════════════════════════
--- 6. rpc_process_transaction — إعادة بناء كاملة للـ multi-tenant
+-- 5. rpc_process_transaction — v2
 --
--- التغييرات عن v1 (20260121_ledger_hardening.sql):
---   ✦ school_id مُستخرَج من student_profiles لا من العميل (tamper-proof)
---   ✦ مقارنة school_id مع JWT لاكتشاف هجوم cross-tenant
---   ✦ جميع INSERT تشمل school_id (M75 schema يتطلبه NOT NULL)
---   ✦ الحد الساعي مُقيَّد بالمدرسة (كل مدرسة حد مستقل)
---   ✦ SET search_path = public (كان مفقوداً في v1)
+-- التغييرات عن النسخة الحالية في DB:
+--   ✦ يقرأ من app_private.secrets (بالتوصيف الكامل — search_path=public فقط)
+--   ✦ فحص student_profiles.school_id IS NULL (العمود nullable في DB الحية)
+--   ✦ الحد الساعي مُقيَّد بالمدرسة لا عالمياً
+--   ✦ school_id في sentinel_flags + transaction_logs INSERTs
 -- ════════════════════════════════════════════════════════════════
 CREATE OR REPLACE FUNCTION public.rpc_process_transaction(
     p_student_id      uuid,
@@ -197,16 +238,16 @@ DECLARE
     v_now              timestamptz := now();
     v_hourly_mint      bigint;
 BEGIN
-    -- 1. قفل advisory لمنع race conditions على نفس الطالب
+    -- 1. advisory lock: يمنع race conditions على نفس الطالب
     PERFORM pg_advisory_xact_lock(hashtext(p_student_id::text));
 
-    -- 2. التحقق من وجود school_id في JWT
+    -- 2. school_id من JWT (الجانب المُستدعِي)
     v_caller_school_id := (auth.jwt() -> 'app_metadata' ->> 'school_id')::uuid;
     IF v_caller_school_id IS NULL THEN
         RAISE EXCEPTION 'Authentication required: school_id missing from JWT';
     END IF;
 
-    -- 3. التحقق من وجود الطالب + استخراج school_id من student_profiles (مصدر موثوق)
+    -- 3. استخراج school_id من student_profiles (مصدر موثوق — tamper-proof)
     SELECT sp.school_id INTO v_school_id
     FROM public.student_profiles sp
     WHERE sp.id = p_student_id;
@@ -215,19 +256,25 @@ BEGIN
         RAISE EXCEPTION 'Student not found: %', p_student_id;
     END IF;
 
-    -- 4. التحقق من التطابق (حماية من هجوم cross-tenant)
+    -- 4. student_profiles.school_id nullable في DB الحية — فحص صريح
+    IF v_school_id IS NULL THEN
+        RAISE EXCEPTION 'Data integrity error: student % has no school_id in student_profiles',
+            p_student_id;
+    END IF;
+
+    -- 5. التحقق من التطابق — حماية من هجوم cross-tenant
     IF v_school_id IS DISTINCT FROM v_caller_school_id THEN
         RAISE EXCEPTION 'cross-tenant violation: student school does not match caller JWT school';
     END IF;
 
-    -- 5. فحص circuit breaker
+    -- 6. circuit breaker
     SELECT value_json INTO v_circuit_breaker
     FROM public.system_config WHERE key = 'circuit_breaker';
     IF (v_circuit_breaker ->> 'is_active')::boolean THEN
         RAISE EXCEPTION 'Economy system in maintenance: %', v_circuit_breaker ->> 'reason';
     END IF;
 
-    -- 6. حدود الاقتصاد
+    -- 7. حدود الاقتصاد
     SELECT value_json INTO v_limits
     FROM public.system_config WHERE key = 'economy_limits';
 
@@ -236,7 +283,7 @@ BEGIN
         VALUES (v_school_id, p_student_id, 'high', 'Limit breach attempt',
                 jsonb_build_object(
                     'attempted', p_delta_coins,
-                    'limit', v_limits ->> 'max_earn_per_event'
+                    'limit',     v_limits ->> 'max_earn_per_event'
                 ));
         RAISE EXCEPTION 'Transaction exceeds maximum earning limit';
     END IF;
@@ -245,7 +292,7 @@ BEGIN
         RAISE EXCEPTION 'Negative delta only allowed for purchase or penalty types';
     END IF;
 
-    -- 7. الحد الساعي — مُقيَّد بالمدرسة (كل مدرسة مستقلة)
+    -- 8. الحد الساعي — مُقيَّد بالمدرسة
     SELECT COALESCE(SUM(delta_coins), 0) INTO v_hourly_mint
     FROM public.transaction_logs
     WHERE school_id   = v_school_id
@@ -259,15 +306,21 @@ BEGIN
         RAISE EXCEPTION 'Hourly mint limit exceeded. Economy locked for this school.';
     END IF;
 
-    -- 8. جلب مفتاح الـ hash (SECURITY DEFINER تتجاوز vault.secrets RLS)
-    SELECT secret INTO v_salt FROM vault.secrets WHERE name = 'ledger_secret_salt';
+    -- 9. مفتاح SHA256 من app_private.secrets
+    -- التوصيف الكامل مطلوب: SET search_path=public لا يشمل app_private
+    -- SECURITY DEFINER يعمل بصلاحيات postgres → يتجاوز RLS على app_private.secrets
+    SELECT secret INTO v_salt
+    FROM app_private.secrets
+    WHERE name = 'ledger_secret_salt';
+
     IF v_salt IS NULL THEN
-        RAISE EXCEPTION 'Ledger config error: vault.secrets.ledger_secret_salt مفقود — يجب التغيير قبل الإطلاق';
+        RAISE EXCEPTION 'Ledger config error: app_private.secrets.ledger_secret_salt مفقود';
     END IF;
 
-    -- 9. حالة المحفظة
+    -- 10. حالة المحفظة الحالية
     SELECT coins, xp INTO v_current_coins, v_current_xp
-    FROM public.student_wallet WHERE student_id = p_student_id;
+    FROM public.student_wallet
+    WHERE student_id = p_student_id;
 
     IF NOT FOUND THEN
         INSERT INTO public.student_wallet (student_id, school_id, coins, xp)
@@ -276,7 +329,7 @@ BEGIN
         v_current_xp    := 0;
     END IF;
 
-    -- 10. آخر hash في سلسلة هذا الطالب في هذه المدرسة
+    -- 11. آخر hash لسلسلة هذا الطالب في هذه المدرسة
     SELECT hash INTO v_last_hash
     FROM public.transaction_logs
     WHERE student_id = p_student_id AND school_id = v_school_id
@@ -284,7 +337,7 @@ BEGIN
     LIMIT 1;
     v_last_hash := COALESCE(v_last_hash, 'GENESIS_SENTINEL');
 
-    -- 11. الأرصدة الجديدة
+    -- 12. الأرصدة الجديدة
     v_current_coins := v_current_coins + p_delta_coins;
     v_current_xp    := v_current_xp    + p_delta_xp;
 
@@ -292,7 +345,7 @@ BEGIN
         RAISE EXCEPTION 'Insufficient balance';
     END IF;
 
-    -- 12. SHA256 hash لسلامة السجل المحاسبي
+    -- 13. SHA256 hash لسلامة السجل المحاسبي
     v_new_hash := encode(
         digest(
             v_last_hash
@@ -306,12 +359,14 @@ BEGIN
         'hex'
     );
 
-    -- 13. تحديث المحفظة بشكل atomic
+    -- 14. تحديث المحفظة (atomic)
     UPDATE public.student_wallet
-    SET coins = v_current_coins, xp = v_current_xp, last_updated = v_now
+    SET coins        = v_current_coins,
+        xp           = v_current_xp,
+        last_updated = v_now
     WHERE student_id = p_student_id;
 
-    -- 14. تسجيل المعاملة (append-only ledger)
+    -- 15. تسجيل المعاملة (append-only ledger)
     INSERT INTO public.transaction_logs
         (school_id, student_id, delta_coins, delta_xp, type, source_type, source_event_id,
          current_total_coins, current_total_xp, hash, prev_hash, created_at)
@@ -334,12 +389,7 @@ GRANT  EXECUTE ON FUNCTION public.rpc_process_transaction(uuid, bigint, bigint, 
     TO authenticated;
 
 -- ════════════════════════════════════════════════════════════════
--- 7. rpc_reconcile_wallets — إعادة بناء مُقيَّدة بالمدرسة
---
--- التغييرات عن v1 (20260121_ledger_hardening.sql):
---   ✦ مُقيَّدة بـ school_id من JWT (system_owner يرى الكل)
---   ✦ school_id في sentinel_flags INSERT
---   ✦ SET search_path = public
+-- 6. rpc_reconcile_wallets — مُقيَّدة بمدرسة المُستدعِي
 -- ════════════════════════════════════════════════════════════════
 CREATE OR REPLACE FUNCTION public.rpc_reconcile_wallets()
 RETURNS jsonb
@@ -379,7 +429,10 @@ BEGIN
         IF v_row.wallet_coins <> v_row.ledger_coins THEN
             INSERT INTO public.sentinel_flags (school_id, student_id, severity, reason, metadata)
             VALUES (v_row.school_id, v_row.student_id, 'critical', 'Wallet mismatch detected',
-                    jsonb_build_object('wallet', v_row.wallet_coins, 'ledger', v_row.ledger_coins));
+                    jsonb_build_object(
+                        'wallet', v_row.wallet_coins,
+                        'ledger', v_row.ledger_coins
+                    ));
             v_errors := v_errors + 1;
         ELSE
             v_reconciled := v_reconciled + 1;
@@ -398,17 +451,12 @@ REVOKE EXECUTE ON FUNCTION public.rpc_reconcile_wallets() FROM anon, public;
 GRANT  EXECUTE ON FUNCTION public.rpc_reconcile_wallets() TO authenticated;
 
 -- ════════════════════════════════════════════════════════════════
--- 8. rpc_complete_quest — إعادة بناء بـ p_student_id صريح
+-- 7. rpc_complete_quest(uuid, uuid)
 --
--- التغييرات عن v1 (20260121_quest_security.sql):
---   ✦ التوقيع تغيَّر: (uuid) → (uuid, uuid)
---     v1 كانت تستخدم auth.uid() كـ student_id — خاطئ بعد M75
---     لأن student_profiles.id ليس مرتبطاً بـ auth.users.id
---   ✦ school_id validation مُضاف
---   ✦ quest_progress INSERT تشمل school_id
---   ✦ SET search_path = public
---
--- النسخة القديمة rpc_complete_quest(uuid) محذوفة صراحةً.
+-- rpc_complete_quest غير موجودة أصلاً في DB (مُؤكَّد من الفحص).
+-- DROP IF EXISTS(uuid) = no-op آمنة.
+-- UNIQUE على quest_progress: quest_progress_student_id_node_id_key
+--   على (student_id, node_id) — مُؤكَّد من information_schema.
 -- ════════════════════════════════════════════════════════════════
 DROP FUNCTION IF EXISTS public.rpc_complete_quest(uuid);
 
@@ -442,7 +490,9 @@ BEGIN
     SELECT * INTO v_quest
     FROM public.quest_nodes
     WHERE id = p_quest_node_id AND school_id = v_school_id;
-    IF NOT FOUND THEN RAISE EXCEPTION 'Quest not found'; END IF;
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Quest not found';
+    END IF;
 
     IF EXISTS (
         SELECT 1 FROM public.quest_progress
@@ -460,6 +510,7 @@ BEGIN
     v_reward_coins := COALESCE((v_quest.rewards_json ->> 'coins')::bigint, 0);
     v_reward_xp    := COALESCE((v_quest.rewards_json ->> 'xp')::bigint,    0);
 
+    -- ON CONFLICT على quest_progress_student_id_node_id_key (مُؤكَّد من DB)
     INSERT INTO public.quest_progress (school_id, student_id, node_id, status, completed_at)
     VALUES (v_school_id, p_student_id, p_quest_node_id, 'completed', now())
     ON CONFLICT (student_id, node_id) DO UPDATE
@@ -486,67 +537,140 @@ REVOKE EXECUTE ON FUNCTION public.rpc_complete_quest(uuid, uuid) FROM anon, publ
 GRANT  EXECUTE ON FUNCTION public.rpc_complete_quest(uuid, uuid) TO authenticated;
 
 -- ════════════════════════════════════════════════════════════════
--- 9. تأكيد صلاحيات rpc_scan_ar_glyph + rpc_purchase_furniture
---    (أُعيد بناؤهما في M75 مع REVOKE — هذا تأكيد دفاعي)
+-- 8. REVOKE anon من scan/furniture
+--
+-- التوقيعات المُؤكَّدة من pg_proc في DB الحية:
+--   rpc_scan_ar_glyph(text, uuid)       ← الموجود فعلاً
+--   rpc_purchase_furniture(uuid, uuid)  ← الموجود فعلاً
+-- REVOKE من anon الذي لا يملك الصلاحية = no-op آمنة في PostgreSQL
 -- ════════════════════════════════════════════════════════════════
-REVOKE EXECUTE ON FUNCTION public.rpc_scan_ar_glyph(text, uuid) FROM anon;
-REVOKE EXECUTE ON FUNCTION public.rpc_purchase_furniture(uuid, uuid) FROM anon;
-GRANT  EXECUTE ON FUNCTION public.rpc_scan_ar_glyph(text, uuid) TO authenticated;
-GRANT  EXECUTE ON FUNCTION public.rpc_purchase_furniture(uuid, uuid) TO authenticated;
+REVOKE EXECUTE ON FUNCTION public.rpc_scan_ar_glyph(text, uuid)     FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.rpc_purchase_furniture(uuid, uuid) FROM anon, public;
+GRANT  EXECUTE ON FUNCTION public.rpc_scan_ar_glyph(text, uuid)      TO authenticated;
+GRANT  EXECUTE ON FUNCTION public.rpc_purchase_furniture(uuid, uuid)  TO authenticated;
 
 -- ════════════════════════════════════════════════════════════════
 -- Postflight: تحقق نهائي
 -- ════════════════════════════════════════════════════════════════
 DO $$
 DECLARE
-    v_vault_exists  boolean;
-    v_config_exists boolean;
-    v_config_rls    boolean;
-    v_vault_rls     boolean;
-    v_config_policy text;
+    v_schema_exists  boolean;
+    v_secrets_exists boolean;
+    v_salt_exists    boolean;
+    v_config_exists  boolean;
+    v_config_rls     boolean;
+    v_config_policy  text;
+    v_index_exists   boolean;
+    v_fn_process     boolean;
+    v_fn_reconcile   boolean;
+    v_fn_quest       boolean;
 BEGIN
+    -- ─── app_private schema ───────────────────────────────────────
+    SELECT EXISTS (
+        SELECT 1 FROM information_schema.schemata WHERE schema_name = 'app_private'
+    ) INTO v_schema_exists;
+    IF NOT v_schema_exists THEN
+        RAISE EXCEPTION 'POSTFLIGHT: app_private schema غير موجود';
+    END IF;
+
+    -- ─── app_private.secrets table ───────────────────────────────
     SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
-        WHERE table_schema = 'vault' AND table_name = 'secrets'
-    ) INTO v_vault_exists;
+        WHERE table_schema = 'app_private' AND table_name = 'secrets'
+    ) INTO v_secrets_exists;
+    IF NOT v_secrets_exists THEN
+        RAISE EXCEPTION 'POSTFLIGHT: app_private.secrets غير موجودة';
+    END IF;
 
+    -- ─── ledger_secret_salt موجود ────────────────────────────────
+    SELECT EXISTS (
+        SELECT 1 FROM app_private.secrets WHERE name = 'ledger_secret_salt'
+    ) INTO v_salt_exists;
+    IF NOT v_salt_exists THEN
+        RAISE EXCEPTION 'POSTFLIGHT: ledger_secret_salt مفقود من app_private.secrets';
+    END IF;
+
+    -- ─── system_config ───────────────────────────────────────────
     SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
         WHERE table_schema = 'public' AND table_name = 'system_config'
     ) INTO v_config_exists;
+    IF NOT v_config_exists THEN
+        RAISE EXCEPTION 'POSTFLIGHT: system_config غير موجود';
+    END IF;
 
     SELECT c.relrowsecurity INTO v_config_rls
     FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
     WHERE n.nspname = 'public' AND c.relname = 'system_config';
-
-    SELECT c.relrowsecurity INTO v_vault_rls
-    FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE n.nspname = 'vault' AND c.relname = 'secrets';
+    IF NOT COALESCE(v_config_rls, false) THEN
+        RAISE EXCEPTION 'POSTFLIGHT: system_config RLS غير مُفعَّل';
+    END IF;
 
     SELECT polname INTO v_config_policy
     FROM pg_policy p
     JOIN pg_class c ON c.oid = p.polrelid
     JOIN pg_namespace n ON n.oid = c.relnamespace
-    WHERE n.nspname = 'public' AND c.relname = 'system_config' AND p.polname = 'sc_admin_all'
+    WHERE n.nspname = 'public' AND c.relname = 'system_config'
+      AND p.polname = 'sc_admin_all'
     LIMIT 1;
+    IF v_config_policy IS NULL THEN
+        RAISE EXCEPTION 'POSTFLIGHT: سياسة sc_admin_all مفقودة من system_config';
+    END IF;
 
-    IF NOT v_vault_exists           THEN RAISE EXCEPTION 'POSTFLIGHT: vault.secrets غير موجود'; END IF;
-    IF NOT v_config_exists          THEN RAISE EXCEPTION 'POSTFLIGHT: system_config غير موجود';  END IF;
-    IF NOT COALESCE(v_config_rls, false) THEN RAISE EXCEPTION 'POSTFLIGHT: system_config RLS غير مُفعَّل'; END IF;
-    IF NOT COALESCE(v_vault_rls,  false) THEN RAISE EXCEPTION 'POSTFLIGHT: vault.secrets RLS غير مُفعَّل';  END IF;
-    IF v_config_policy IS NULL THEN RAISE EXCEPTION 'POSTFLIGHT: سياسة sc_admin_all مفقودة من system_config'; END IF;
+    -- ─── idempotency index ────────────────────────────────────────
+    SELECT EXISTS (
+        SELECT 1 FROM pg_indexes
+        WHERE schemaname = 'public' AND tablename = 'transaction_logs'
+          AND indexname = 'unique_student_source_event'
+    ) INTO v_index_exists;
+    IF NOT v_index_exists THEN
+        RAISE EXCEPTION 'POSTFLIGHT: unique_student_source_event index مفقود';
+    END IF;
+
+    -- ─── RPCs موجودة ─────────────────────────────────────────────
+    SELECT EXISTS (
+        SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = 'public' AND p.proname = 'rpc_process_transaction'
+          AND p.pronargs = 6
+    ) INTO v_fn_process;
+    IF NOT v_fn_process THEN RAISE EXCEPTION 'POSTFLIGHT: rpc_process_transaction مفقودة'; END IF;
+
+    SELECT EXISTS (
+        SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = 'public' AND p.proname = 'rpc_reconcile_wallets'
+          AND p.pronargs = 0
+    ) INTO v_fn_reconcile;
+    IF NOT v_fn_reconcile THEN RAISE EXCEPTION 'POSTFLIGHT: rpc_reconcile_wallets مفقودة'; END IF;
+
+    SELECT EXISTS (
+        SELECT 1 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = 'public' AND p.proname = 'rpc_complete_quest'
+          AND p.pronargs = 2
+    ) INTO v_fn_quest;
+    IF NOT v_fn_quest THEN RAISE EXCEPTION 'POSTFLIGHT: rpc_complete_quest(uuid,uuid) مفقودة'; END IF;
+
+    -- ─── anon لا يملك EXECUTE على RPCs الحساسة ──────────────────
+    IF has_function_privilege('anon',
+        'public.rpc_process_transaction(uuid,bigint,bigint,text,text,uuid)', 'EXECUTE') THEN
+        RAISE EXCEPTION 'POSTFLIGHT: rpc_process_transaction — EXECUTE ممنوح لـ anon';
+    END IF;
+    IF has_function_privilege('anon',
+        'public.rpc_complete_quest(uuid,uuid)', 'EXECUTE') THEN
+        RAISE EXCEPTION 'POSTFLIGHT: rpc_complete_quest — EXECUTE ممنوح لـ anon';
+    END IF;
 
     RAISE NOTICE '';
-    RAISE NOTICE '✅ Gamification Ledger Infrastructure Rebuild مكتمل:';
-    RAISE NOTICE '   ✓ vault.secrets موجود + RLS مُقفَلة (لا وصول مباشر للمستخدمين)';
-    RAISE NOTICE '   ✓ system_config موجود + RLS: system_owner فقط مباشرةً';
-    RAISE NOTICE '   ✓ rpc_process_transaction: school_id cross-tenant validation + M75 schema-safe';
+    RAISE NOTICE '✅ Phase 4 (Gamification Ledger Rebuild v2) مكتمل:';
+    RAISE NOTICE '   ✓ app_private.secrets: بديل vault — schema + table + RLS';
+    RAISE NOTICE '   ✓ system_config: موجود + RLS + sc_admin_all policy';
+    RAISE NOTICE '   ✓ unique_student_source_event: partial index (source_event_id IS NOT NULL)';
+    RAISE NOTICE '   ✓ rpc_process_transaction v2: app_private.secrets + null school_id guard';
     RAISE NOTICE '   ✓ rpc_reconcile_wallets: مُقيَّدة بمدرسة المُستدعِي';
-    RAISE NOTICE '   ✓ rpc_complete_quest(uuid, uuid): explicit p_student_id — النسخة القديمة محذوفة';
-    RAISE NOTICE '   ✓ REVOKE anon من جميع gamification RPCs';
+    RAISE NOTICE '   ✓ rpc_complete_quest(uuid, uuid): مُنشَأة حديثاً';
+    RAISE NOTICE '   ✓ REVOKE anon من scan/furniture (توقيعات مُتحقَّق منها)';
     RAISE NOTICE '';
-    RAISE NOTICE '   ⚠️  vault.secrets.ledger_secret_salt = placeholder';
-    RAISE NOTICE '   ⚠️  يجب تغيير القيمة عبر Supabase Dashboard قبل الإطلاق';
+    RAISE NOTICE '   ⚠️  app_private.secrets.ledger_secret_salt = placeholder';
+    RAISE NOTICE '   ⚠️  يجب استبداله قبل أي معاملة طالب حقيقية';
 END $$;
 
 COMMIT;

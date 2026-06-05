@@ -282,6 +282,8 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 | Phase 7b — layout guards إضافية | `app/student-affairs/layout.tsx` · `app/educational/layout.tsx` · `app/staff-evaluation/layout.tsx` · `app/student/metaverse/layout.tsx` — أدوار: student_affairs_vp / academic_vp / school_principal / student. commits `fc1748b` + `3b44d1b`. |
 | Phase 8c — timetable Server Component | `app/admin/timetable/page.tsx` → async Server Component + `TimetableClient.tsx`. يُصلح query legacy `profiles.role='teacher'` → `user_personas!inner(full_name)`. commit `3b44d1b`. |
 | Phase 8e/8f — school_id hardening | `period-attendance-service.ts` + `meeting-service.ts`: explicit `.eq('school_id', persona.schoolId)` defense-in-depth على جميع UPDATE queries. commit `0bf76d8`. |
+| Supabase Audit Phase 3 — role cleanup | `db/migrations/20260604_harden_legacy_rpc_and_roles.sql`: REVOKE anon من dangerous RPCs · DROP `get_my_role()` · DROP policy `"Assigned Role Update Cases"` · تحويل `invites.target_role` + `cases.assigned_to_role` من `user_role` → `school_role_type` (super_admin → system_owner) · DROP TYPE `user_role` · CREATE `rate_limit_tracker` + `increment_rate_limit`. يُطبَّق يدوياً. |
+| Supabase Audit Phase 4 — ledger infrastructure | `db/migrations/20260604_rebuild_gamification_ledger_infrastructure.sql` v2: CREATE `app_private` schema + `app_private.secrets` (بديل vault) · `system_config` + RLS · partial index `unique_student_source_event` · `rpc_process_transaction` v2 (null school_id guard) · `rpc_complete_quest(uuid, uuid)` · REVOKE anon من scan/furniture. يُطبَّق يدوياً. |
 
 ---
 
