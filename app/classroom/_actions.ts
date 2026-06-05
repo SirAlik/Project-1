@@ -80,17 +80,6 @@ export async function undoEventsAction(ids: string[]): Promise<AR> {
     return { ok: true };
 }
 
-export async function submitCleaningReportAction(
-    _teacherId: string,
-    _rating: number,
-    _comment: string,
-): Promise<AR> {
-    const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
-    // cleaning_reports حُذف في r01_drop_legacy_tables — يتطلب إعادة تصميم
-    return { ok: false, error: 'تقارير النظافة قيد إعادة التصميم — ستُتاح قريباً' };
-}
-
 export async function saveStarsAction(
     stars: { studentId: string; studentName: string }[],
     classId?: string,

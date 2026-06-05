@@ -6,7 +6,6 @@ import {
     saveAttendanceAction,
     addEventAction,
     undoEventsAction,
-    submitCleaningReportAction,
     saveStarsAction,
     saveParentNoteAction,
     saveSeatingMapAction,
@@ -99,7 +98,6 @@ export function useClassroom() {
     const [modals, setModals] = useState({
         referral: false,
         excuse: false,
-        cleaning: false,
         parentNote: false,
         gradebook: false,
         groups: false,
@@ -267,16 +265,6 @@ export function useClassroom() {
             setMsg(`✅ تم تحديث حالة ${student.name} إلى ${status === 'late' ? 'متأخر' : status}`);
             loadEvents();
         }
-    }
-
-    async function submitCleaningReport(rating: number, comment: string) {
-        const result = await submitCleaningReportAction(user?.id ?? '', rating, comment);
-        if (!result.ok) {
-            await addEvent("بلاغ نظافة" as EventType, `التقييم: ${rating}/5 - ${comment}`);
-        } else {
-            setMsg("🚨 تم إرسال بلاغ النظافة لمدير المدرسة.");
-        }
-        setModals(p => ({ ...p, cleaning: false }));
     }
 
     async function addEvent(type: EventType, note?: string, pointsDelta?: number, category: EventRow['action_category'] = 'discipline') {
@@ -596,7 +584,7 @@ export function useClassroom() {
             toggleModal: (key: keyof typeof modals, val: boolean) => setModals(p => ({ ...p, [key]: val })),
             sendReferral, sendExcuse,
             toggleStar, saveStars,
-            startClass, toggleAttendance, saveAttendance, updateStudentStatus, submitCleaningReport,
+            startClass, toggleAttendance, saveAttendance, updateStudentStatus,
             // Phase 2
             startExit, endExit,
             pickRandomStudent, setPickerType,

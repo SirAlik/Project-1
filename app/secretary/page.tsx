@@ -6,34 +6,25 @@ import { useSecretary } from "./_hooks/useSecretary";
 import { KPICard } from "@/components/ui/KPICard";
 import { CorrespondenceTable } from "./_components/CorrespondenceTable";
 import { LeaveRequestForm } from "./_components/LeaveRequestForm";
-import { AttendancePanel } from "./_components/AttendancePanel";
-import { HRInquiryWorkflow } from "./_components/HRInquiryWorkflow";
-import { MeetingScheduler } from "./_components/MeetingScheduler";
-import { ProcurementForm } from "./_components/ProcurementForm";
 import {
-    Clock,
     Mail,
     Users,
     Calendar,
     FileText,
-    ShoppingCart,
-    AlertCircle,
+    ShieldCheck,
     LayoutDashboard,
     Zap,
     Plus,
-    ShieldCheck,
     ChevronRight,
     CalendarDays,
     ClipboardList,
 } from "lucide-react";
 
-type SecretaryTab = "dashboard" | "action_center" | "correspondence" | "staff" | "procurement" | "reports";
-type ActionSubTab = "attendance" | "inquiries" | "meetings";
+type SecretaryTab = "dashboard" | "correspondence" | "staff" | "reports";
 
 export default function SecretaryPage() {
     const { state, actions } = useSecretary();
     const [tab, setTab] = useState<SecretaryTab>("dashboard");
-    const [actionSubTab, setActionSubTab] = useState<ActionSubTab>("attendance");
 
     return (
         <main className="min-h-screen text-foreground font-sans pb-20" dir="rtl">
@@ -56,7 +47,7 @@ export default function SecretaryPage() {
                     </div>
                 </header>
 
-                {/* KPI Strip */}
+                {/* KPI Strip — بيانات حقيقية فقط */}
                 {state.stats && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                         <KPICard
@@ -66,21 +57,21 @@ export default function SecretaryPage() {
                             color="destructive"
                         />
                         <KPICard
-                            title="استفسارات معلقة"
-                            value={state.stats.pendingInquiries}
-                            icon={AlertCircle}
+                            title="صادر (إجمالي)"
+                            value={state.stats.outgoingTotal}
+                            icon={FileText}
                             color="accent"
                         />
                         <KPICard
-                            title="اجتماعات اليوم"
-                            value={state.stats.meetingsToday}
+                            title="إجازات معلقة"
+                            value={state.stats.activeLeaves}
                             icon={Calendar}
                             color="primary"
                         />
                         <KPICard
-                            title="طلبات شراء"
-                            value={state.stats.pendingProcurement}
-                            icon={ShoppingCart}
+                            title="في إجازة اليوم"
+                            value={state.stats.onLeaveToday}
+                            icon={Users}
                             color="accent"
                         />
                     </div>
@@ -100,10 +91,8 @@ export default function SecretaryPage() {
                 <nav className="mb-10 p-1.5 glass-panel rounded-3xl flex gap-1 overflow-x-auto no-scrollbar">
                     {[
                         { id: "dashboard", label: "الرئيسية", icon: LayoutDashboard },
-                        { id: "action_center", label: "مركز العمليات", icon: Zap },
                         { id: "correspondence", label: "الصادر والوارد", icon: Mail },
                         { id: "staff", label: "شؤون الموظفين", icon: Users },
-                        { id: "procurement", label: "المشتريات", icon: ShoppingCart },
                         { id: "reports", label: "التقارير", icon: FileText },
                     ].map((t) => (
                         <button
@@ -131,18 +120,18 @@ export default function SecretaryPage() {
                                     </div>
                                     <h3 className="text-3xl font-bold mb-4">مركز القيادة الإداري</h3>
                                     <p className="opacity-60 text-sm leading-relaxed mb-10">
-                                        تم دمج النماذج الرسمية في سير عملك اليومي. ابدأ بتسجيل الحضور أو معالجة البريد، وسيقوم النظام بتجهيز المستندات المطلوبة آلياً وفق معايير الجودة.
+                                        تم دمج النماذج الرسمية في سير عملك اليومي. ابدأ بمعالجة البريد أو إدارة الإجازات، وسيقوم النظام بتجهيز المستندات المطلوبة آلياً وفق معايير الجودة.
                                     </p>
                                     <div className="flex gap-4 justify-center">
-                                        <button onClick={() => setTab('action_center')} className="px-8 py-3.5 bg-primary text-primary-foreground rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">مركز العمليات</button>
-                                        <button onClick={() => setTab('correspondence')} className="px-8 py-3.5 glass-panel rounded-2xl text-xs font-bold uppercase tracking-widest border hover:bg-muted/5 transition-colors">الصادر والوارد</button>
+                                        <button onClick={() => setTab('correspondence')} className="px-8 py-3.5 bg-primary text-primary-foreground rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">الصادر والوارد</button>
+                                        <button onClick={() => setTab('staff')} className="px-8 py-3.5 glass-panel rounded-2xl text-xs font-bold uppercase tracking-widest border hover:bg-muted/5 transition-colors">شؤون الموظفين</button>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="lg:col-span-4 space-y-6">
                                 <h4 className="text-[10px] font-black opacity-40 uppercase tracking-[0.3em] mb-4 flex items-center gap-2 px-2">
-                                    <Clock className="w-3 h-3" /> التحديثات الذكية
+                                    <Zap className="w-3 h-3" /> التحديثات الذكية
                                 </h4>
                                 <div className="space-y-4">
                                     <aside className="glass-card p-6 border-r-4 border-r-primary">
@@ -166,7 +155,7 @@ export default function SecretaryPage() {
                                 </div>
                             </div>
 
-                            {/* ── v2: روابط سريعة للأنظمة الجديدة ── */}
+                            {/* روابط سريعة للأنظمة الفعلية */}
                             <div className="lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <Link
                                     href="/secretary/staff-attendance"
@@ -176,7 +165,7 @@ export default function SecretaryPage() {
                                         <CalendarDays className="w-6 h-6 text-primary group-hover:text-primary-foreground" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm">سجل الحضور v2</p>
+                                        <p className="font-bold text-sm">سجل الحضور</p>
                                         <p className="text-[11px] opacity-50 mt-0.5">تسجيل وإدارة حضور الموظفين — نظام متعدد المدارس</p>
                                     </div>
                                     <ChevronRight className="w-4 h-4 opacity-30 mr-auto rtl:rotate-180 group-hover:opacity-100 group-hover:text-primary transition-all" />
@@ -213,56 +202,6 @@ export default function SecretaryPage() {
                         </div>
                     )}
 
-                    {tab === "action_center" && (
-                        <div className="space-y-10 animate-in slide-in-from-right-8 duration-700">
-                            <div className="flex glass-panel p-1.5 rounded-3xl w-fit border">
-                                {[
-                                    { id: "attendance", label: "الحضور", icon: Clock },
-                                    { id: "inquiries", label: "الاستفسارات", icon: AlertCircle },
-                                    { id: "meetings", label: "الاجتماعات", icon: Calendar }
-                                ].map(st => (
-                                    <button
-                                        key={st.id}
-                                        onClick={() => setActionSubTab(st.id as ActionSubTab)}
-                                        className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase transition-all ${actionSubTab === st.id ? "bg-card text-primary shadow-xl" : "opacity-40 hover:opacity-100"
-                                            }`}
-                                    >
-                                        <st.icon className="w-4 h-4" />
-                                        {st.label}
-                                        {st.id === 'inquiries' && state.stats.pendingInquiries > 0 && (
-                                            <span className="bg-destructive text-destructive-foreground w-4 h-4 rounded-full flex items-center justify-center text-[8px] animate-pulse">
-                                                {state.stats.pendingInquiries}
-                                            </span>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="glass-panel p-1 rounded-[2.5rem] border overflow-hidden">
-                                {actionSubTab === "attendance" && (
-                                    <AttendancePanel
-                                        employees={state.employees}
-                                        attendance={state.attendance}
-                                        onLogAttendance={actions.logAttendance}
-                                    />
-                                )}
-                                {actionSubTab === "inquiries" && (
-                                    <HRInquiryWorkflow
-                                        inquiries={state.inquiries}
-                                        onUpdateInquiry={actions.updateInquiry}
-                                    />
-                                )}
-                                {actionSubTab === "meetings" && (
-                                    <MeetingScheduler
-                                        meetings={state.meetings}
-                                        employees={state.employees}
-                                        onSchedule={actions.scheduleMeeting}
-                                    />
-                                )}
-                            </div>
-                        </div>
-                    )}
-
                     {tab === "correspondence" && (
                         <div className="glass-panel p-1 rounded-[2.5rem] border overflow-hidden">
                             <CorrespondenceTable
@@ -280,15 +219,6 @@ export default function SecretaryPage() {
                                 leaves={state.leaves}
                                 onAdd={actions.addLeave}
                                 onUpdateStatus={actions.updateLeaveStatus}
-                            />
-                        </div>
-                    )}
-
-                    {tab === "procurement" && (
-                        <div className="glass-panel p-1 rounded-[2.5rem] border overflow-hidden">
-                            <ProcurementForm
-                                requests={state.procurement}
-                                onSubmit={actions.submitProcurement}
                             />
                         </div>
                     )}

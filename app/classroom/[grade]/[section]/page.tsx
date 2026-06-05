@@ -19,7 +19,6 @@ import { StarSelector } from "../../_components/StarSelector";
 import { StudentLog } from "../../_components/StudentLog";
 import { ReferralModal } from "../../_components/ReferralModal";
 import { ExcuseModal } from "../../_components/ExcuseModal";
-import { CleaningModal } from "../../_components/CleaningModal";
 import { ToolsWidget } from "../../_components/ToolsWidget";
 import { RandomPicker } from "../../_components/RandomPicker";
 import { GroupTool } from "../../_components/GroupTool";
@@ -109,13 +108,6 @@ export default function ClassDetailsPage() {
                                 <Grid3X3 className="w-3 h-3 inline ml-1" /> خريطة
                             </button>
                         </div>
-
-                        <button
-                            onClick={() => actions.toggleModal("cleaning", true)}
-                            className="bg-stone-100 border border-rose-500/20 px-4 py-2.5 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-all active:scale-95"
-                        >
-                            🚨 تنبيه نظافة
-                        </button>
 
                         <div className="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-stone-200">
                             <BookOpen className="w-4 h-4 text-[var(--primary)]" />
@@ -423,12 +415,6 @@ export default function ClassDetailsPage() {
                 studentName={state.selectedStudentName}
                 onClose={() => actions.toggleModal("excuse", false)}
                 onSend={actions.sendExcuse}
-            />
-
-            <CleaningModal
-                isOpen={state.modals.cleaning}
-                onClose={() => actions.toggleModal("cleaning", false)}
-                onSend={actions.submitCleaningReport}
             />
 
             <ParentNoteModal
