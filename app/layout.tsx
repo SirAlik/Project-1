@@ -13,8 +13,6 @@ import { DevTokenStrip } from "@/components/dev/DevTokenStrip";
 // import { AntigravityBouncers } from "@/components/ui/AntigravityBouncers";
 import { AntigravityParticlesCanvas } from "@/components/ui/AntigravityParticlesCanvas";
 import { GlobalHeader } from "@/components/layout/GlobalHeader";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ThemeTransition } from "@/components/ui/ThemeTransition";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 
@@ -36,9 +34,8 @@ export default function RootLayout({
       <body
         className={`${saudiFont.variable} ${inter.variable} ${tajawal.variable} antialiased`}
       >
-        <ThemeProvider>
+        <>
           <AntigravityParticlesCanvas />
-          <ThemeTransition />
           {process.env.NODE_ENV === "development" && <DevTokenStrip />}
           <ClientOverlays />
           <Providers>
@@ -52,7 +49,7 @@ export default function RootLayout({
               <DevToolsRoot />
             </div>
           </Providers>
-        </ThemeProvider>
+        </>
       </body>
     </html>
   );

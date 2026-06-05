@@ -9,7 +9,7 @@ This is a full engineering audit and radical restructuring review.
 
 Your role is:
 
-**Senior Software Architect + Principal Software Engineer + Security-Focused Reviewer**
+### Senior Software Architect + Principal Software Engineer + Security-Focused Reviewer
 
 You must review the project strictly, honestly, and deeply.
 
@@ -100,6 +100,10 @@ The following issues are **already resolved**. Do not report them as new finding
 | Supabase Security Audit — High Risk | فحص مباشر (2026-06-05): `handle_new_user()` + `block_privileged_field_changes()` مُصلَحتان مسبقاً · `student_honors/wishes/case_actions` school_id NOT NULL مسبقاً · `workflow_definitions USING(true)` مقبول (global catalog بلا school_id، INSERT/UPDATE/DELETE مسدودة بـ RLS default deny) · `get_my_school_id()` مطلوب للـ RLS لا يُحذف · `pg_net in public` Supabase-managed لا يُصلح من SQL · GraphQL broad grants مطلوب لـ PostgREST. لا migrations مطلوبة. |
 | Supabase Auth — Password Hardening (2026-06-05) | مُفعَّل يدوياً عبر Dashboard: Require current password on update ✅ · Minimum length = 10 ✅ · Require lowercase + uppercase + digits + symbols ✅ · Email OTP length = 8 · OTP expiry = 3600s. **Leaked password protection**: مؤجل — يتطلب Supabase Pro plan. |
 | Supabase Security Audit — Medium Risk (2026-06-05) | `db/migrations/20260605_medium_risk_cleanup.sql` مُطبَّق ✅: DROP 8 duplicate indexes (regular indexes تحت UNIQUE constraints) · DROP 8 legacy/broken RLS policies (case_actions بلا school_id check · cases_update legacy · "Users read invites" subquery · profiles duplicates · student_honors/wishes "Students View Own" مكسورة — student_id ≠ auth.uid()) · CREATE 13 school_id indexes على tenant tables بلا تغطية · CREATE 23 FK indexes عالية الاستخدام. **cron secrets** (`app.cron_site_url` + `app.cron_secret`): غير مُضبوطَين → cron_trigger_daily_feed no-op مؤجل (Low Risk). |
+
+| Dark Mode System | `next-themes` removed from package.json. `components/theme-provider.tsx` + `components/ui/ThemeTransition.tsx` deleted. `@custom-variant dark` + `.dark {}` block removed from globals.css. All `dark:*` Tailwind classes removed from button/badge/input/textarea/select/tabs/dropdown-menu/WorkflowStatusBadge/PublicFeed. `AntigravityParticlesCanvas` converted to fixed light-theme (no `useTheme`). Light UI only. |
+| Supabase Browser Client Env Fix | `lib/db/supabase-browser.ts` + `lib/db/supabase.ts`: replaced dynamic `process.env[name]` with `requirePublicEnv(name, process.env.NEXT_PUBLIC_*)`. Next.js bundler requires direct static dot-notation access to inline `NEXT_PUBLIC_*` vars in client bundles — dynamic bracket access returns `undefined` at runtime. `supabase-admin.ts` unchanged (server-only, Node.js process.env works). |
+| M79 — Cron AI Insights applied | `db/migrations/20260605_m79_cron_ai_insights.sql` applied to live Supabase with corrected schema (`name`/`secret` columns, not `key`/`value`). Live schema verified 2026-06-05: `app_private.secrets(name PK, secret, created_at)`. `get_cron_setting()` + `cron_trigger_ai_insights()` created. `daily-ai-insights` pg_cron job scheduled at `0 1 * * *`. Placeholders `cron_site_url`/`cron_secret` inserted — replace before launch: `UPDATE app_private.secrets SET secret='...' WHERE name='cron_site_url';` |
 
 **When auditing these areas:** verify the fix is complete and no regression was introduced. Do not flag the original problem as open.
 

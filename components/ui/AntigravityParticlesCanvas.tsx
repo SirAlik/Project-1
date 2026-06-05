@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useTheme } from 'next-themes';
 
 // =============================================================================
 // CONFIGURATION
@@ -36,7 +35,6 @@ function getFlowAngle(x: number, y: number, z: number): number {
 export const AntigravityParticlesCanvas: React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const { resolvedTheme } = useTheme();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -266,7 +264,7 @@ export const AntigravityParticlesCanvas: React.FC = () => {
             window.removeEventListener('mouseleave', handleMouseLeave);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [resolvedTheme]);
+    }, []);
 
     return (
         <div

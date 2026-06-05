@@ -1,22 +1,27 @@
 -- =================================================================
 -- M79: جدولة AI Insights + إعداد cron secrets
--- التاريخ: 2026-06-05
+-- التاريخ: 2026-06-05 (مُصحَّح بعد فحص DB الحية 2026-06-05)
 -- =================================================================
 -- البنود:
 --   1. إضافة مفاتيح cron_site_url + cron_secret إلى app_private.secrets
 --      (placeholder values — تُستبدل عند الإطلاق)
---   2. دالة get_cron_setting(key) SECURITY DEFINER — تقرأ app_private.secrets
+--   2. دالة get_cron_setting(p_name) SECURITY DEFINER — تقرأ app_private.secrets
 --      مع fallback إلى current_setting (لتوافق الإعدادات القديمة)
 --   3. تحديث cron_trigger_daily_feed() لاستخدام get_cron_setting
 --   4. إنشاء cron_trigger_ai_insights() — نفس النمط
 --   5. جدولة AI insights عبر pg_cron: 01:00 UTC يومياً (04:00 Asia/Riyadh)
 --
+-- مخطط app_private.secrets الحي (مُتحقَّق منه 2026-06-05):
+--   name       text  NOT NULL  PRIMARY KEY
+--   secret     text  NOT NULL
+--   created_at timestamptz NOT NULL DEFAULT now()
+--
 -- تعليمات الإطلاق:
 --   قبل أي وظيفة cron حقيقية، حدِّث القيم في app_private.secrets:
---     UPDATE app_private.secrets SET value = 'https://your-app.vercel.app'
---       WHERE key = 'cron_site_url';
---     UPDATE app_private.secrets SET value = '<your-CRON_SECRET>'
---       WHERE key = 'cron_secret';
+--     UPDATE app_private.secrets SET secret = 'https://your-app.vercel.app'
+--       WHERE name = 'cron_site_url';
+--     UPDATE app_private.secrets SET secret = '<your-CRON_SECRET>'
+--       WHERE name = 'cron_secret';
 --   ملاحظة: هذه التعليمات تُنفَّذ من Supabase SQL Editor (بصلاحية postgres) — لا تُكتب في كود.
 --
 -- المتطلبات:
@@ -45,25 +50,34 @@ BEGIN
         RAISE EXCEPTION 'PREFLIGHT FAILED: app_private.secrets غير موجود — طبِّق Phase 4 migration أولاً';
     END IF;
 
-    RAISE NOTICE 'Preflight ✓';
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = 'app_private'
+          AND table_name   = 'secrets'
+          AND column_name  = 'secret'
+    ) THEN
+        RAISE EXCEPTION 'PREFLIGHT FAILED: العمود secret غير موجود في app_private.secrets — تحقق من مخطط الجدول';
+    END IF;
+
+    RAISE NOTICE 'Preflight ✓ (مخطط app_private.secrets: name/secret/created_at)';
 END $$;
 
 -- ════════════════════════════════════════════════════════════════
 -- 2. إضافة مفاتيح cron إلى app_private.secrets
---    ON CONFLICT DO NOTHING لتجنب الكتابة فوق قيم حقيقية
+--    ON CONFLICT (name) DO NOTHING — name هو PRIMARY KEY
 -- ════════════════════════════════════════════════════════════════
-INSERT INTO app_private.secrets (key, value)
+INSERT INTO app_private.secrets (name, secret)
 VALUES
     ('cron_site_url', 'https://REPLACE_BEFORE_LAUNCH.vercel.app'),
     ('cron_secret',   'REPLACE_BEFORE_LAUNCH')
-ON CONFLICT (key) DO NOTHING;
+ON CONFLICT (name) DO NOTHING;
 
 -- ════════════════════════════════════════════════════════════════
--- 3. دالة مساعدة: get_cron_setting(key)
+-- 3. دالة مساعدة: get_cron_setting(p_name)
 --    SECURITY DEFINER — تقرأ app_private.secrets (محجوبة بـ RLS)
 --    Fallback: current_setting لتوافق الإعدادات القديمة
 -- ════════════════════════════════════════════════════════════════
-CREATE OR REPLACE FUNCTION public.get_cron_setting(p_key text)
+CREATE OR REPLACE FUNCTION public.get_cron_setting(p_name text)
 RETURNS text
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -72,15 +86,15 @@ AS $$
 DECLARE
     v_val text;
 BEGIN
-    -- المصدر الأساسي: app_private.secrets
-    SELECT value INTO v_val
+    -- المصدر الأساسي: app_private.secrets (العمود: secret)
+    SELECT secret INTO v_val
     FROM app_private.secrets
-    WHERE key = p_key
+    WHERE name = p_name
     LIMIT 1;
 
     -- fallback: current_setting (للإعدادات المضبوطة عبر ALTER DATABASE)
     IF coalesce(v_val, '') = '' OR v_val LIKE '%REPLACE_BEFORE_LAUNCH%' THEN
-        v_val := current_setting('app.' || p_key, true);
+        v_val := current_setting('app.' || p_name, true);
     END IF;
 
     RETURN coalesce(v_val, '');
@@ -105,7 +119,8 @@ DECLARE
     v_secret text := public.get_cron_setting('cron_secret');
 BEGIN
     IF coalesce(v_url, '') = '' OR coalesce(v_secret, '') = ''
-       OR v_url LIKE '%REPLACE_BEFORE_LAUNCH%' OR v_secret LIKE '%REPLACE_BEFORE_LAUNCH%'
+       OR v_url    LIKE '%REPLACE_BEFORE_LAUNCH%'
+       OR v_secret LIKE '%REPLACE_BEFORE_LAUNCH%'
     THEN
         RAISE NOTICE 'cron_trigger_daily_feed: cron_site_url أو cron_secret غير مضبوطَين — تم التخطي';
         RETURN;
@@ -140,7 +155,8 @@ DECLARE
     v_secret text := public.get_cron_setting('cron_secret');
 BEGIN
     IF coalesce(v_url, '') = '' OR coalesce(v_secret, '') = ''
-       OR v_url LIKE '%REPLACE_BEFORE_LAUNCH%' OR v_secret LIKE '%REPLACE_BEFORE_LAUNCH%'
+       OR v_url    LIKE '%REPLACE_BEFORE_LAUNCH%'
+       OR v_secret LIKE '%REPLACE_BEFORE_LAUNCH%'
     THEN
         RAISE NOTICE 'cron_trigger_ai_insights: cron_site_url أو cron_secret غير مضبوطَين — تم التخطي';
         RETURN;
@@ -191,13 +207,13 @@ $$;
 -- ════════════════════════════════════════════════════════════════
 DO $$
 DECLARE
-    v_keys_count   integer;
-    v_fn_ai_exists boolean;
+    v_keys_count    integer;
+    v_fn_ai_exists  boolean;
     v_fn_get_exists boolean;
 BEGIN
     SELECT COUNT(*) INTO v_keys_count
     FROM app_private.secrets
-    WHERE key IN ('cron_site_url', 'cron_secret');
+    WHERE name IN ('cron_site_url', 'cron_secret');
 
     SELECT EXISTS (
         SELECT 1 FROM pg_proc p
@@ -212,7 +228,7 @@ BEGIN
     ) INTO v_fn_get_exists;
 
     IF v_keys_count < 2 THEN
-        RAISE EXCEPTION 'FAIL: cron_site_url أو cron_secret مفقودان من app_private.secrets';
+        RAISE EXCEPTION 'FAIL: cron_site_url أو cron_secret مفقودان من app_private.secrets (العمود: name)';
     END IF;
 
     IF NOT v_fn_ai_exists THEN
@@ -225,14 +241,14 @@ BEGIN
 
     RAISE NOTICE '✅ M79 اكتمل:';
     RAISE NOTICE '   ✓ app_private.secrets يحتوي cron_site_url + cron_secret (placeholders)';
-    RAISE NOTICE '   ✓ get_cron_setting() — SECURITY DEFINER — تقرأ app_private.secrets';
+    RAISE NOTICE '   ✓ get_cron_setting() — SECURITY DEFINER — يقرأ العمود secret حيث name = p_name';
     RAISE NOTICE '   ✓ cron_trigger_daily_feed() محدَّثة لاستخدام get_cron_setting';
     RAISE NOTICE '   ✓ cron_trigger_ai_insights() — تستدعي /api/cron/ai-insights';
     RAISE NOTICE '   ✓ daily-ai-insights مجدوَل: 01:00 UTC يومياً';
     RAISE NOTICE '';
     RAISE NOTICE '⚠️  قبل الإطلاق: حدِّث القيم الفعلية في app_private.secrets:';
-    RAISE NOTICE '   UPDATE app_private.secrets SET value = ''https://your-app.vercel.app'' WHERE key = ''cron_site_url'';';
-    RAISE NOTICE '   UPDATE app_private.secrets SET value = ''<CRON_SECRET>'' WHERE key = ''cron_secret'';';
+    RAISE NOTICE '   UPDATE app_private.secrets SET secret = ''https://your-app.vercel.app'' WHERE name = ''cron_site_url'';';
+    RAISE NOTICE '   UPDATE app_private.secrets SET secret = ''<CRON_SECRET>'' WHERE name = ''cron_secret'';';
 END $$;
 
 COMMIT;

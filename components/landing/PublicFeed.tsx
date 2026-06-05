@@ -19,7 +19,7 @@ export function PublicFeed() {
     // Determine active class only after hydration to prevent mismatch
     const getTabClass = (tabId: string) => {
         const isActive = filter === tabId;
-        return `px-6 py-2.5 rounded-xl text-xs font-black transition-all ${isActive ? "bg-white dark:bg-zinc-900 text-[var(--primary)] shadow-xl" : "opacity-40 hover:opacity-100"}`;
+        return `px-6 py-2.5 rounded-xl text-xs font-black transition-all ${isActive ? "bg-white text-[var(--primary)] shadow-xl" : "opacity-40 hover:opacity-100"}`;
     };
 
     return (
