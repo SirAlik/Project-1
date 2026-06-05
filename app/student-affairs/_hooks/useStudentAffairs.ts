@@ -69,7 +69,7 @@ export function useStudentAffairs() {
     const loadAttendance = useCallback(async (date: string = new Date().toISOString().split('T')[0]) => {
         setLoading(true);
         const { data, error } = await supabase
-            .from('student_attendance')
+            .from('student_daily_attendance')
             .select('*, student:student_profiles(name, student_id)')
             .eq('attendance_date', date);
 

@@ -81,25 +81,14 @@ export async function undoEventsAction(ids: string[]): Promise<AR> {
 }
 
 export async function submitCleaningReportAction(
-    teacherId: string,
-    rating: number,
-    comment: string,
+    _teacherId: string,
+    _rating: number,
+    _comment: string,
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from('cleaning_reports').insert([{
-        teacher_id: teacherId,
-        rating,
-        comment,
-        status: 'open',
-        school_id: persona.schoolId,
-        created_at: new Date().toISOString(),
-    }]);
-
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    // cleaning_reports حُذف في r01_drop_legacy_tables — يتطلب إعادة تصميم
+    return { ok: false, error: 'تقارير النظافة قيد إعادة التصميم — ستُتاح قريباً' };
 }
 
 export async function saveStarsAction(

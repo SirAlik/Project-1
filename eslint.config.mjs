@@ -5,6 +5,21 @@ import nextTs from "eslint-config-next/typescript";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Standard TypeScript convention: _-prefixed parameters are intentionally unused.
+  // argsIgnorePattern was missing from eslint-config-next/typescript defaults.
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        vars: "all",
+        args: "after-used",
+        argsIgnorePattern: "^_",
+        caughtErrors: "all",
+        caughtErrorsIgnorePattern: "^_",
+        destructuredArrayIgnorePattern: "^_",
+        ignoreRestSiblings: true,
+      }],
+    },
+  },
   // Plain JS scripts legitimately use require() — exempt them.
   {
     files: ["scripts/**/*.js"],

@@ -22,7 +22,10 @@ export function useSyncEngine() {
                 return false;
             }
             case 'ar_scan': {
-                const { error } = await supabase.rpc('rpc_scan_ar_glyph', { glyph_hash: action.payload.hash });
+                const { error } = await supabase.rpc('rpc_scan_ar_glyph', {
+                    p_glyph_hash: action.payload.hash,
+                    p_student_id: action.payload.student_id,
+                });
                 if (!error) {
                     createToast('تم تسجيل الكشف المتأخر', 'reward');
                     return true;

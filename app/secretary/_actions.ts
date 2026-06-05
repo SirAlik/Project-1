@@ -54,39 +54,26 @@ export async function deleteLetterAction(id: string): Promise<AR> {
 }
 
 export async function logAttendanceAction(
-    log: Omit<AttendanceLog, 'id' | 'created_at' | 'is_late' | 'employee'>,
+    _log: Omit<AttendanceLog, 'id' | 'created_at' | 'is_late' | 'employee'>,
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from('attendance_logs').insert([{
-        ...log,
-        school_id: persona.schoolId,
-    }]);
-
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    // attendance_logs حُذف في r01_drop_legacy_tables — الاستبدال: staff_attendance_logs (schema مختلف)
+    return { ok: false, error: 'سجلات الحضور قيد إعادة التصميم على schema الجديد' };
 }
 
 export async function updateInquiryAction(
-    id: string,
-    updates: Partial<Omit<HRInquiry, 'id' | 'employee'>>,
+    _id: string,
+    _updates: Partial<Omit<HRInquiry, 'id' | 'employee'>>,
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    let query = supabase.from('hr_inquiries').update(updates).eq('id', id);
-    if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
-
-    const { error } = await query;
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    // hr_inquiries حُذف في r01_drop_legacy_tables — الاستبدال: hr_accountability_tickets (schema مختلف)
+    return { ok: false, error: 'الاستفسارات الوظيفية قيد إعادة التصميم على schema الجديد' };
 }
 
 export async function scheduleMeetingAction(
-    meeting: {
+    _meeting: {
         title: string;
         meeting_date: string;
         meeting_time?: string | null;
@@ -95,30 +82,12 @@ export async function scheduleMeetingAction(
         meeting_type: string;
         status: string;
     },
-    attendeeIds: string[],
+    _attendeeIds: string[],
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    const { data: meetingData, error: mErr } = await supabase
-        .from('meetings')
-        .insert([{ ...meeting, school_id: persona.schoolId }])
-        .select('id')
-        .single();
-
-    if (mErr) return { ok: false, error: mErr.message };
-
-    if (attendeeIds.length > 0) {
-        const attendees = attendeeIds.map(eid => ({
-            meeting_id: (meetingData as { id: string }).id,
-            employee_id: eid,
-        }));
-        const { error: aErr } = await supabase.from('meeting_attendees').insert(attendees);
-        if (aErr) return { ok: false, error: aErr.message };
-    }
-
-    return { ok: true };
+    // meetings + meeting_attendees حُذفا في r01_drop_legacy_tables — الاستبدال: meeting_sessions (schema مختلف)
+    return { ok: false, error: 'جدولة الاجتماعات قيد إعادة التصميم على schema الجديد' };
 }
 
 export async function addLeaveAction(leave: {
@@ -154,7 +123,7 @@ export async function updateLeaveStatusAction(id: string, status: string): Promi
     return { ok: true };
 }
 
-export async function submitProcurementAction(request: {
+export async function submitProcurementAction(_request: {
     request_number: string;
     request_date: string;
     urgency: string | null;
@@ -164,30 +133,15 @@ export async function submitProcurementAction(request: {
 }): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from('procurement_requests').insert([{
-        ...request,
-        requested_by: persona.userId,
-        school_id: persona.schoolId,
-    }]);
-
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    // procurement_requests حُذف في r01_drop_legacy_tables — لا يوجد جدول بديل محدد بعد
+    return { ok: false, error: 'طلبات التوريد قيد إعادة التصميم' };
 }
 
 export async function addAssignmentAction(
-    letter: Omit<AssignmentLetter, 'id' | 'created_at'>,
+    _letter: Omit<AssignmentLetter, 'id' | 'created_at'>,
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from('assignment_letters').insert([{
-        ...letter,
-        school_id: persona.schoolId,
-    }]);
-
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    // assignment_letters حُذف في r01_drop_legacy_tables — لا يوجد جدول بديل محدد بعد
+    return { ok: false, error: 'خطابات التكليف قيد إعادة التصميم' };
 }

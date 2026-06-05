@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldAlert, Fingerprint, Activity, AlertTriangle, ShieldCheck, Lock, RotateCw } from 'lucide-react';
 import { supabase } from '@/lib/db/supabase';
 import { Card } from '@/components/ui/Card';
+import { toggleCircuitBreakerAction } from '../_actions';
 
 interface SentinelFlag {
     id: string;
@@ -89,16 +90,12 @@ export function SentinelDashboard() {
 
     const toggleCircuitBreaker = async () => {
         try {
-            const { data, error: fetchErr } = await supabase.from('system_config').select('value_json').eq('key', 'circuit_breaker').single();
-            if (fetchErr) throw fetchErr;
-
-            const current = data.value_json;
-            const updated = { ...current, is_active: !current.is_active, reason: !current.is_active ? 'Manual Administrative Lock' : 'none' };
-
-            const { error: upErr } = await supabase.from('system_config').update({ value_json: updated }).eq('key', 'circuit_breaker');
-            if (upErr) throw upErr;
-
-            alert(`Circuit Breaker ${updated.is_active ? 'ACTIVATED' : 'DEACTIVATED'}`);
+            const result = await toggleCircuitBreakerAction();
+            if (!result.ok) {
+                alert(`خطأ: ${result.error}`);
+                return;
+            }
+            alert(`Circuit Breaker ${result.is_active ? 'ACTIVATED' : 'DEACTIVATED'}`);
         } catch (err) {
             console.error('Failed to toggle circuit breaker', err);
         }

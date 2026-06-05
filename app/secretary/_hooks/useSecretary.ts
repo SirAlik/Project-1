@@ -88,63 +88,33 @@ export function useSecretary() {
     }, []);
 
     const loadEmployees = useCallback(async () => {
-        const { data, error } = await supabase
-            .from("employees")
-            .select("*")
-            .order("name", { ascending: true });
-        if (error) setMsg(error.message);
-        else setEmployees((data || []) as Employee[]);
+        // employees جدول موروث حُذف — سيُستبدَل بـ user_personas في الإصدار القادم
+        setEmployees([]);
     }, []);
 
-    const loadAttendance = useCallback(async (date: string = new Date().toISOString().split('T')[0]) => {
-        const { data, error } = await supabase
-            .from("attendance_logs")
-            .select("*, employee:employees(name)")
-            .eq("log_date", date);
-        if (error) setMsg(error.message);
-        else {
-            const formatted = (data || []).map((row: Record<string, unknown> & { employee?: { name?: string } | null }) => ({
-                ...row,
-                employee_name: row.employee?.name
-            }));
-            setAttendance(formatted as unknown as AttendanceLog[]);
-        }
+    const loadAttendance = useCallback(async (_date: string = new Date().toISOString().split('T')[0]) => {
+        // attendance_logs جدول موروث حُذف — الاستبدال: staff_attendance_logs (schema مختلف)
+        setAttendance([]);
     }, []);
 
     const loadInquiries = useCallback(async () => {
-        const { data, error } = await supabase
-            .from("hr_inquiries")
-            .select("*, employee:employees(name)")
-            .order("created_at", { ascending: false });
-        if (error) setMsg(error.message);
-        else setInquiries((data || []) as HRInquiry[]);
+        // hr_inquiries جدول موروث حُذف — الاستبدال: hr_accountability_tickets (schema مختلف)
+        setInquiries([]);
     }, []);
 
     const loadMeetings = useCallback(async () => {
-        const { data, error } = await supabase
-            .from("meetings")
-            .select("*, attendees:meeting_attendees(*)")
-            .order("meeting_date", { ascending: false });
-        if (error) setMsg(error.message);
-        else setMeetings((data || []) as Meeting[]);
+        // meetings + meeting_attendees جداول موروثة حُذفت — الاستبدال: meeting_sessions (schema مختلف)
+        setMeetings([]);
     }, []);
 
     const loadProcurement = useCallback(async () => {
-        const { data, error } = await supabase
-            .from("procurement_requests")
-            .select("*")
-            .order("request_date", { ascending: false });
-        if (error) setMsg(error.message);
-        else setProcurement((data || []) as ProcurementRequest[]);
+        // procurement_requests جدول موروث حُذف — لا يوجد جدول بديل محدد بعد
+        setProcurement([]);
     }, []);
 
     const loadAssignments = useCallback(async () => {
-        const { data, error } = await supabase
-            .from("assignment_letters")
-            .select("*")
-            .order("issue_date", { ascending: false });
-        if (error) setMsg(error.message);
-        else setAssignments((data || []) as AssignmentLetter[]);
+        // assignment_letters جدول موروث حُذف — لا يوجد جدول بديل محدد بعد
+        setAssignments([]);
     }, []);
 
     const loadAll = useCallback(async () => {

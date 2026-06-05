@@ -4,6 +4,7 @@ import type { TransactionDelta } from './ledger';
 
 export interface ArScanPayload {
     hash: string;
+    student_id: string;
 }
 
 export interface QuestUpdatePayload {

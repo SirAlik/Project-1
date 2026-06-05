@@ -167,13 +167,13 @@ export async function markAttendanceAction(
     if (!persona) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.from('student_attendance').upsert({
+    const { error } = await supabase.from('student_daily_attendance').upsert({
         student_id: studentId,
         attendance_date: new Date().toISOString().split('T')[0],
         status,
         ...metadata,
-        recorded_by: persona.userId,
         school_id: persona.schoolId,
+        // recorded_by_persona_id يُضاف عند إعادة تصميم هذه الوظيفة لتمرير personaId
     });
 
     if (error) return { ok: false, error: error.message };
