@@ -21,8 +21,8 @@ export const GlobalHeader = () => {
         setIsScrolled(latest > 20);
     });
 
-    // Hide header on login page or potentially other full-screen pages if needed
-    if (pathname === '/login') return null;
+    // Hide app header on login + on the public landing page ('/' uses its own LandingHeader).
+    if (pathname === '/login' || pathname === '/') return null;
 
     // Dynamic contrast styles
     const isTransparent = isHome && !isScrolled;

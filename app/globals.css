@@ -2,245 +2,178 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* stylelint-disable-next-line at-rule-no-unknown */
+/* ========================================================================
+   SCHOOL OS / SIDRA OS — VISUAL CONSTITUTION (Phase 3B)
+   Light-only · Warm vanilla canvas · Teal primary · Blue secondary-accent
+   Charcoal text · IBM Plex Sans Arabic · Soft premium shadows · 16px radius
+   Legacy "dark-matte + gold" system REMOVED / neutralized to light.
+   shadcn/ui token names preserved (values changed) → @theme inline maps them.
+   ======================================================================== */
+
 @theme {
-  /* ========================================================================
-     CHAMELEON DESIGN TOKENS - LUXURY HIGH-CONTRAST SYSTEM
-     ======================================================================== */
+  /* ---- Status colors (direct, restrained) ---- */
+  --color-success: #10b981;
+  --color-success-foreground: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-foreground: #111827;
+  --color-info: #3b6fe0;
+  /* الأزرق الثانوي المعتمد (secondary accent) */
+  --color-info-foreground: #ffffff;
+  --color-danger: #ef4444;
+  --color-danger-foreground: #ffffff;
 
-  /* Legacy compatibility tokens */
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-
-  /* Status colors mapped to gold palette */
-  --color-warning: hsl(var(--primary));
-  --color-warning-foreground: hsl(var(--primary-foreground));
-  --color-info: hsl(var(--primary));
-  --color-info-foreground: hsl(var(--primary-foreground));
-  --color-success: 160 84% 39%;
-  --color-success-foreground: 0 0% 100%;
-
-  /* ====== CHAMELEON SEMANTIC TOKENS ====== */
-
-  /* Background Tokens */
+  /* ---- CHAMELEON compat tokens (HSL triplets consumed via hsl()) ----
+     مُبقاة بأسمائها لأن 60+ ملفاً يستخدم text-text-primary / accent-primary / bg-surface …
+     لكن قيمها حُوّلت إلى نظام فاتح (charcoal/teal/white) بدل الداكن/الذهبي. */
   --color-bg-canvas: hsl(var(--bg-canvas));
   --color-bg-surface: hsl(var(--bg-surface));
-
-  /* Text Tokens */
   --color-text-primary: hsl(var(--text-primary));
   --color-text-secondary: hsl(var(--text-secondary));
   --color-text-inverse: hsl(var(--text-inverse));
-
-  /* Border Tokens */
   --color-border-subtle: hsl(var(--border-subtle));
   --color-border-soft: hsl(var(--border-soft));
-
-  /* Accent Tokens */
   --color-accent-primary: hsl(var(--accent-primary));
 
-  /* Custom Fonts */
-  --font-saudi: var(--font-brand-saudi), sans-serif;
+  /* Custom Fonts — (تنظيف Phase 3B) أُزيل خط Saudi المحلي؛ يُعاد توجيه أداة font-saudi
+     (المستخدمة في ~12 ملفاً) إلى الخط الأساسي IBM Plex Sans Arabic للحفاظ على Arabic-first
+     دون تعديل تلك الملفات. الاسم مُبقى للتوافق الخلفي. */
+  --font-saudi: var(--font-sans), system-ui, sans-serif;
 }
 
 :root {
-  /* ========================================================================
-     LUXURY HIGH-CONTRAST DESIGN SYSTEM
-     White Canvas • Dark Matte Blocks • Gold Authority
-     ======================================================================== */
+  /* ===== Surfaces (warm vanilla canvas, white cards) ===== */
+  --background: #fbf7ef;
+  --foreground: #111827;
+  --card: #ffffff;
+  --card-foreground: #111827;
+  --popover: #ffffff;
+  --popover-foreground: #111827;
+  --surface-soft: #fffdf8;
 
-  /* ====== CHAMELEON SEMANTIC VARIABLES ====== */
+  /* ===== Brand: Teal primary · subtle secondary · soft teal accent ===== */
+  --primary: #0d9488;
+  --primary-foreground: #ffffff;
+  --secondary: #f4efe6;
+  /* sطح ثانوي خافت (دلالة shadcn) — الأزرق المعتمد كأكسنت في --color-info/--chart-2 */
+  --secondary-foreground: #111827;
+  --accent: #e6f4f1;
+  /* tint teal لخلفيات hover / active nav */
+  --accent-foreground: #0f172a;
 
-  /* Canvas: White Foundation */
-  --bg-canvas: 0 0% 98%;
-  /* Soft off-white #FAFAFA */
-  --bg-surface: 220 15% 12%;
-  /* Matte dark blocks #1C1F26 */
+  /* ===== Muted / borders (warm) ===== */
+  --muted: #f4efe6;
+  --muted-foreground: #6b7280;
+  /* ثانوي فقط (وصف/وقت/تلميح) */
+  --border: #e8e1d4;
+  --input: #e8e1d4;
+  --ring: #0d9488;
 
-  /* Text Hierarchy */
-  --text-primary: 0 0% 100%;
-  /* White on dark surfaces */
-  --text-secondary: 220 10% 60%;
-  /* Gray-400 for secondary */
-  --text-inverse: 220 15% 11%;
-  /* Near-black on white canvas */
+  /* ===== Status ===== */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
 
-  /* Borders */
-  --border-subtle: 220 10% 22%;
-  /* Subtle on dark surfaces */
-  --border-soft: 220 10% 88%;
-  /* Soft on light canvas */
+  /* ===== Charts (restrained palette) ===== */
+  --chart-1: #0d9488;
+  /* teal */
+  --chart-2: #3b6fe0;
+  /* blue */
+  --chart-3: #8b7df0;
+  /* lavender */
+  --chart-4: #f59e0b;
+  /* amber */
+  --chart-5: #ef4444;
+  /* soft red */
 
-  /* Accent: Gold Authority */
-  --accent-primary: 43 74% 49%;
-  /* Metallic Gold #D9A520 */
+  /* ===== Sidebar (هوية المنتج — labels charcoal لا رمادي باهت) ===== */
+  --sidebar: #fffdf8;
+  --sidebar-foreground: #111827;
+  --sidebar-primary: #0d9488;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e6f4f1;
+  --sidebar-accent-foreground: #0f172a;
+  --sidebar-border: #e8e1d4;
+  --sidebar-ring: #0d9488;
 
-  /* Depth Shadows */
-  --shadow-depth-soft: 0 4px 12px -2px rgba(0, 0, 0, 0.08);
-  --shadow-depth-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.15);
+  /* ===== Radius (بطاقات 16px) ===== */
+  --radius: 1rem;
 
-  /* Gold Tokens (Centralized) */
-  --gold: 45 90% 52%;
-  --gold-strong: 45 95% 45%;
+  /* ===== CHAMELEON semantic vars (HSL triplets — neutralized to LIGHT) ===== */
+  --bg-canvas: 40 53% 96%;
+  /* #FBF7EF vanilla */
+  --bg-surface: 0 0% 100%;
+  /* white card (كان داكناً matte) */
+  --text-primary: 222 47% 11%;
+  /* #111827 charcoal (كان أبيض) */
+  --text-secondary: 220 9% 46%;
+  /* #6B7280 ثانوي مقروء */
+  --text-inverse: 0 0% 100%;
+  /* أبيض على الأكسنت الداكن */
+  --border-subtle: 39 30% 87%;
+  /* حد دافئ هادئ */
+  --border-soft: 39 33% 90%;
+  --accent-primary: 175 82% 32%;
+  /* teal (كان ذهبياً) */
 
-  /* ====== LEGACY TOKENS (Mapped for compatibility) ====== */
+  /* ===== Soft premium shadows ===== */
+  --shadow-depth-soft: 0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 14px -6px rgba(17, 24, 39, 0.08);
+  --shadow-depth-hover: 0 10px 28px -8px rgba(17, 24, 39, 0.12);
 
-  /* Background mapped to canvas */
+  /* ===== Legacy gold tokens — NEUTRALIZED to teal (back-compat فقط) ===== */
+  --gold: 175 82% 32%;
+  --gold-strong: 175 84% 26%;
 
-  /* Cards mapped to dark surface */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-
-  /* Popover: Dark surface */
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-
-  /* Primary: Metallic Gold */
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-
-  /* Secondary: Muted for canvas */
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-
-  /* Muted: Subtle gray */
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-
-  /* Accent: Matches Primary Gold */
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-
-  /* Destructive: Muted Red */
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: 0 0% 100%;
-
-  /* Borders: Soft for canvas context */
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-
-  /* Radius */
-  --radius: 0.625rem;
-
-  /* Glass fallbacks (deprecated) */
-  --glass-bg: var(--bg-surface);
-  --glass-border: var(--border-subtle);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ===== Glass fallbacks (deprecated → light) ===== */
+  --glass-bg: var(--card);
+  --glass-border: var(--border);
 }
 
 @layer utilities {
 
-  /* ====== SURFACE BLOCK UTILITIES ====== */
-
-  /* Dark matte functional block - primary container style */
-  .surface-block {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border-subtle));
-    border-radius: 1rem;
+  /* أسطح البطاقات الفاتحة (تستبدل نظام glass/dark القديم) — قيم صحيحة بلا hsl(oklch()) */
+  .surface-block,
+  .surface-card,
+  .glass-card,
+  .card-paper {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
     box-shadow: var(--shadow-depth-soft);
   }
 
-  /* Hover enhancement for surface blocks */
-  .surface-block-hover {
-    transition: all 200ms ease-out;
-  }
-
-  .surface-block-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-depth-hover);
-  }
-
-  /* Combined surface block with hover */
-  .surface-card {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border-subtle));
-    border-radius: 1rem;
-    box-shadow: var(--shadow-depth-soft);
-    transition: all 200ms ease-out;
-  }
-
-  .surface-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-depth-hover);
-  }
-
-  /* Glass card fallback - now maps to surface */
+  .surface-block-hover,
+  .surface-card,
   .glass-card {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border-subtle));
-    border-radius: 1rem;
-    box-shadow: var(--shadow-depth-soft);
-    transition: all 200ms ease-out;
+    transition: transform 200ms ease-out, box-shadow 200ms ease-out;
   }
 
+  .surface-block-hover:hover,
+  .surface-card:hover,
   .glass-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-depth-hover);
   }
 
+  /* لوحة سابقاً translucent داكنة → سطح فاتح هادئ */
   .glass-panel {
-    background-color: hsl(var(--bg-surface) / 0.5);
-    border: 1px solid hsl(var(--border-subtle));
+    background-color: var(--card);
+    border: 1px solid var(--border);
     border-radius: 0.75rem;
   }
 
-  /* Legacy card-paper - now uses surface styling */
-  .card-paper {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border-subtle));
-    border-radius: 1rem;
-    box-shadow: var(--shadow-depth-soft);
-  }
-
-  /* Background utility */
   .bg-card {
-    background-color: hsl(var(--card));
+    background-color: var(--card);
   }
 
-  /* Text Balance Utility */
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Override any lingering glass classes */
   .bg-glass {
     @apply bg-card;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
 
-  /* QA Bar Height (replaces inline style) */
+  .text-balance {
+    text-wrap: balance;
+  }
+
   .qa-bar {
     height: calc(attr(data-h number) * 1%);
   }
@@ -255,7 +188,7 @@
     @apply bg-background text-foreground;
   }
 
-  /* Scrollbar - elegant for light canvas */
+  /* Scrollbar — canvas فاتح + hover teal (أُزيل الذهبي) */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -263,7 +196,7 @@
   }
 
   ::-webkit-scrollbar-track {
-    background-color: hsl(var(--bg-canvas));
+    background-color: var(--background);
   }
 
   ::-webkit-scrollbar-thumb {
@@ -272,9 +205,10 @@
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background-color: hsla(43, 74%, 49%, 0.6);
-    /* Gold hover */
+    background-color: hsla(175, 82%, 32%, 0.55);
+    /* teal */
   }
+
   html {
     @apply font-sans;
   }
@@ -314,6 +248,7 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
+  --color-surface-soft: var(--surface-soft);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);

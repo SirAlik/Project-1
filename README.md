@@ -30,9 +30,9 @@
 * **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — البنية التحتية والأساسية للنظام مكتملة تماماً.
 * **المستخدمون:** لا يوجد مستخدمون حقيقيون حالياً، ولا توجد بيانات إنتاجية (Production Data) نشطة.
 * **قاعدة البيانات:** ترحيلات من (`M01–M77 + R00–R12`) بإجمالي **80 ترحيل** — بنية البيانات مكتملة.
-* **واجهات المستخدم (UI):** قيد المراجعة — **لم تبدأ** أي إعادة تصميم بصري premium بعد.
+* **واجهات المستخدم (UI):** **الدستور البصري المعتمد (Phase 3B) مُطبَّق** (خلفية vanilla · نص charcoal · أكسنت teal/أزرق · خط IBM Plex Sans Arabic · Light-only · بلا ذهبي/داكن/زجاج)، و**الصفحة الرئيسية العامة (Landing) أُعيد تصميمها بالكامل** عليه. **لوحات الأدوار الداخلية لم يُعَد تصميمها بعد** (Phase 3C لاحقاً) — راجع قسم «الهوية البصرية» أدناه.
 * **جودة الكود:** اكتملت مراحل تنظيف الكود الأساسية 1–5 — راجع القسم أدناه.
-* **التوجيه وعزل المستأجر (Routing & Tenancy):** اكتملت **Phase 1** (مواءمة توجيه الأدوار مع شجرة `app/` الفعلية) و**Phase 2A** (حارس مستأجر دفاعي لـ `app/school/[id]/*`). **التركيز الحالي** هو الاستقرار والأمان والتوجيه وعزل المستأجر **قبل** إعادة التصميم البصري. **Phase 2B (تقوية الوصول الآمن للبيانات) لم تبدأ بعد** وهي الخطوة التالية.
+* **التوجيه وعزل المستأجر (Routing & Tenancy):** اكتملت **Phase 1 + Phase 2A → 2F** (مواءمة توجيه الأدوار · حارس مستأجر لـ `app/school/[id]/*` · عزل بيانات tenant-safe لـ `classroom/[classId]` · تصحيح ملكية المجالات بين `academic_vp`/`school_affairs_vp` · إغلاق DB hardening لـ `classes.school_id`). المشروع **PRE-LAUNCH** — لا مستخدمون ولا بيانات إنتاجية.
 
 ---
 
@@ -56,7 +56,7 @@
 | ------- | ------ |
 | إجمالي المشاكل عند البداية | ~700 |
 | `npm run lint` الآن | **0 أخطاء · 0 تحذيرات** |
-| `npm run build` الآن | ✅ **77/77 صفحة** · صفر أخطاء TypeScript · `ƒ Proxy (Middleware)` |
+| `npm run build` الآن | ✅ **63/63 صفحة** · صفر أخطاء TypeScript · `ƒ Proxy (Middleware)` |
 | `@typescript-eslint/no-explicit-any` المتبقية | **صفر** |
 
 ### ✅ المرحلة الرابعة — مكتملة
@@ -87,6 +87,8 @@
 | **الرسوم والتحليلات (Charts)** | Recharts |
 | **الحركة والتفاعل (Animation)** | Framer Motion · GSAP |
 | **الأيقونات (Icons)** | Lucide React |
+| **الخطوط (Fonts)** | IBM Plex Sans Arabic (الخط الأساسي للواجهة عبر `next/font/google`) |
+| **الوضع البصري (Theme)** | Light-only — نظام الوضع الداكن محذوف بالكامل |
 
 ---
 
@@ -129,6 +131,56 @@
 
 ---
 
+## 🎨 الهوية البصرية ونظام التصميم (Visual Constitution)
+
+> **الحالة (2026-06-06):** الأساس البصري المعتمد (**Phase 3B**) مُطبَّق بالكامل، و**الصفحة الرئيسية العامة (Landing)** أُعيد تصميمها عليه. **لوحات الأدوار الداخلية لم يُعَد تصميمها بعد.**
+
+### الـ Design Tokens المعتمدة (في `app/globals.css`)
+
+| الرمز | القيمة | الاستخدام |
+| --- | --- | --- |
+| `--background` | `#FBF7EF` (vanilla) | خلفية الصفحة — **يمنع `bg-white` كخلفية رئيسية** |
+| `--foreground` | `#111827` (charcoal) | النص المهم |
+| `--card` / `--surface-soft` | `#FFFFFF` / `#FFFDF8` | أسطح البطاقات الدافئة |
+| `--primary` | `#0D9488` (teal) | الأكسنت الأساسي |
+| `--color-info` / `--chart-2` | `#3B6FE0` (أزرق) | الأكسنت الثانوي |
+| `--border` | `#E8E1D4` | حدود هادئة |
+| `--muted-foreground` | `#6B7280` | تعليقات صغيرة/بيانات ثانوية **فقط** (لا للنص المهم) |
+| `--radius` | `1rem` (~16px) | نصف قطر موحّد |
+| الرسوم (charts) | teal · أزرق · lavender · amber · soft-red | ألوان لوحات التحليل |
+
+- **Light UI فقط** — لا `dark:`، لا خلفيات داكنة، لا زجاج/holographic/antigravity، **لا ذهبي legacy** (حُيِّد إلى teal للتوافق الخلفي).
+- **أسماء tokens الخاصة بـ shadcn/ui محفوظة كما هي** — القيم فقط هي التي تغيّرت.
+
+### الخط
+
+- الخط الأساسي للواجهة العربية: **IBM Plex Sans Arabic** عبر `next/font/google` (`--font-sans` في `lib/fonts.ts`).
+- أُزيلت خطوط Saudi (localFont) وTajawal وGeist من سلسلة الخط الأساسية؛ `--font-saudi` مُعاد توجيهه إلى `var(--font-sans)`.
+
+### الصفحة الرئيسية العامة (Landing)
+
+- `app/page.tsx`: **Server Component رفيع** (يقرأ الجلسة فقط لتوجيه CTA: مسجّل → `/portal` · غير مسجّل → `/login`) يركّب أقسامًا معيارية في `components/landing/`:
+  `LandingHeader` · `HeroSection` (+ `HeroDashboardPreview` لوحة معاينة وهمية بـ SVG/CSS) · `SchoolPulseSection` · `RoleIntelligenceSection` · `DataToActionSection` · `WorkflowSection` · `TrustSection` · `StudentRoomSection` · `FinalCTASection` · `LandingFooter`.
+- التموضع: **نظام تشغيل مدرسي مدفوع بالبيانات** (بيانات → رؤى → تنبيهات → مخاطر → توصيات → سير عمل → قرار). عنوان الـ Hero: «مدرستي» + «من البيانات إلى القرارات».
+- الرسوم في الـ Hero مبنية بـ **SVG/CSS فقط** — **بلا أي تبعية جديدة** (لا Recharts على صفحة الهبوط).
+- `components/layout/GlobalHeader.tsx`: ترويسة التطبيق **مُخفاة على `/`** — الهبوط يستخدم `LandingHeader` الخاص به.
+
+### الـ Metadata (عناوين التبويب)
+
+- `app/layout.tsx`: `title: { default: "Sidra OS | نظام تشغيل مدرسي", template: "%s | Sidra OS" }`.
+- `app/page.tsx`: «الرئيسية | Sidra OS» (نصّ مطلق — القالب لا ينطبق على نفس الـ segment الجذر في Next.js).
+- `app/(auth)/login`: «تسجيل الدخول | Sidra OS».
+- أُزيل «أداة فلاح» نهائياً من كل metadata نشط.
+
+### تنظيف مكوّنات الهبوط القديمة
+
+- **حُذفت 8 ملفات** غير مستخدمة (صفر استيراد، تحقّق grep شامل): `HighlightTile` · `KPIStatCard` · `LivePulse` · `PublicFeed` · `SkeletonLoaders` (في `components/landing/`) + `HolographicCard` · `AntigravityMagneticText` · `AntigravityParticlesCanvas` (في `components/ui/`).
+- **أُبقيت:** `LoginCard` (تستخدمها صفحة الدخول) · `GlassSkeleton` (تستخدمها صفحات `loading.tsx`).
+
+> `npm run lint` → صفر أخطاء/تحذيرات · `npm run build` → **63/63 صفحة** · لا تبعيات جديدة.
+
+---
+
 ## 📁 بنية ومجلدات المشروع (Project Architecture)
 
 تم تنظيم المشروع ليعكس الهيكل الإداري والأكاديمي للمنشآت التعليمية من خلال مسارات واضحة:
@@ -160,6 +212,7 @@ app/                         — صفحات واجهة المستخدم بناء
 └── portal/                  — بوابة أولياء الأمور لمتابعة الأبناء
 
 components/
+├── landing/                 — أقسام الصفحة الرئيسية العامة المعيارية (Hero · SchoolPulse · RoleIntelligence · DataToAction · Workflow · Trust · StudentRoom · FinalCTA · Header/Footer)
 ├── ui/chart-container.tsx   — مكوّن موحَّد ومخصص لـ Recharts (يقوم بتغليف ResponsiveContainer)
 └── ui/...                   — المكونات الأساسية للنظام المستمدة من وثائق shadcn/ui
 

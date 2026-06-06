@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import React from "react";
 import { LoginCard } from "@/components/landing/LoginCard";
+
+export const metadata: Metadata = {
+    // العنوان النهائي في التبويب: "تسجيل الدخول | Sidra OS" عبر قالب الجذر
+    title: "تسجيل الدخول",
+};
 
 export default function LoginPage() {
     return (

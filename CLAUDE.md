@@ -202,7 +202,32 @@ Use the approved dependency baseline unless a documented architectural decision 
 - **Phase 2D (Role-domain correction):** تصحيح ملكية المجال — `school_affairs_vp` (تشغيلي) ضُيِّق في `ROLE_ACCESS_MAP` إلى `['/school','/portal']` ومحصور داخل `/school` بصفحة `school-affairs` عبر حُرّاس متداخلة admin-only على `dashboard`/`setup`/`academic-setup` (+ staff/classroom من 2C). `academic_vp` (تعليمي) أُبقي على `/educational`+`/classroom`+`/qa`. إزالة `student_affairs_vp` من دوال إدارة الفصول. مصفوفة أدوار-مجالات مرجعية موثّقة في `roles.ts`.
 - **Phase 2E (Final pre-UX cleanup):** **Student Metaverse ميزة مقصودة** (فضاء الطالب التفاعلي) — أُنشئت `app/student/metaverse/page.tsx` كصفحة فهرس بروابط لأبنائها (إصلاح 404، بلا حذف، بلا redesign) وأُعيد إدخالها في routeMetadata. تحقق access/action consistency: **لا خلط متبقٍّ** بين academic_vp/school_affairs_vp. أُنشئ `db/migrations/20260606_drop_classes_school_id_default.sql`.
 - **Phase 2F (DB hardening closeout):** ✅ **تم تطبيق** `db/migrations/20260606_drop_classes_school_id_default.sql` على DB الحية والتحقق منه: `classes.school_id` الآن `uuid NOT NULL` بـ `column_default = NULL` (أُزيل الافتراضي الصفري) · 0 صفوف · RLS مفعّلة (3 سياسات). بند DB hardening **مكتمل**.
-- جميع المراحل: `npm run lint` (نظيف) · `npm run build` (63/63 بعد فهرس metaverse) · `npm test` (25/25). **لم تبدأ إعادة التصميم البصري.** المشروع **PRE-LAUNCH** (لا مستخدمون · لا بيانات إنتاجية). الخطوة التالية: **Phase 3A — UX Planning (تخطيط ورقي فقط)**.
+- جميع المراحل: `npm run lint` (نظيف) · `npm run build` (63/63 بعد فهرس metaverse) · `npm test` (25/25). المشروع **PRE-LAUNCH** (لا مستخدمون · لا بيانات إنتاجية).
+
+---
+
+## Visual Constitution + Public Homepage — Phase 3B + Landing (2026-06-06)
+
+> **الحالة:** الأساس البصري المعتمد (**Phase 3B**) مُطبَّق، وأُعيد تصميم **الصفحة الرئيسية العامة فقط** عليه. **لوحات الأدوار الداخلية لم تُمَسّ** (Phase 3C لاحقاً). المشروع ما يزال **PRE-LAUNCH**. النتائج النهائية: `npm run lint` صفر · `npm run build` **63/63 صفحة** · لا تبعيات جديدة · لا تغيير DB/Supabase/مسارات/منطق أعمال.
+
+### ✅ Phase 3B — الدستور البصري (Design Tokens)
+- `app/globals.css`: أُعيد بناء نظام الـ tokens مع **الحفاظ على أسماء shadcn/ui** (القيم فقط تغيّرت): `--background:#FBF7EF` (vanilla) · `--foreground:#111827` (charcoal) · `--card:#FFFFFF` · `--surface-soft:#FFFDF8` · `--primary:#0D9488` (teal) · `--color-info`/`--chart-2:#3B6FE0` (أزرق) · `--border:#E8E1D4` · `--radius:1rem` (~16px). ألوان الرسوم: teal/أزرق/lavender/amber/soft-red · حالات success/warning/info/danger.
+- **Light-only صارم:** لا `dark:` · لا خلفيات داكنة · لا glass/holographic/antigravity · **الذهبي legacy مُحيَّد إلى teal** (`--gold`/`--gold-strong` → teal للتوافق الخلفي مع ~20 ملف).
+- **هجرة الخط:** `lib/fonts.ts` → **IBM Plex Sans Arabic** أساسيًا (`--font-sans` عبر `next/font/google`). أُزيلت Saudi (localFont) وTajawal وGeist من السلسلة · `--font-saudi` مُعاد توجيهه إلى `var(--font-sans)` للتوافق مع ~12 ملف.
+
+### ✅ الصفحة الرئيسية العامة (Public Homepage)
+- `app/page.tsx`: Server Component رفيع (يقرأ الجلسة **فقط** لتوجيه CTA: مسجّل → `/portal` · غير مسجّل → `/login`) يركّب أقسامًا معيارية في `components/landing/`: `LandingHeader` · `HeroSection` (+`HeroDashboardPreview`) · `SchoolPulseSection` · `RoleIntelligenceSection` · `DataToActionSection` · `WorkflowSection` · `TrustSection` · `StudentRoomSection` · `FinalCTASection` · `LandingFooter`.
+- التموضع: «نظام تشغيل مدرسي مدفوع بالبيانات» (بيانات→رؤى→تنبيهات→مخاطر→توصيات→سير عمل→قرار). عنوان الـ Hero: «مدرستي» + «من البيانات إلى القرارات» (charcoal + teal). النص المهم charcoal (`text-foreground` / `text-foreground/70-80`)؛ `text-muted-foreground` للتعليقات الصغيرة فقط.
+- لوحة المعاينة الوهمية في الـ Hero مبنية بـ **SVG/CSS فقط** (polyline + conic-gradient) — **بلا أي تبعية جديدة** (لا Recharts client boundary).
+- `components/layout/GlobalHeader.tsx`: تُخفى ترويسة التطبيق على `/` (`pathname === '/'`) — الهبوط يستخدم `LandingHeader`.
+
+### ✅ الـ Metadata (عناوين التبويب)
+- `app/layout.tsx`: `title: { default: "Sidra OS | نظام تشغيل مدرسي", template: "%s | Sidra OS" }`. أُزيل «أداة فلاح» نهائياً.
+- `app/page.tsx`: `"الرئيسية | Sidra OS"` (نصّ مطلق — قالب الـ template لا ينطبق على نفس segment الجذر في Next.js).
+- `app/(auth)/login/page.tsx`: `"تسجيل الدخول"` → «تسجيل الدخول | Sidra OS» عبر القالب.
+
+### ✅ تنظيف المكوّنات الميتة
+- حُذفت **8 ملفات** بصفر استيراد (تحقّق grep شامل): `HighlightTile` · `KPIStatCard` · `LivePulse` · `PublicFeed` · `SkeletonLoaders` (في `components/landing/`) + `HolographicCard` · `AntigravityMagneticText` · `AntigravityParticlesCanvas` (في `components/ui/`). أُبقيت `LoginCard` (تستخدمها صفحة الدخول) و`GlassSkeleton` (تستخدمها `loading.tsx`). نُظّفت تعليقات الاستيراد الميتة في `app/layout.tsx`.
 
 ### ✅ المرحلة الأولى — مكتملة
 
