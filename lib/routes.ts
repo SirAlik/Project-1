@@ -170,46 +170,54 @@ export interface RouteMetadata {
     keywords: string[];
 }
 
+// ملاحظة توحيد المسارات (Phase 2C): مصدر الحقيقة لربط الدور↔لوحة التحكم والوصول هو
+// lib/auth/roles.ts (ROLE_DASHBOARD_MAP / ROLE_ACCESS_MAP). يجب أن تبقى مسارات routeMetadata
+// أدناه مطابقةً لشجرة app/ الفعلية وخاليةً من placeholders (مثل :id) لتفادي 404 في Command Palette.
+// التوحيد الكامل في سجل واحد مؤجَّل (refactor أوسع — موثّق لـ Phase 2D).
 export const routeMetadata: RouteMetadata[] = [
     // Admin Routes
-    { path: '/admin/dashboard', label: 'Admin Dashboard', labelAr: 'ظ„ظˆط­ط© ط§ظ„طھط­ظƒظ…', icon: 'Shield', roles: ['system_owner'], keywords: ['admin', 'dashboard', 'super', 'ظ„ظˆط­ط©', 'طھط­ظƒظ…'] },
-    { path: '/admin/setup', label: 'Setup Wizard', labelAr: 'ظ…ط¹ط§ظ„ط¬ ط§ظ„ط¥ط¹ط¯ط§ط¯', icon: 'Settings', roles: ['system_owner'], keywords: ['setup', 'wizard', 'ط¥ط¹ط¯ط§ط¯', 'ظ…ط¹ط§ظ„ط¬'] },
-    { path: '/admin/schools/new', label: 'Add School', labelAr: 'ط¥ط¶ط§ظپط© ظ…ط¯ط±ط³ط©', icon: 'Plus', roles: ['system_owner'], keywords: ['add', 'school', 'new', 'ط¥ط¶ط§ظپط©', 'ظ…ط¯ط±ط³ط©', 'ط¬ط¯ظٹط¯'] },
-    { path: '/admin/timetable', label: 'Timetable Builder', labelAr: 'ط¨ظ†ط§ط، ط§ظ„ط¬ط¯ظˆظ„', icon: 'Calendar', roles: ['system_owner'], keywords: ['timetable', 'schedule', 'ط¬ط¯ظˆظ„', 'ط­طµطµ'] },
+    { path: '/admin/dashboard', label: 'Admin Dashboard', labelAr: 'لوحة التحكم', icon: 'Shield', roles: ['system_owner'], keywords: ['admin', 'dashboard', 'super', 'لوحة', 'تحكم'] },
+    { path: '/admin/setup', label: 'Setup Wizard', labelAr: 'معالج الإعداد', icon: 'Settings', roles: ['system_owner'], keywords: ['setup', 'wizard', 'إعداد', 'معالج'] },
+    { path: '/admin/schools/new', label: 'Add School', labelAr: 'إضافة مدرسة', icon: 'Plus', roles: ['system_owner'], keywords: ['add', 'school', 'new', 'إضافة', 'مدرسة', 'جديد'] },
+    { path: '/admin/timetable', label: 'Timetable Builder', labelAr: 'بناء الجدول', icon: 'Calendar', roles: ['system_owner'], keywords: ['timetable', 'schedule', 'جدول', 'حصص'] },
 
     // Principal Routes
-    { path: '/principal', label: 'Principal Dashboard', labelAr: 'ظ„ظˆط­ط© ط§ظ„ظ…ط¯ظٹط±', icon: 'User', roles: ['school_principal'], keywords: ['principal', 'dashboard', 'ظ…ط¯ظٹط±', 'ظ„ظˆط­ط©'] },
+    { path: '/principal', label: 'Principal Dashboard', labelAr: 'لوحة المدير', icon: 'User', roles: ['school_principal'], keywords: ['principal', 'dashboard', 'مدير', 'لوحة'] },
 
     // School Coordinator Routes
-    { path: '/school/:id/setup', label: 'Bulk Import', labelAr: 'ط§ط³طھظٹط±ط§ط¯ ط§ظ„ط¨ظٹط§ظ†ط§طھ', icon: 'Upload', roles: ['school_admin'], keywords: ['import', 'bulk', 'excel', 'ط§ط³طھظٹط±ط§ط¯', 'ط±ظپط¹', 'ط·ظ„ط§ط¨'] },
+    // ملاحظة: أُزيل إدخال '/school/:id/setup' لأنه يحوي placeholder غير قابل للحل في
+    // Command Palette (يُنتج 404). الوصول إلى الاستيراد المجمّع يتم عبر روابط لوحة
+    // المدرسة التي تبني المسار ديناميكياً بـ schoolId (routes.school.setup(schoolId)).
 
     // Student Affairs Routes
-    { path: '/student-affairs', label: 'Student Affairs', labelAr: 'ط´ط¤ظˆظ† ط§ظ„ط·ظ„ط§ط¨', icon: 'Users', roles: ['student_affairs_vp'], keywords: ['student', 'affairs', 'ط´ط¤ظˆظ†', 'ط·ظ„ط§ط¨'] },
+    { path: '/student-affairs', label: 'Student Affairs', labelAr: 'شؤون الطلاب', icon: 'Users', roles: ['student_affairs_vp'], keywords: ['student', 'affairs', 'شؤون', 'طلاب'] },
 
     // Counselor Routes
-    { path: '/counselor', label: 'Counselor', labelAr: 'ط§ظ„ظ…ط±ط´ط¯ ط§ظ„ط·ظ„ط§ط¨ظٹ', icon: 'Heart', roles: ['student_counselor'], keywords: ['counselor', 'ظ…ط±ط´ط¯', 'ط·ظ„ط§ط¨ظٹ'] },
+    { path: '/counselor', label: 'Counselor', labelAr: 'المرشد الطلابي', icon: 'Heart', roles: ['student_counselor'], keywords: ['counselor', 'مرشد', 'طلابي'] },
 
     // Classroom Routes
-    { path: '/classroom', label: 'Classroom', labelAr: 'ط§ظ„ظپطµظ„ ط§ظ„ط¯ط±ط§ط³ظٹ', icon: 'BookOpen', roles: ['teacher'], keywords: ['classroom', 'teacher', 'ظپطµظ„', 'ظ…ط¹ظ„ظ…'] },
+    { path: '/classroom', label: 'Classroom', labelAr: 'الفصل الدراسي', icon: 'BookOpen', roles: ['teacher'], keywords: ['classroom', 'teacher', 'فصل', 'معلم'] },
 
     // Secretary Routes
-    { path: '/secretary', label: 'Secretary', labelAr: 'ط§ظ„ط³ظƒط±طھط§ط±ظٹط©', icon: 'FileText', roles: ['school_secretary'], keywords: ['secretary', 'ط³ظƒط±طھط§ط±ظٹط©', 'correspondence'] },
+    { path: '/secretary', label: 'Secretary', labelAr: 'السكرتارية', icon: 'FileText', roles: ['school_secretary'], keywords: ['secretary', 'سكرتارية', 'correspondence'] },
 
     // Health Routes
-    { path: '/health', label: 'Health Guide', labelAr: 'ط§ظ„ظ…ط±ط´ط¯ ط§ظ„طµط­ظٹ', icon: 'Heart', roles: ['health_coordinator'], keywords: ['health', 'طµط­ط©', 'ظ…ط±ط´ط¯'] },
+    { path: '/health', label: 'Health Guide', labelAr: 'المرشد الصحي', icon: 'Heart', roles: ['health_coordinator'], keywords: ['health', 'صحة', 'مرشد'] },
 
     // Science Lab Routes
-    { path: '/science', label: 'Science Lab', labelAr: 'ظ…ط¹ظ…ظ„ ط§ظ„ط¹ظ„ظˆظ…', icon: 'Flask', roles: ['lab_technician'], keywords: ['science', 'lab', 'ظ…ط¹ظ…ظ„', 'ط¹ظ„ظˆظ…'] },
+    { path: '/science', label: 'Science Lab', labelAr: 'معمل العلوم', icon: 'Flask', roles: ['lab_technician'], keywords: ['science', 'lab', 'معمل', 'علوم'] },
 
     // LRC Routes
-    { path: '/lrc', label: 'Library (LRC)', labelAr: 'ظ…ط±ظƒط² ظ…طµط§ط¯ط± ط§ظ„طھط¹ظ„ظ…', icon: 'Book', roles: ['school_librarian'], keywords: ['library', 'lrc', 'ظ…ظƒطھط¨ط©', 'ظ…طµط§ط¯ط±'] },
+    { path: '/lrc', label: 'Library (LRC)', labelAr: 'مركز مصادر التعلم', icon: 'Book', roles: ['school_librarian'], keywords: ['library', 'lrc', 'مكتبة', 'مصادر'] },
 
     // Student Routes
-    { path: '/student', label: 'Student Portal', labelAr: 'ط¨ظˆط§ط¨ط© ط§ظ„ط·ط§ظ„ط¨', icon: 'GraduationCap', roles: ['student'], keywords: ['student', 'portal', 'ط·ط§ظ„ط¨', 'ط¨ظˆط§ط¨ط©'] },
-    { path: '/student/metaverse', label: 'Metaverse', labelAr: 'ط§ظ„ط¹ط§ظ„ظ… ط§ظ„ط§ظپطھط±ط§ط¶ظٹ', icon: 'Globe', roles: ['student'], keywords: ['metaverse', 'virtual', 'ط§ظپطھط±ط§ط¶ظٹ'] },
+    { path: '/student', label: 'Student Portal', labelAr: 'بوابة الطالب', icon: 'GraduationCap', roles: ['student'], keywords: ['student', 'portal', 'طالب', 'بوابة'] },
+    // (Phase 2E) أُعيد إدخال '/student/metaverse' بعد إنشاء صفحة فهرس تُوجّه إلى /student/metaverse/home
+    // — ميزة مقصودة (فضاء الطالب التفاعلي)، لم تعد تولّد 404.
+    { path: '/student/metaverse', label: 'Metaverse', labelAr: 'العالم الافتراضي', icon: 'Globe', roles: ['student'], keywords: ['metaverse', 'virtual', 'افتراضي', 'الطالب'] },
 
     // QA Routes
-    { path: '/qa', label: 'Quality Assurance', labelAr: 'ط¶ظ…ط§ظ† ط§ظ„ط¬ظˆط¯ط©', icon: 'CheckCircle', roles: ['quality_coordinator'], keywords: ['qa', 'quality', 'ط¬ظˆط¯ط©'] },
+    { path: '/qa', label: 'Quality Assurance', labelAr: 'ضمان الجودة', icon: 'CheckCircle', roles: ['quality_coordinator'], keywords: ['qa', 'quality', 'جودة'] },
 ];
 
 // ============================================================

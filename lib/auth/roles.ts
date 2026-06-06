@@ -65,10 +65,14 @@ export const ROLE_DASHBOARD_MAP: Record<UserRole, string> = {
     system_owner: '/admin/dashboard',
 
     // School Leadership
-    school_admin: '/coordinator',
+    // ملاحظة: school_admin وschool_affairs_vp يُحلّان ديناميكياً إلى مسار المدرسة
+    // (`/school/[id]/dashboard` و`/school/[id]/school-affairs`) عبر getDashboardPath
+    // في app/api/persona/select وapp/_actions/switch-persona. القيمة هنا بديل ثابت
+    // (hub بوابة) لأن لوحتيهما مرتبطتان بـ schoolId الديناميكي ولا تملكان مساراً ثابتاً.
+    school_admin: '/portal',
     school_principal: '/principal',
-    school_affairs_vp: '/school-vp',
-    academic_vp: '/academic-vp',
+    school_affairs_vp: '/portal',
+    academic_vp: '/educational',
     student_affairs_vp: '/student-affairs',
 
     // Specialized
@@ -86,13 +90,31 @@ export const ROLE_DASHBOARD_MAP: Record<UserRole, string> = {
     parent: '/parent',
 };
 
-// Access Level Map (for RBAC)
+// ============================================================
+// مصفوفة وصول الأدوار حسب المجال (Role–Domain Access Matrix) — Phase 2D
+// المرجع الموحَّد لملكية المجالات. الإنفاذ موزَّع (proxy + layouts + page guards + action role
+// arrays)، لكن هذا الجدول هو المصدر الواحد لتصحيح أي انحراف لاحق:
+//
+//  system_owner       → منصة كاملة (wildcard) — لا يخصّ مستأجراً بعينه.
+//  school_admin       → إدارة المستأجر التشغيلية: /school/[id]/* كاملة + /portal.
+//  school_principal   → إشراف قيادي واسع (قراءة) عبر المجالات.
+//  academic_vp        → الشؤون التعليمية: /educational + /classroom (تدريسي) + /qa (جودة التعليم).
+//                       ملاحظة: academic-setup والجدول يعيشان حالياً تحت شجرة admin (/school)، لذا
+//                       لم تُمنح ملكيتهما لـ academic_vp الآن (تجنّب خلط صلاحيات admin) — موثّقة كصفحات مستقبلية.
+//  school_affairs_vp  → الشؤون المدرسية التشغيلية فقط: /school/[id]/school-affairs (+ /portal).
+//                       لا يملك: الموظفين · الفصول · الإعداد الأكاديمي · الجودة · شؤون الطلاب.
+//  student_affairs_vp → شؤون الطلاب: /student-affairs (+ سياقات داعمة).
+//  teacher            → /classroom (طاولة عمل المعلم).  student/parent → بواباتهما الشخصية فقط.
+//  المتخصّصون (librarian/secretary/counselor/health/lab/activity/quality) → نطاق مجالهم فقط.
+// ============================================================
 export const ROLE_ACCESS_MAP: Record<UserRole, string[]> = {
     system_owner: ['*'],
     school_admin: ['/school', '/portal'],
     school_librarian: ['/lrc'],
     school_principal: ['/principal', '/qa', '/parent', '/classroom', '/student-affairs', '/science', '/health', '/lrc'],
-    school_affairs_vp: ['/school-ops', '/school', '/student-affairs', '/classroom', '/qa'],
+    // (Phase 2D) تضييق: وكيل الشؤون المدرسية تشغيلي فقط — أُزيل /student-affairs و/classroom و/qa.
+    // وصوله إلى /school محصور داخلياً بصفحة school-affairs عبر nested guards (بقية صفحات /school محروسة admin-only).
+    school_affairs_vp: ['/school', '/portal'],
     academic_vp: ['/educational', '/qa', '/classroom'],
     student_affairs_vp: ['/student-affairs', '/classroom', '/qa', '/parent', '/secretary'],
     teacher: ['/classroom'],
@@ -102,7 +124,7 @@ export const ROLE_ACCESS_MAP: Record<UserRole, string[]> = {
     student_counselor: ['/counselor', '/qa', '/parent'],
     health_coordinator: ['/health'],
     lab_technician: ['/science'],
-    activity_leader: ['/activities'],
+    activity_leader: ['/activity'],
     quality_coordinator: ['/qa'],
 };
 

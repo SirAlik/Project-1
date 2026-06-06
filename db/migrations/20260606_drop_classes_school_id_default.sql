@@ -1,0 +1,28 @@
+-- Migration: Drop zero-UUID default on classes.school_id
+-- Phase 2E (prepared) — Phase 2F (applied) — 2026-06-06
+-- =====================================================================
+-- ✅ STATUS: APPLIED to live Supabase (project ciwqgskyqtnciexfcgrr) — verified in Phase 2F.
+--    Post-apply verification (2026-06-06): public.classes.school_id is uuid NOT NULL with
+--    column_default = NULL (zero-UUID default removed); classes row count = 0; RLS enabled (3 policies).
+--
+-- Pre-apply state (Phase 2E, before this migration):
+--   public.classes.school_id : uuid NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'::uuid
+--   classes row count        : 0
+--   zero-UUID rows           : 0
+--   RLS on public.classes    : enabled (tenant-isolation policies present)
+--
+-- WHY: the zero-UUID default MASKS missing-school_id insert bugs — an INSERT that omits
+--   school_id silently receives the all-zeros UUID instead of failing. The app always supplies
+--   school_id explicitly (the only INSERT path is createClass in
+--   app/_actions/coordinator-classroom.ts), so the default is unused and unsafe.
+--
+-- RISK: LOW. classes has 0 rows; dropping a column DEFAULT never rewrites/affects existing rows.
+--   After this change, a future INSERT that omits school_id will correctly ERROR on NOT NULL
+--   instead of silently inserting an orphan zero-UUID row.
+--
+-- ROLLBACK:
+--   ALTER TABLE public.classes
+--     ALTER COLUMN school_id SET DEFAULT '00000000-0000-0000-0000-000000000000'::uuid;
+-- =====================================================================
+
+ALTER TABLE public.classes ALTER COLUMN school_id DROP DEFAULT;

@@ -37,9 +37,12 @@ import { ROLE_DASHBOARD_MAP, UserRole, SCHOOL_ROLES } from '@/lib/auth/roles';
 // ...
 
 function getDashboardPath(role: SwitchPersonaInput['role'], schoolId?: string): string {
-    // 1. Dynamic handling
+    // 1. Dynamic handling (school-scoped roles بلا مسار ثابت)
     if (role === 'school_admin' && schoolId) {
         return `/school/${schoolId}/dashboard`;
+    }
+    if (role === 'school_affairs_vp' && schoolId) {
+        return `/school/${schoolId}/school-affairs`;
     }
 
     // 2. Static mapping

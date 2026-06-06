@@ -367,9 +367,32 @@ async function createStudentRecords(
 
     // 2. Create enrollment if class and year specified
     if (row.class_id && row.academic_year_id) {
+        // عزل المستأجر: supabaseAdmin يتجاوز RLS، لذا نتحقق صراحةً أن class_id وacademic_year_id
+        // يتبعان نفس المدرسة قبل إنشاء التسجيل (منع ربط طالب بفصل/سنة مدرسة أخرى عبر صف CSV).
+        const { data: cls } = await supabaseAdmin
+            .from('classes')
+            .select('id')
+            .eq('id', row.class_id)
+            .eq('school_id', schoolId)
+            .maybeSingle();
+        if (!cls) {
+            throw new Error('class_id لا يتبع هذه المدرسة');
+        }
+
+        const { data: year } = await supabaseAdmin
+            .from('academic_years')
+            .select('id')
+            .eq('id', row.academic_year_id)
+            .eq('school_id', schoolId)
+            .maybeSingle();
+        if (!year) {
+            throw new Error('academic_year_id لا يتبع هذه المدرسة');
+        }
+
         const { error: enrollmentError } = await supabaseAdmin
             .from('student_enrollments')
             .upsert({
+                school_id: schoolId,
                 student_id: userId,
                 class_id: row.class_id,
                 academic_year_id: row.academic_year_id,

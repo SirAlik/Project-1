@@ -5,8 +5,10 @@ import { supabaseAdmin } from '@/lib/db/supabase-admin';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 
-// Allowed roles: only coordinator (and admins)
-const COORDINATOR_ROLES: UserRole[] = ['system_owner', 'school_admin', 'school_principal', 'student_affairs_vp', 'academic_vp', 'school_affairs_vp'];
+// Allowed roles لإدارة الفصول/الجدول (مجال تعليمي/إداري).
+// (Phase 2C) أُزيل school_affairs_vp. (Phase 2D) أُزيل student_affairs_vp — شؤون الطلاب لا تملك
+// إدارة الفصول/الجدول. المتبقي: admin التشغيلي + قيادة المدرسة + الوكيل التعليمي. تضييق فقط.
+const COORDINATOR_ROLES: UserRole[] = ['system_owner', 'school_admin', 'school_principal', 'academic_vp'];
 
 // === Schemas ===
 
@@ -16,6 +18,8 @@ const getSchoolClassroomsSchema = z.object({
 
 const getClassTimetableSchema = z.object({
     classId: z.string().uuid(),
+    // عزل المستأجر: schoolId مطلوب ليطابقه createSafeAction مع persona ويُقيَّد به الاستعلام
+    schoolId: z.string().uuid(),
 });
 
 const getSchoolTeachersSchema = z.object({
@@ -64,7 +68,8 @@ export const getClassTimetable = createSafeAction({
         resource: 'timetable',
     },
 
-    async handler({ classId }) {
+    async handler({ classId, schoolId }) {
+        // supabaseAdmin يتجاوز RLS، لذا القيد الصريح على school_id إلزامي لمنع تسريب جدول فصل من مدرسة أخرى
         const { data, error } = await supabaseAdmin
             .from('timetable_slots')
             .select(`
@@ -74,6 +79,7 @@ export const getClassTimetable = createSafeAction({
         period: periods (id, number, label, start_time, end_time)
       `)
             .eq('class_id', classId)
+            .eq('school_id', schoolId)
             .order('day', { ascending: true });
 
         if (error) {

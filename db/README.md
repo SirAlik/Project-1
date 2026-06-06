@@ -205,4 +205,23 @@ For triggers:
 
 ---
 
+## Tenant-Access Hardening — Phase 2B (RESOLVED, app-layer, no migration)
+
+The `app/school/[id]/classroom/[classId]` cross-tenant read was fixed at the **app layer** in Phase 2B: the `classes` lookup now constrains `id = classId` AND `school_id = schoolId`, with `notFound()` fail-closed and `validateSchoolAccess` defense-in-depth; `getClassTimetable` was hardened with an explicit `school_id` filter. Live verification confirmed `classes.school_id` and `timetable_slots.school_id` are both `uuid NOT NULL` with RLS enabled — **no migration was required** (the leak existed because `supabaseAdmin` bypasses RLS, so the fix is the explicit app-layer `school_id` filter).
+
+## APPLIED migration — Phase 2F: dropped classes.school_id zero-default
+
+Migration `db/migrations/20260606_drop_classes_school_id_default.sql`:
+
+```sql
+ALTER TABLE public.classes ALTER COLUMN school_id DROP DEFAULT;
+```
+
+- **Status:** ✅ **APPLIED to live Supabase** (prepared in Phase 2E, applied + verified in Phase 2F, 2026-06-06).
+- **Post-apply verification (2026-06-06):** `classes.school_id` = `uuid` · `NOT NULL` · `column_default = NULL` (zero-UUID default removed); `classes` row count = 0; zero-UUID rows = 0; RLS enabled with 3 policies intact.
+- **Why:** the zero-UUID default masked missing-`school_id` insert bugs (silent orphan rows). The only app INSERT path (`createClass`) always supplies `school_id`, so the default was unused. A future INSERT that omits `school_id` now correctly ERRORs on NOT NULL.
+- **Rollback (if ever needed):** `ALTER TABLE public.classes ALTER COLUMN school_id SET DEFAULT '00000000-0000-0000-0000-000000000000'::uuid;`
+
+---
+
 *This file reflects the pre-launch radical restructuring mandate defined in `CLAUDE.md`.*

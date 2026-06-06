@@ -24,6 +24,7 @@ import {
     Sparkles,
 } from 'lucide-react';
 import { searchRoutes, RouteMetadata } from '@/lib/routes';
+import { useAuth } from '@/app/_context/AuthContext';
 
 // Icon mapping
 const iconMap: Record<string, React.ReactNode> = {
@@ -44,10 +45,11 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 interface CommandPaletteProps {
+    /** اختياري لأغراض الاختبار فقط؛ المصدر الموثوق هو الدور من AuthContext */
     userRole?: string;
 }
 
-export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProps) {
+export function CommandPalette({ userRole }: CommandPaletteProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<RouteMetadata[]>([]);
@@ -55,14 +57,19 @@ export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProp
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
+    // الدور يأتي من سياق المصادقة الموثوق (server-verified persona)، لا من قيمة افتراضية.
+    // عند غياب الدور (غير مسجّل/قيد التحميل) يكون '' فلا تُكشف أي مسارات.
+    const { role } = useAuth();
+    const effectiveRole = userRole ?? role ?? '';
+
     // Search effect
     useEffect(() => {
-        const searchResults = searchRoutes(query, userRole);
+        const searchResults = searchRoutes(query, effectiveRole);
         startTransition(() => {
             setResults(searchResults);
             setSelectedIndex(0);
         });
-    }, [query, userRole]);
+    }, [query, effectiveRole]);
 
     // Keyboard shortcuts
     useEffect(() => {
@@ -120,16 +127,16 @@ export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProp
             onClick={() => setIsOpen(false)}
         >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-stone-900/30 backdrop-blur-sm" />
 
             {/* Modal */}
             <div
-                className="relative w-full max-w-2xl mx-4 bg-zinc-900 rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+                className="relative w-full max-w-2xl mx-4 bg-white rounded-2xl border border-stone-200 shadow-2xl overflow-hidden"
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="flex items-center gap-3 p-4 border-b border-white/5">
-                    <Search size={20} className="text-white/40" />
+                <div className="flex items-center gap-3 p-4 border-b border-stone-200">
+                    <Search size={20} className="text-muted-foreground" />
                     <input
                         ref={inputRef}
                         type="text"
@@ -137,14 +144,14 @@ export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProp
                         onChange={e => setQuery(e.target.value)}
                         onKeyDown={handleKeyNavigation}
                         placeholder="ابحث عن صفحة أو أداة..."
-                        className="flex-1 bg-transparent text-white text-lg font-medium placeholder:text-white/30 outline-none"
+                        className="flex-1 bg-transparent text-foreground text-lg font-medium placeholder:text-muted-foreground outline-none"
                         dir="rtl"
                     />
                     <div className="flex items-center gap-2">
-                        <kbd className="px-2 py-1 text-[10px] font-bold bg-white/5 text-white/40 rounded">ESC</kbd>
+                        <kbd className="px-2 py-1 text-[10px] font-bold bg-stone-100 text-muted-foreground rounded">ESC</kbd>
                         <button
                             onClick={() => setIsOpen(false)}
-                            className="p-1.5 rounded-lg hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-stone-100 text-muted-foreground hover:text-foreground transition-colors"
                             aria-label="إغلاق البحث"
                         >
                             <X size={18} />
@@ -156,9 +163,9 @@ export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProp
                 <div className="max-h-[400px] overflow-y-auto">
                     {results.length === 0 ? (
                         <div className="p-8 text-center">
-                            <Search size={40} className="mx-auto mb-3 text-white/10" />
-                            <p className="text-sm font-bold text-white/40">لا توجد نتائج</p>
-                            <p className="text-xs text-white/20 mt-1">جرب كلمات بحث مختلفة</p>
+                            <Search size={40} className="mx-auto mb-3 text-stone-300" />
+                            <p className="text-sm font-bold text-muted-foreground">لا توجد نتائج</p>
+                            <p className="text-xs text-muted-foreground mt-1">جرب كلمات بحث مختلفة</p>
                         </div>
                     ) : (
                         <div className="p-2" dir="rtl">
@@ -168,10 +175,10 @@ export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProp
                                     onClick={() => navigateTo(route.path)}
                                     className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${index === selectedIndex
                                         ? 'bg-primary/10 text-primary'
-                                        : 'hover:bg-white/5 text-white'
+                                        : 'hover:bg-stone-50 text-foreground'
                                         }`}
                                 >
-                                    <div className={`p-2 rounded-lg ${index === selectedIndex ? 'bg-primary/20' : 'bg-white/5'
+                                    <div className={`p-2 rounded-lg ${index === selectedIndex ? 'bg-primary/20' : 'bg-stone-100'
                                         }`}>
                                         {iconMap[route.icon] || <Command size={18} />}
                                     </div>
@@ -188,15 +195,15 @@ export function CommandPalette({ userRole = 'system_owner' }: CommandPaletteProp
                 </div>
 
                 {/* Footer */}
-                <div className="p-3 border-t border-white/5 flex items-center justify-between text-[10px] text-white/30">
+                <div className="p-3 border-t border-stone-200 flex items-center justify-between text-[10px] text-muted-foreground">
                     <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1">
-                            <kbd className="px-1.5 py-0.5 bg-white/5 rounded">↑</kbd>
-                            <kbd className="px-1.5 py-0.5 bg-white/5 rounded">↓</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-stone-100 rounded">↑</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-stone-100 rounded">↓</kbd>
                             للتنقل
                         </span>
                         <span className="flex items-center gap-1">
-                            <kbd className="px-1.5 py-0.5 bg-white/5 rounded">Enter</kbd>
+                            <kbd className="px-1.5 py-0.5 bg-stone-100 rounded">Enter</kbd>
                             للفتح
                         </span>
                     </div>
@@ -231,11 +238,11 @@ export function CommandPaletteTrigger() {
     return (
         <button
             onClick={handleClick}
-            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 text-white/60 hover:text-white transition-all"
+            className="flex items-center gap-2 px-3 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl border border-stone-200 text-muted-foreground hover:text-foreground transition-all"
         >
             <Search size={14} />
             <span className="text-xs font-bold">بحث</span>
-            <kbd className="px-1.5 py-0.5 text-[10px] bg-white/10 rounded">⌘K</kbd>
+            <kbd className="px-1.5 py-0.5 text-[10px] bg-stone-200 rounded">⌘K</kbd>
         </button>
     );
 }

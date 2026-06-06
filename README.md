@@ -30,8 +30,9 @@
 * **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — البنية التحتية والأساسية للنظام مكتملة تماماً.
 * **المستخدمون:** لا يوجد مستخدمون حقيقيون حالياً، ولا توجد بيانات إنتاجية (Production Data) نشطة.
 * **قاعدة البيانات:** ترحيلات من (`M01–M77 + R00–R12`) بإجمالي **80 ترحيل** — بنية البيانات مكتملة.
-* **واجهات المستخدم (UI):** قيد المراجعة والاستكمال النهائي.
+* **واجهات المستخدم (UI):** قيد المراجعة — **لم تبدأ** أي إعادة تصميم بصري premium بعد.
 * **جودة الكود:** اكتملت مراحل تنظيف الكود الأساسية 1–5 — راجع القسم أدناه.
+* **التوجيه وعزل المستأجر (Routing & Tenancy):** اكتملت **Phase 1** (مواءمة توجيه الأدوار مع شجرة `app/` الفعلية) و**Phase 2A** (حارس مستأجر دفاعي لـ `app/school/[id]/*`). **التركيز الحالي** هو الاستقرار والأمان والتوجيه وعزل المستأجر **قبل** إعادة التصميم البصري. **Phase 2B (تقوية الوصول الآمن للبيانات) لم تبدأ بعد** وهي الخطوة التالية.
 
 ---
 
@@ -284,6 +285,13 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 | Phase 8e/8f — school_id hardening | `period-attendance-service.ts` + `meeting-service.ts`: explicit `.eq('school_id', persona.schoolId)` defense-in-depth على جميع UPDATE queries. commit `0bf76d8`. |
 | Supabase Audit Phase 3 — role cleanup | `db/migrations/20260604_harden_legacy_rpc_and_roles.sql`: REVOKE anon من dangerous RPCs · DROP `get_my_role()` · DROP policy `"Assigned Role Update Cases"` · تحويل `invites.target_role` + `cases.assigned_to_role` من `user_role` → `school_role_type` (super_admin → system_owner) · DROP TYPE `user_role` · CREATE `rate_limit_tracker` + `increment_rate_limit`. يُطبَّق يدوياً. |
 | Supabase Audit Phase 4 — ledger infrastructure | `db/migrations/20260604_rebuild_gamification_ledger_infrastructure.sql` v2: CREATE `app_private` schema + `app_private.secrets` (بديل vault) · `system_config` + RLS · partial index `unique_student_source_event` · `rpc_process_transaction` v2 (null school_id guard) · `rpc_complete_quest(uuid, uuid)` · REVOKE anon من scan/furniture. يُطبَّق يدوياً. |
+| Phase 1 — مواءمة توجيه الأدوار | `lib/auth/roles.ts`: مواءمة `ROLE_DASHBOARD_MAP` + `ROLE_ACCESS_MAP` مع شجرة `app/` الفعلية (5 أدوار كانت توجَّه لمسارات مفقودة) · `activity_leader` ACCESS صُحِّح `/activities`→`/activity` · `app/student/page.tsx` + `app/parent/page.tsx` صفحتا هبوط فارغة آمنة (بلا mock) · `CommandPalette` لم يعد يفترض `system_owner` ويقرأ الدور من `AuthContext` + light tokens · `lib/routes.ts` mojibake مُصلَح. lint + build + test نجحت. |
+| Phase 2A — حارس مستأجر `/school/[id]` | `app/school/[id]/layout.tsx` (جديد): تحقق `schoolId` (UUID) + persona موثوقة + دور ∈ {`system_owner`, `school_admin`, `school_affairs_vp`} + تطابق المدرسة لغير `system_owner` — **فشل مغلق** · `lib/routes.ts` حذف إدخال `/school/:id/setup` المعطوب · `lib/auth/roles.ts` حذف بادئة `/school-ops` الميتة. lint + build + test نجحت. |
+| Phase 2B — عزل بيانات `classroom/[classId]` | قيد `school_id` على استعلام `classes` (admin client يتجاوز RLS) + `notFound()` فشل-مغلق + `validateSchoolAccess` · تحصين `getClassTimetable` بـ `schoolId`. فحص Supabase حي: `classes`/`timetable_slots` `school_id NOT NULL` وRLS سليمة — بلا migration. |
+| Phase 2C — توحيد + تضييق | حذف 7 دوال مكررة ميتة من `app/_actions/staff.ts` (المصدر `coordinator-classroom.ts`) · حُرّاس متداخلة `school/[id]/{staff,classroom}` (admin-only) عبر `lib/auth/school-page-guard.ts` · تحقق tenant لـ `class_id`/`academic_year_id`+`school_id` في admin-import. |
+| Phase 2D — تصحيح ملكية الأدوار | `school_affairs_vp` (تشغيلي) ضُيِّق إلى `['/school','/portal']` ومحصور بصفحة `school-affairs` عبر حُرّاس admin-only على `dashboard`/`setup`/`academic-setup` · `academic_vp` (تعليمي) أُبقي على نطاقه · إزالة `student_affairs_vp` من إدارة الفصول · مصفوفة أدوار-مجالات موثّقة. |
+| Phase 2E — تنظيف ما قبل UX | **Student Metaverse ميزة مقصودة** — `app/student/metaverse/page.tsx` صفحة فهرس بروابط لأبنائها (إصلاح 404، بلا حذف) + إعادة إدراجها في routeMetadata · إنشاء `db/migrations/20260606_drop_classes_school_id_default.sql`. lint + build + test نجحت. |
+| Phase 2F — إغلاق DB hardening | ✅ **تم تطبيق** `db/migrations/20260606_drop_classes_school_id_default.sql` على Supabase الحي والتحقق: `classes.school_id` = `uuid NOT NULL` · `default = NULL` (أُزيل الصفري) · 0 صفوف · RLS مفعّلة (3 سياسات). lint + build (63/63) + test نجحت. |
 
 ---
 
