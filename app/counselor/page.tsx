@@ -8,7 +8,7 @@ import { SessionList } from "./_components/SessionList";
 import { QualityForms } from "./_components/QualityForms";
 import { KPICard } from "@/components/ui/KPICard";
 import { TabKey } from "@/lib/types/counselor";
-import { DisciplineKnightsModal } from "@/components/admin/DisciplineKnightsModal";
+import { DisciplineKnightsModal } from "@/components/operations/DisciplineKnightsModal";
 import {
   Trophy, ShieldCheck, PieChart, BookOpen,
   ClipboardCheck, LayoutDashboard, RefreshCw

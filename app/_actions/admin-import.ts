@@ -207,8 +207,8 @@ export const executeImport = createSafeAction({
             await processChunk(chunk, userMap, input.schoolId, results, ctx.user.userId);
         }
 
-        revalidatePath('/admin/setup');
-        revalidatePath('/admin/dashboard');
+        revalidatePath('/platform/setup');
+        revalidatePath('/platform/dashboard');
 
         return results;
     },

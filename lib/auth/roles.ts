@@ -62,7 +62,7 @@ export const ALL_ROLES = new Set<UserRole>([...GLOBAL_ROLES, ...SCHOOL_ROLES]);
 
 export const ROLE_DASHBOARD_MAP: Record<UserRole, string> = {
     // Global
-    system_owner: '/admin/dashboard',
+    system_owner: '/platform/dashboard',
 
     // School Leadership
     // ملاحظة: school_admin وschool_affairs_vp يُحلّان ديناميكياً إلى مسار المدرسة
@@ -109,9 +109,9 @@ export const ROLE_DASHBOARD_MAP: Record<UserRole, string> = {
 // ============================================================
 export const ROLE_ACCESS_MAP: Record<UserRole, string[]> = {
     system_owner: ['*'],
-    school_admin: ['/school', '/portal'],
+    school_admin: ['/school', '/portal', '/bulk-upload'],
     school_librarian: ['/lrc'],
-    school_principal: ['/principal', '/qa', '/parent', '/classroom', '/student-affairs', '/science', '/health', '/lrc'],
+    school_principal: ['/principal', '/qa', '/parent', '/classroom', '/student-affairs', '/science', '/health', '/lrc', '/bulk-upload'],
     // (Phase 2D) تضييق: وكيل الشؤون المدرسية تشغيلي فقط — أُزيل /student-affairs و/classroom و/qa.
     // وصوله إلى /school محصور داخلياً بصفحة school-affairs عبر nested guards (بقية صفحات /school محروسة admin-only).
     school_affairs_vp: ['/school', '/portal'],
@@ -120,7 +120,7 @@ export const ROLE_ACCESS_MAP: Record<UserRole, string[]> = {
     teacher: ['/classroom'],
     student: ['/student'],
     parent: ['/parent'],
-    school_secretary: ['/secretary'],
+    school_secretary: ['/secretary', '/bulk-upload'],
     student_counselor: ['/counselor', '/qa', '/parent'],
     health_coordinator: ['/health'],
     lab_technician: ['/science'],

@@ -21,8 +21,9 @@ export const GlobalHeader = () => {
         setIsScrolled(latest > 20);
     });
 
-    // Hide app header on login + public landing ('/') + portal role-selection ('/portal' uses its own سِدرة header).
-    if (pathname === '/login' || pathname === '/' || pathname === '/portal') return null;
+    // Hide app header on login + public landing ('/') + portal + the platform/system-owner area
+    // ('/portal' and '/platform/*' use their own سِدرة shells).
+    if (pathname === '/login' || pathname === '/' || pathname === '/portal' || pathname.startsWith('/platform')) return null;
 
     // Dynamic contrast styles
     const isTransparent = isHome && !isScrolled;
@@ -34,6 +35,7 @@ export const GlobalHeader = () => {
         : 'mt-0 max-w-full bg-transparent border-b border-transparent';
 
     return (
+        <>
         <motion.header
             dir="rtl"
             initial={{ y: -100 }}
@@ -52,7 +54,7 @@ export const GlobalHeader = () => {
                 <div className="flex items-center gap-6">
                     <Link href="/" className="flex items-center gap-3 group">
                         <span className={`font-black text-xl tracking-tight hidden md:block ${isScrolled ? 'opacity-100' : 'opacity-90'} ${textColor}`}>
-                            فلاح
+                            سِدرة
                         </span>
                     </Link>
                 </div>
@@ -84,5 +86,9 @@ export const GlobalHeader = () => {
                 </div>
             </div>
         </motion.header>
+            {/* مباعد داخل التدفّق يحجز ارتفاع الترويسة الثابتة (fixed). يُركَّب فقط حين تظهر الترويسة؛
+                وعلى المسارات التي تُخفى فيها (/, /login, /portal, /platform/*) لا يُركَّب أصلاً — فلا مساحة مهدورة. */}
+            <div aria-hidden className="h-24" />
+        </>
     );
 };

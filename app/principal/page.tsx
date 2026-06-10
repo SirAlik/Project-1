@@ -5,7 +5,7 @@ import { KPICard } from "@/components/ui/KPICard";
 import { Card } from "@/components/ui/Card";
 import Link from "next/link";
 
-import { DisciplineKnightsModal } from "@/components/admin/DisciplineKnightsModal";
+import { DisciplineKnightsModal } from "@/components/operations/DisciplineKnightsModal";
 import { ClassNavigatorModal } from "./analytics/_components/ClassNavigatorModal";
 import { SentinelDashboard } from "./analytics/_components/SentinelDashboard";
 import { Trophy, Microscope, BookOpen, Shield, TrendingUp, Bell } from "lucide-react";

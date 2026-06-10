@@ -29,3 +29,9 @@
 - Database, routes, dashboards, and permissions must follow this standard.
 - Arabic labels are display-only.
 - role_key is the official programming identifier
+
+## Critical Disambiguation
+
+- `school_admin` (**منسق المدرسة**) is a **school-level** role scoped to one tenant via `school_id`. It is **NOT** the platform owner.
+- `system_owner` (**مالك النظام**) is the **global platform owner** (no `school_id`); it is the only role with wildcard access.
+- The System Owner area lives at **`/platform`** (renamed from `/admin` on 2026-06-10), and `/platform/dashboard` is the platform command center. The word "admin" in `school_admin` is a role key only — it does **not** imply platform/system ownership.

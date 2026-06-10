@@ -10,7 +10,7 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/Card";
-import { LRCBookingModal } from "@/components/admin/LRCBookingModal";
+import { LRCBookingModal } from "@/components/operations/LRCBookingModal";
 import { useLRC } from "@/app/lrc/_hooks/useLRC";
 import { useClassroom } from "../../_hooks/useClassroom";
 import type { EventType } from "@/lib/types/classroom";

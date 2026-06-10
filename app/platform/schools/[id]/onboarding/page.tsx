@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Users, GraduationCap, UserCircle, School, Mail, Phone, BookOpen, Layers } from "lucide-react";
-import { GlobalImportStudio } from "@/components/admin/GlobalImportStudio";
+import { GlobalImportStudio } from "@/components/operations/GlobalImportStudio";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -53,7 +53,7 @@ export default function SchoolOnboardingPage() {
         <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6 lg:p-12" dir="rtl">
             <div className="max-w-6xl mx-auto">
                 <header className="mb-10">
-                    <Link href="/admin/dashboard" className="text-xs font-bold text-muted hover:text-foreground transition-colors mb-2 block">
+                    <Link href="/platform/dashboard" className="text-xs font-bold text-muted hover:text-foreground transition-colors mb-2 block">
                         ← العودة للوحة التحكم
                     </Link>
                     <h1 className="text-3xl font-black tracking-tight mb-2">تهيئة بيانات المدرسة</h1>

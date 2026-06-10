@@ -35,7 +35,7 @@ export default function RootLayout({
           <Providers>
             <div className="relative z-10">
               <GlobalHeader />
-              <main className="pt-24 min-h-screen">
+              <main className="min-h-screen">
                 {children}
               </main>
               <ToastContainer />

@@ -100,7 +100,7 @@ export function PortalClient({ personas, userName }: PortalClientProps) {
     return (
         <div
             dir="rtl"
-            className="relative flex min-h-[calc(100vh-6rem)] items-center justify-center bg-background px-6 py-10"
+            className="relative flex min-h-screen items-center justify-center bg-background px-6 py-10"
         >
             {/* تسجيل الخروج (لمن دخل بحساب خاطئ) */}
             <button

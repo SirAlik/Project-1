@@ -1,7 +1,8 @@
-﻿/**
- * Admin Schools API
- * ==================
- * Returns list of all schools for system_owner import school selection.
+/**
+ * Platform Schools API
+ * ====================
+ * Returns list of all schools for the system_owner import school-selection step.
+ * Platform/system-owner scope only (cross-tenant read) — NOT a school-level endpoint.
  */
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/db/supabase-admin';
@@ -32,7 +33,3 @@ export async function GET() {
         return NextResponse.json({ error: 'Internal error' }, { status: 500 });
     }
 }
-
-
-
-

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Users, Shield, Mail, Phone, Hash } from "lucide-react";
 import { Card } from "@/components/ui/Card";
-import { GlobalImportStudio, ImportField } from "@/components/admin/GlobalImportStudio";
+import { GlobalImportStudio, ImportField } from "@/components/operations/GlobalImportStudio";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
@@ -32,7 +32,7 @@ export default function SchoolStaffPage() {
             <div className="max-w-6xl mx-auto">
                 <header className="mb-10 flex justify-between items-center">
                     <div>
-                        <Link href="/admin/dashboard" className="text-xs font-bold text-muted hover:text-foreground transition-colors mb-2 block">
+                        <Link href="/platform/dashboard" className="text-xs font-bold text-muted hover:text-foreground transition-colors mb-2 block">
                             ← العودة للوحة التحكم
                         </Link>
                         <h1 className="text-3xl font-black tracking-tight flex items-center gap-3">

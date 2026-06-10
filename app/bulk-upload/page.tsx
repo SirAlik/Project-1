@@ -3,7 +3,7 @@ import { getActivePersona } from '@/lib/auth/context-service';
 import { getMyJobs }        from '@/lib/services/bulk-upload-service';
 import { UploadClient }     from './UploadClient';
 
-export const metadata = { title: 'الرفع المجمّع — Sidra OS' };
+export const metadata = { title: 'الرفع المجمّع' };
 
 const ALLOWED_ROLES = ['school_principal', 'school_admin', 'school_secretary'];
 

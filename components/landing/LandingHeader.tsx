@@ -15,6 +15,7 @@ const NAV_LINKS = [
 // ترويسة الهبوط الخاصة بالصفحة العامة (بديلة عن GlobalHeader المخفي على '/').
 export function LandingHeader({ ctaHref, ctaLabel }: LandingHeaderProps) {
     return (
+        <>
         <header className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background">
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
                 {/* Brand */}
@@ -53,5 +54,8 @@ export function LandingHeader({ ctaHref, ctaLabel }: LandingHeaderProps) {
                 </Link>
             </div>
         </header>
+            {/* مباعد داخل التدفّق يحجز ارتفاع ترويسة الهبوط الثابتة (h-16) بدل الاعتماد على حشو الجذر العام. */}
+            <div aria-hidden className="h-16" />
+        </>
     );
 }

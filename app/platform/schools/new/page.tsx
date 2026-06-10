@@ -36,7 +36,7 @@ export default function NewSchoolPage() {
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="mb-10">
-                    <Link href="/admin/dashboard" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors mb-4 block">
+                    <Link href="/platform/dashboard" className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors mb-4 block">
                         ← العودة إلى لوحة التحكم
                     </Link>
                     <h1 className="text-3xl font-black tracking-tight mb-2 text-foreground">إضافة مدرسة جديدة</h1>

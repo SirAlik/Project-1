@@ -45,17 +45,17 @@ export const routes = {
     // ADMIN (System Owner) ROUTES
     // ============================================================
     admin: {
-        dashboard: () => '/admin/dashboard',
-        setup: () => '/admin/setup',
-        timetable: () => '/admin/timetable',
-        audit: () => '/admin/audit',
-        settings: () => '/admin/settings',
+        dashboard: () => '/platform/dashboard',
+        setup: () => '/platform/setup',
+        timetable: () => '/platform/timetable',
+        audit: () => '/platform/audit',
+        settings: () => '/platform/settings',
 
         // School Management
-        addSchool: () => '/admin/schools/new',
-        schoolStaff: (schoolId: string) => `/admin/schools/${schoolId}/staff`,
-        schoolOnboarding: (schoolId: string) => `/admin/schools/${schoolId}/onboarding`,
-        schoolSettings: (schoolId: string) => `/admin/schools/${schoolId}/settings`,
+        addSchool: () => '/platform/schools/new',
+        schoolStaff: (schoolId: string) => `/platform/schools/${schoolId}/staff`,
+        schoolOnboarding: (schoolId: string) => `/platform/schools/${schoolId}/onboarding`,
+        schoolSettings: (schoolId: string) => `/platform/schools/${schoolId}/settings`,
     },
 
     // ============================================================
@@ -176,10 +176,10 @@ export interface RouteMetadata {
 // التوحيد الكامل في سجل واحد مؤجَّل (refactor أوسع — موثّق لـ Phase 2D).
 export const routeMetadata: RouteMetadata[] = [
     // Admin Routes
-    { path: '/admin/dashboard', label: 'Admin Dashboard', labelAr: 'لوحة التحكم', icon: 'Shield', roles: ['system_owner'], keywords: ['admin', 'dashboard', 'super', 'لوحة', 'تحكم'] },
-    { path: '/admin/setup', label: 'Setup Wizard', labelAr: 'معالج الإعداد', icon: 'Settings', roles: ['system_owner'], keywords: ['setup', 'wizard', 'إعداد', 'معالج'] },
-    { path: '/admin/schools/new', label: 'Add School', labelAr: 'إضافة مدرسة', icon: 'Plus', roles: ['system_owner'], keywords: ['add', 'school', 'new', 'إضافة', 'مدرسة', 'جديد'] },
-    { path: '/admin/timetable', label: 'Timetable Builder', labelAr: 'بناء الجدول', icon: 'Calendar', roles: ['system_owner'], keywords: ['timetable', 'schedule', 'جدول', 'حصص'] },
+    { path: '/platform/dashboard', label: 'Admin Dashboard', labelAr: 'لوحة التحكم', icon: 'Shield', roles: ['system_owner'], keywords: ['admin', 'dashboard', 'super', 'لوحة', 'تحكم'] },
+    { path: '/platform/setup', label: 'Setup Wizard', labelAr: 'معالج الإعداد', icon: 'Settings', roles: ['system_owner'], keywords: ['setup', 'wizard', 'إعداد', 'معالج'] },
+    { path: '/platform/schools/new', label: 'Add School', labelAr: 'إضافة مدرسة', icon: 'Plus', roles: ['system_owner'], keywords: ['add', 'school', 'new', 'إضافة', 'مدرسة', 'جديد'] },
+    { path: '/platform/timetable', label: 'Timetable Builder', labelAr: 'بناء الجدول', icon: 'Calendar', roles: ['system_owner'], keywords: ['timetable', 'schedule', 'جدول', 'حصص'] },
 
     // Principal Routes
     { path: '/principal', label: 'Principal Dashboard', labelAr: 'لوحة المدير', icon: 'User', roles: ['school_principal'], keywords: ['principal', 'dashboard', 'مدير', 'لوحة'] },

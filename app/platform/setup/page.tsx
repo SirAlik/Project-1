@@ -3,9 +3,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileSpreadsheet, CheckCircle2, ShieldCheck, Building2, AlertCircle } from 'lucide-react';
-import { FileEngine } from '@/components/admin/setup/FileEngine';
-import { DryRunDashboard } from '@/components/admin/setup/DryRunDashboard';
-import { ExecutionEngine } from '@/components/admin/setup/ExecutionEngine';
+import { FileEngine } from '@/components/operations/setup/FileEngine';
+import { DryRunDashboard } from '@/components/operations/setup/DryRunDashboard';
+import { ExecutionEngine } from '@/components/operations/setup/ExecutionEngine';
 import { ImportRow, ImportResult } from '@/app/_actions/admin-import';
 
 const steps = [
@@ -39,7 +39,7 @@ export default function AdminSetupPage() {
     useEffect(() => {
         async function fetchSchools() {
             try {
-                const res = await fetch('/api/admin/schools');
+                const res = await fetch('/api/platform/schools');
                 if (res.ok) {
                     const data = await res.json();
                     setSchools(data.schools || []);

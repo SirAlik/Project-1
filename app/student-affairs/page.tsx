@@ -23,7 +23,7 @@ import { AssetTracker } from "./_components/AssetTracker";
 import { StudentProfileCard } from "./_components/StudentProfileCard";
 import { ContractSigner } from "./_components/ContractSigner";
 import { CounselorWorkbench } from "./_components/CounselorWorkbench";
-import { DisciplineKnightsModal } from "@/components/admin/DisciplineKnightsModal";
+import { DisciplineKnightsModal } from "@/components/operations/DisciplineKnightsModal";
 
 import { StudentAffairsDashboard } from "./_components/StudentAffairsDashboard";
 import { AIInsightCard } from "@/components/ai/AIInsightCard";

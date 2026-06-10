@@ -23,7 +23,7 @@ export default function LoginPage() {
     return (
         <div
             dir="rtl"
-            className="flex min-h-[calc(100vh-6rem)] items-center justify-center bg-background px-4 py-10 sm:px-6"
+            className="flex min-h-screen items-center justify-center bg-background px-4 py-10 sm:px-6"
         >
             <div className="grid w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-card shadow-[0_24px_60px_-24px_rgba(17,24,39,0.18)] lg:grid-cols-2">
                 {/* عمود نموذج الدخول — يمين في RTL */}

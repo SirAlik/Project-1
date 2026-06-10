@@ -58,7 +58,7 @@ export function ExecutionEngine({ data, validation, onBack, schoolId }: Executio
     const generatePDF = () => {
         const doc = new jsPDF();
         doc.setFontSize(22);
-        doc.text("Smart School OS - Login Cards", 105, 20, { align: "center" });
+        doc.text("Sidra — Login Cards", 105, 20, { align: "center" });
 
         let y = 40;
         data.forEach((student, index) => {

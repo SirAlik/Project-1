@@ -36,6 +36,65 @@
 
 ---
 
+## 🧭 معمارية المسارات والهوية ومركز القيادة (Routes · Identity · Command Center) — 2026-06-10
+
+### 1) الهوية المعتمدة (Product Identity)
+- **العلامة المرئية:** «**سِدرة**». **الشعار:** «**نظام تشغيل مدرسي قائم على البيانات**».
+- **الهوية البصرية:** Light-only · خلفية vanilla دافئة · أكسنت teal أساسي + أزرق ثانوي · نص charcoal · **IBM Plex Sans Arabic** · عربي-أولاً RTL · بلا ذهبي/بنفسجي/داكن/زجاج.
+- **ممنوع في الواجهة المرئية للمستخدم:** `فلاح` · `Sidra OS` · `School OS` · `سِدرة OS` · `Smart School OS`. («Sidra OS» اسم المستودع الداخلي فقط، لا يُعرض للمستخدم.)
+
+### 2) معمارية المسارات (Route Architecture)
+| المسار | الوصف | الـ Shell |
+| --- | --- | --- |
+| `/` | الصفحة العامة (Landing) | PublicShell (`LandingHeader`) |
+| `/login` | صفحة دخول مستقلّة | AuthShell |
+| `/portal` | اختيار الدور/الـ persona | PortalShell (`PortalClient`) |
+| `/platform/dashboard` | **مركز قيادة المنصّة** (مالك النظام فقط) | **PlatformShell** |
+| `/bulk-upload` | الرفع المجمّع (school_principal/admin/secretary) | chrome عام (`GlobalHeader`) |
+| `/school/[id]/*` | شجرة عمليات المدرسة (حارس مستأجر) | DashboardShell مستقبلي |
+| لوحات الأدوار (`/principal` · `/secretary` · ...) | لوحة متخصصة لكل دور | DashboardShell مستقبلي |
+
+- **`/admin` لم يَعُد مسار مالك النظام** — أُعيدت تسميته إلى **`/platform`** (2026-06-10). أي «admin» متبقٍّ هو إمّا مفتاح الدور `school_admin` أو مصطلح قاعدة بيانات/ترحيل تاريخي فقط.
+
+### 3) الأدوار (Roles)
+مفاتيح الأدوار الـ16 **ثابتة** (راجع `ROLE_KEYS_STANDARD.md`). **`school_admin` = «منسق المدرسة»** دور على مستوى المدرسة (tenant)، **ليس** مالك النظام. **`system_owner` = «مالك النظام»** هو مالك المنصّة العالمي (المسار `/platform`، صلاحية wildcard).
+
+### 4) مركز قيادة المنصّة (System Owner Dashboard)
+`/platform/dashboard` ليس صفحة «إضافة مدرسة» بل مركز قيادة على مستوى المنصّة: نظرة تنفيذية · عمليات المدارس/المستأجرين · حوكمة المستخدمين والأدوار · مركز جودة البيانات · سجل النشاط/التدقيق · تنبيهات ومخاطر · placeholder صادق لتوصيات الذكاء · إجراءات سريعة · جدول المدارس. **بلا تحليلات وهمية · بلا ذكاء وهمي · بلا صحة منصّة وهمية.**
+
+### 5) قاعدة صدق البيانات (Data Honesty Rule) — إلزامية
+أي مقياس غير مدعوم بمصدر بيانات حقيقي **يُعرَض كحالة فارغة/غير-مفعّلة صادقة** («لا توجد بيانات كافية بعد» / «غير مفعّل بعد»)، لا كرقم وهمي ولا حالة «Online/Connected» ثابتة.
+
+### 6) طبقة الذكاء الاصطناعي (AI Layer)
+- الذكاء الاصطناعي طبقة **مستقبلية تتوسّع** تُولّد توصيات/تنبيهات/تحليل جاهزية.
+- **لا يُعرض mock كأنه AI حقيقي.** التوصيات يجب أن تأتي من pipeline/جدول/job حقيقي؛ وإلا يُعرض placeholder صريح.
+
+### 7) اتجاه الـ Shells
+PublicShell · AuthShell · PortalShell · **PlatformShell** (منجز) · **DashboardShell** مستقبلي لأدوار المدرسة. **قاعدة:** الجذر `app/layout.tsx` لا يفرض حشواً علوياً عاماً تقاومه الـ shells المتخصصة؛ كل ترويسة ثابتة (fixed) تملك مباعدها الخاص داخل التدفّق.
+
+### 8) حالة التنظيف المنجزة (2026-06-10)
+- ✅ إعادة تسمية `/admin → /platform` + حارس `system_owner` + `PlatformShell`.
+- ✅ إعادة بناء `/platform/dashboard` كمركز قيادة (بيانات حقيقية + حالات فارغة صادقة).
+- ✅ نقل `bulk-upload` من المنصّة إلى `/bulk-upload` (وصول مُحكَم لـ principal/admin/secretary).
+- ✅ إزالة اختراق `-mt-24` من جذوره (مباعدات داخل الترويسات الثابتة).
+- ✅ `components/admin` → `components/operations` · `app/api/admin/schools` → `app/api/platform/schools`.
+- ✅ لوحات الأدوار العربية في `/portal` + زر تسجيل خروج + حذف مكوّنات portal ميتة.
+- ✅ «فلاح» المرئية أُزيلت من `GlobalHeader` → «سِدرة».
+- ✅ **بلا أي تغيير** في Supabase/DB/migrations/RLS/auth/persona/مفاتيح الأدوار/التبعيات.
+
+### 9) عمل متبقٍّ معروف (Known Remaining Work)
+- بناء **DashboardShell** شامل لأدوار المدرسة وإعادة تصميم لوحاتها تباعاً.
+- إكمال نقل أي ميزات مدرسية في غير محلّها.
+- مصدر مراقبة **صحة منصّة** حقيقي + مصدر **AI على مستوى المنصّة** + توسيع قواعد **جودة البيانات**.
+- تنظيف ~17 تسريب براند قديم خارج النطاق (`Sidra OS`/`School OS`/`Antigravity School OS` في عناوين تبويب/شارات/تذييلات PDF) — **مهمة منفصلة**.
+- اسم مستأجر مُثبَّت «مدارس الفلاح الأهلية» في قوالب تقارير PDF (يجب أن يصبح ديناميكياً) + كلمة مرور مؤقتة مُثبَّتة في بطاقات الدخول.
+- تحديث لقطات الشاشة لاحقاً عند الحاجة.
+
+### 10) حالة التحقق (Verification)
+`npm run lint` → **صفر** · `npm run build` → **63/63 صفحة** · تحقّق عدائي (8 مدقّقين متوازين) → **8/8**. (آخر تشغيل ناجح بعد التنظيف النهائي.)
+
+---
+
 ## 🧹 حالة جودة الكود (Code Quality Status)
 
 > **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **77/77 صفحة** بدون أي خطأ TypeScript. **Virtual-Swimming-Wave (2026-06-03): 100% مكتمل** — تأمين 9 نقاط أمنية + M77 compound unique + layout guards (lrc/qa/science/student-affairs/educational/staff-evaluation/metaverse/admin) + Phase 6 browser hooks → Server Actions + Phase 8c/8e/8f hardening. **Edge Functions + LRC Maintenance (2026-06-03): مُنجز** — `validate-bulk-upload` + `generate-qms-pdf` + `daily-maintenance` + `lrc-maintenance-service`. commit `c05b95a`.
@@ -167,10 +226,10 @@
 
 ### الـ Metadata (عناوين التبويب)
 
-- `app/layout.tsx`: `title: { default: "Sidra OS | نظام تشغيل مدرسي", template: "%s | Sidra OS" }`.
-- `app/page.tsx`: «الرئيسية | Sidra OS» (نصّ مطلق — القالب لا ينطبق على نفس الـ segment الجذر في Next.js).
-- `app/(auth)/login`: «تسجيل الدخول | Sidra OS».
-- أُزيل «أداة فلاح» نهائياً من كل metadata نشط.
+- `app/layout.tsx`: `title: { default: "سِدرة | نظام تشغيل مدرسي", template: "%s | سِدرة" }`.
+- `app/page.tsx`: «الرئيسية | سِدرة» (نصّ مطلق — القالب لا ينطبق على نفس الـ segment الجذر في Next.js).
+- `app/(auth)/login`: «تسجيل الدخول | سِدرة».
+- أُزيل «أداة فلاح» و«Sidra OS» نهائياً من كل metadata نشط — العلامة المرئية المعتمدة هي «سِدرة».
 
 ### تنظيف مكوّنات الهبوط القديمة
 
@@ -187,12 +246,14 @@
 
 ```text
 app/                         — صفحات واجهة المستخدم بناءً على الصلاحيات والأدوار (Next.js App Router)
-├── admin/
+├── platform/                — منطقة مالك النظام (system_owner فقط) — أُعيدت تسميتها من admin (2026-06-10)
+│   ├── dashboard/           — مركز قيادة المنصّة (نظرة تنفيذية + حوكمة الأدوار + جودة البيانات + التدقيق + التنبيهات)
 │   ├── automation/          — قواعد الأتمتة البرمجية للنظام (automation_rules)
-│   ├── bulk-upload/         — نظام الرفع المجمّع للملفات وإدارتها (bulk_upload_jobs)
-│   ├── dashboard/           — لوحة المؤشرات والإحصاءات العامة للنظام
-│   ├── setup/               — الإعداد الأكاديمي الأساسي (المراحل الأكاديمية + الترمات + الحصص الزمنية)
-│   └── timetable/           — إدارة وإعداد الجدول الدراسي العام
+│   ├── setup/               — محرك الاستيراد الإداري + اختيار المدرسة الهدف
+│   ├── timetable/           — إدارة وإعداد الجدول الدراسي العام
+│   └── schools/             — إدارة المدارس (الموظفون + التهيئة + إنشاء مدرسة)
+├── bulk-upload/             — الرفع المجمّع (school_principal/admin/secretary) — نُقل خارج المنصّة (2026-06-10)
+├── school/[id]/             — شجرة عمليات المدرسة بحارس مستأجر (dashboard · setup · staff · classroom · school-affairs)
 ├── principal/               — لوحة عمل مدير المدرسة (وتشمل 9 صفحات تحليلات بيانية متقدمة)
 ├── student-affairs/         — لوحة وكيل شؤون الطلاب (الغياب + الإحالات السلوكية + رصد السلوك)
 ├── secretary/               — لوحة عمل سكرتير المدرسة والمهام الإدارية
@@ -296,7 +357,7 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 يحتوي نظام **Sidra OS** على **16 دوراً رسمياً ومحدداً** يمنع تعديل مسمياتها أو صلاحياتها إلا بعد الرجوع لهندسة النظام وإجراء مراجعة شاملة للأثر الكلي:
 
 1. `system_owner` (مالك النظام)
-2. `school_admin` (مدير النظام بالمدرسة)
+2. `school_admin` (منسق المدرسة — دور على مستوى المدرسة، **ليس** مالك النظام)
 3. `school_principal` (مدير المدرسة)
 4. `school_affairs_vp` (وكيل الشؤون المدرسية)
 5. `student_affairs_vp` (وكيل شؤون الطلاب)

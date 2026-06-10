@@ -3,9 +3,9 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileSpreadsheet, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { FileEngine } from '@/components/admin/setup/FileEngine';
-import { DryRunDashboard } from '@/components/admin/setup/DryRunDashboard';
-import { ExecutionEngine } from '@/components/admin/setup/ExecutionEngine';
+import { FileEngine } from '@/components/operations/setup/FileEngine';
+import { DryRunDashboard } from '@/components/operations/setup/DryRunDashboard';
+import { ExecutionEngine } from '@/components/operations/setup/ExecutionEngine';
 import { ImportRow, ImportResult } from '@/app/_actions/admin-import';
 import { useParams } from 'next/navigation';
 

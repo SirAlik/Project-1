@@ -5,7 +5,7 @@ import { getActivePersona }       from '@/lib/auth/context-service';
 import { getSchoolsAction }        from './_actions';
 import { AutomationRulesClient }   from './AutomationRulesClient';
 
-export const metadata: Metadata = { title: 'قواعد الأتمتة — Sidra OS' };
+export const metadata: Metadata = { title: 'قواعد الأتمتة' };
 
 export default async function AutomationPage() {
   const persona = await getActivePersona();

@@ -27,7 +27,7 @@ function sourcePath(n: NotificationItem): string | null {
   if (n.workflow_instance_id) return `/workflows/${n.workflow_instance_id}`;
   if (n.source_table === 'meeting_sessions' && n.source_record_id)
     return `/meetings/${n.source_record_id}`;
-  if (n.source_table === 'bulk_upload_jobs') return '/admin/bulk-upload';
+  if (n.source_table === 'bulk_upload_jobs') return '/bulk-upload';
   if (n.source_table === 'hr_accountability_tickets') return '/secretary/staff-attendance';
   return null;
 }

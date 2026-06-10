@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useQA } from "./_hooks/useQA";
 import { KPICard } from "@/components/ui/KPICard";
 import { ObservationList } from "./_components/ObservationList";
-import { DisciplineKnightsModal } from "@/components/admin/DisciplineKnightsModal";
+import { DisciplineKnightsModal } from "@/components/operations/DisciplineKnightsModal";
 import { Trophy, ChevronLeft, BarChart3, ShieldCheck, Activity } from "lucide-react";
 import { AIInsightCard } from "@/components/ai/AIInsightCard";
 
