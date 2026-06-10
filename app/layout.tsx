@@ -5,16 +5,15 @@ import { inter, ibmPlexArabic } from "@/lib/fonts";
 import { ToastContainer } from "@/components/ui/ToastContainer";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ClientOverlays } from "@/components/ClientOverlays";
-import { DevToolsRoot } from "@/components/dev/DevToolsRoot";
-import { DevTokenStrip } from "@/components/dev/DevTokenStrip";
-// (تنظيف) حُذفت مكوّنات التأثيرات القديمة غير المستخدمة (Antigravity/Holographic) نهائياً من المشروع.
+// (تنظيف) أُزيلت أدوات التطوير/التصحيح المرئية: شريط DevTokenStrip ("BRAND LOCK") + زر Omni-Inspector (الأيقونة البنفسجية).
+// كانت تظهر في بيئة التطوير فقط وبلا قيمة للمستخدم. (مكوّنات التأثيرات القديمة Antigravity/Holographic أُزيلت سابقاً.)
 import { GlobalHeader } from "@/components/layout/GlobalHeader";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: {
-    default: "Sidra OS | نظام تشغيل مدرسي",
-    template: "%s | Sidra OS",
+    default: "سِدرة | نظام تشغيل مدرسي",
+    template: "%s | سِدرة",
   },
   description:
     "نظام تشغيل مدرسي يحوّل بيانات المدرسة إلى رؤى وتنبيهات ومخاطر وتوصيات وقرارات — بعزل تامّ لكل مدرسة.",
@@ -32,7 +31,6 @@ export default function RootLayout({
         className="antialiased"
       >
         <>
-          {process.env.NODE_ENV === "development" && <DevTokenStrip />}
           <ClientOverlays />
           <Providers>
             <div className="relative z-10">
@@ -42,7 +40,6 @@ export default function RootLayout({
               </main>
               <ToastContainer />
               <CommandPalette />
-              <DevToolsRoot />
             </div>
           </Providers>
         </>

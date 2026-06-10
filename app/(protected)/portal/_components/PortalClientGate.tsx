@@ -107,7 +107,7 @@ export function PortalClientGate({ serverUserName }: PortalClientGateProps) {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-                    <p className="text-muted-foreground font-saudi">جاري التحميل...</p>
+                    <p className="text-muted-foreground">جاري التحميل...</p>
                 </div>
             </div>
         );
@@ -117,7 +117,7 @@ export function PortalClientGate({ serverUserName }: PortalClientGateProps) {
     if (allPersonas.length === 0) {
         return (
             <div className="min-h-screen flex items-center justify-center text-center">
-                <div className="space-y-3 font-saudi">
+                <div className="space-y-3">
                     <h1 className="text-xl font-bold">الحساب قيد الانتظار</h1>
                     <p className="text-muted-foreground">
                         لا توجد أدوار مسندة لهذا الحساب حالياً.
@@ -139,7 +139,7 @@ export function PortalClientGate({ serverUserName }: PortalClientGateProps) {
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-                    <p className="text-muted-foreground font-saudi">جاري توجيهك...</p>
+                    <p className="text-muted-foreground">جاري توجيهك...</p>
                 </div>
             </div>
         );

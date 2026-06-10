@@ -71,7 +71,7 @@ export function StudentRoomSection() {
                 <div className="order-1 lg:order-2">
                     <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">فضاء الطالب التفاعلي</p>
                     <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground md:text-4xl">
-                        تجربة تُحفّز الطالب، لا تراقبه فقط
+                        تجربة تحفّز الطالب
                     </h2>
                     <p className="mt-4 max-w-xl text-base leading-relaxed text-foreground/80">
                         فضاء تفاعلي يحوّل بيانات الطالب إلى دافعية: إنجازات وتحدّيات ونقاط تميّز

@@ -113,7 +113,7 @@ export function HeroDashboardPreview() {
                             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                                 <GraduationCap className="h-4 w-4" />
                             </span>
-                            <span className="text-xs font-black text-foreground">Sidra OS</span>
+                            <span className="text-xs font-black text-foreground">سِدرة</span>
                         </div>
                         <nav className="space-y-1">
                             {SIDEBAR_ITEMS.map((item) => {

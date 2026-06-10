@@ -34,7 +34,7 @@ export function FinalCTASection({ ctaHref, ctaLabel }: FinalCTASectionProps) {
                         href={ctaHref}
                         className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3.5 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 sm:w-auto"
                     >
-                        ابدأ رحلة Sidra OS
+                        ابدأ رحلة سِدرة
                         <ArrowLeft className="h-4 w-4" />
                     </Link>
                     <span className="text-xs font-medium text-muted-foreground">

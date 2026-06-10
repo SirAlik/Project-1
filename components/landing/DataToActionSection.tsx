@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 /**
- * "من البيانات إلى القرار" — سلسلة التحويل التي تميّز Sidra OS عن نظام إدخال بيانات تقليدي:
+ * "من البيانات إلى القرار" — سلسلة التحويل التي تميّز سِدرة عن نظام إدخال بيانات تقليدي:
  * بيانات → رؤى → تنبيهات → مخاطر → توصيات → سير عمل → قرار.
  */
 
@@ -31,10 +31,10 @@ export function DataToActionSection() {
                 <div className="mx-auto max-w-2xl text-center">
                     <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">من البيانات إلى القرار</p>
                     <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground md:text-4xl">
-                        ليس نظام إدخال بيانات — بل محرّك قرار
+                        يحوّل البيانات إلى معلومات تُستخدم لاتخاذ القرارات
                     </h2>
                     <p className="mt-4 text-base leading-relaxed text-foreground/80">
-                        البيانات وحدها لا تكفي. Sidra OS يسلكها في سلسلة واضحة حتى تصبح قرارًا
+                        البيانات وحدها لا تكفي؛ تسلكها سِدرة في سلسلة واضحة حتى تصبح قرارًا
                         موثّقًا يصل للشخص المناسب في الوقت المناسب.
                     </p>
                 </div>

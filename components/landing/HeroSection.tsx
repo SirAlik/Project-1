@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, PlayCircle, Sparkles, ShieldCheck, Zap } from "lucide-react";
+import { ArrowLeft, PlayCircle, Sparkles, LayoutGrid, Zap } from "lucide-react";
 import { HeroDashboardPreview } from "./HeroDashboardPreview";
 
 interface HeroSectionProps {
@@ -8,7 +8,7 @@ interface HeroSectionProps {
 }
 
 const TRUST_CHIPS = [
-    { icon: ShieldCheck, label: "عزل مستأجر صارم (RLS)" },
+    { icon: LayoutGrid, label: "لكل دور مساحة عمله الخاصة" },
     { icon: Zap, label: "تنبيهات وقرارات لحظية" },
     { icon: Sparkles, label: "رؤى مدعومة بالذكاء" },
 ];

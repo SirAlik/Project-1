@@ -21,8 +21,8 @@ export const GlobalHeader = () => {
         setIsScrolled(latest > 20);
     });
 
-    // Hide app header on login + on the public landing page ('/' uses its own LandingHeader).
-    if (pathname === '/login' || pathname === '/') return null;
+    // Hide app header on login + public landing ('/') + portal role-selection ('/portal' uses its own سِدرة header).
+    if (pathname === '/login' || pathname === '/' || pathname === '/portal') return null;
 
     // Dynamic contrast styles
     const isTransparent = isHome && !isScrolled;

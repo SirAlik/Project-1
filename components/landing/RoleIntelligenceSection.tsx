@@ -29,7 +29,7 @@ interface RoleCard {
 const ROLES: RoleCard[] = [
     {
         icon: Crown,
-        role: "قائد المدرسة",
+        role: "مدير المدرسة",
         kpiLabel: "صحة المدرسة العامة",
         kpiValue: "جيدة",
         alert: "3 مؤشرات تتجه للهبوط",
@@ -56,7 +56,7 @@ const ROLES: RoleCard[] = [
     },
     {
         icon: HeartPulse,
-        role: "المرشد الصحي",
+        role: "الموجه الصحي",
         kpiLabel: "زيارات العيادة",
         kpiValue: "5 اليوم",
         alert: "حالة تحتاج إشعار وليّ أمر",
@@ -74,7 +74,7 @@ const ROLES: RoleCard[] = [
     },
     {
         icon: Trophy,
-        role: "قائد النشاط",
+        role: "رائد النشاط",
         kpiLabel: "مشاركة الأندية",
         kpiValue: "71%",
         alert: "رحلة بانتظار الموافقات",

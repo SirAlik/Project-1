@@ -16,7 +16,7 @@ export function LandingFooter() {
                         <GraduationCap className="h-4 w-4" />
                     </span>
                     <span className="text-sm font-bold text-foreground">
-                        Sidra OS — <span className="text-muted-foreground font-medium">نظام تشغيل المدرسة</span>
+                        سِدرة — <span className="text-muted-foreground font-medium">نظام تشغيل المدرسة</span>
                     </span>
                 </div>
 
@@ -32,7 +32,7 @@ export function LandingFooter() {
                     ))}
                 </nav>
 
-                <p className="text-xs font-medium text-muted-foreground">© 2026 Sidra OS · جميع الحقوق محفوظة</p>
+                <p className="text-xs font-medium text-muted-foreground">© 2026 سِدرة · جميع الحقوق محفوظة</p>
             </div>
         </footer>
     );

@@ -10,7 +10,6 @@ const NAV_LINKS = [
     { href: "#pulse", label: "نبض المدرسة" },
     { href: "#roles", label: "الأدوار" },
     { href: "#how", label: "من البيانات إلى القرار" },
-    { href: "#trust", label: "الأمان" },
 ];
 
 // ترويسة الهبوط الخاصة بالصفحة العامة (بديلة عن GlobalHeader المخفي على '/').
@@ -24,9 +23,9 @@ export function LandingHeader({ ctaHref, ctaLabel }: LandingHeaderProps) {
                         <GraduationCap className="h-5 w-5" />
                     </span>
                     <span className="leading-none">
-                        <span className="block text-sm font-black tracking-tight text-foreground">Sidra OS</span>
-                        <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                            School Operating System
+                        <span className="block text-base font-black tracking-tight text-foreground">سِدرة</span>
+                        <span className="mt-1 block text-[10px] font-bold tracking-wide text-muted-foreground">
+                            نظام تشغيل مدرسي
                         </span>
                     </span>
                 </Link>

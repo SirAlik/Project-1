@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { PortalClientGate } from "./_components/PortalClientGate";
 import { createSupabaseServerClient } from "@/lib/db/supabase-server";
+
+export const metadata: Metadata = {
+    // العنوان في التبويب: "اختيار الدور | سِدرة" عبر قالب الجذر في app/layout.tsx
+    title: "اختيار الدور",
+};
 
 /**
  * PortalPage - Server Component Shell

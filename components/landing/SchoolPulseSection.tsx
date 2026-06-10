@@ -35,11 +35,12 @@ export function SchoolPulseSection() {
                 <div className="mx-auto max-w-2xl text-center">
                     <p className="text-xs font-bold uppercase tracking-[0.25em] text-primary">نبض المدرسة</p>
                     <h2 className="mt-3 text-3xl font-black tracking-tight text-foreground md:text-4xl">
-                        مدرستك كنظام حيّ، لا كأرشيف
+                        من بياناتٍ مُهمَلة ومتراكمة إلى نظامٍ حيّ يتنفّس
                     </h2>
                     <p className="mt-4 text-base leading-relaxed text-foreground/80">
-                        كل رقم هنا يُحدَّث من بيانات حقيقية لحظيًا — حضور، صحة، تعلّم، أنشطة، ومخاطر — لتقرأ
-                        حالة المدرسة في لمحة واحدة.
+                        بياناتك التشغيلية التي تراكمت لسنوات في سجلّات منعزلة لم تكن عبئًا، بل أصلًا
+                        مُعطَّلًا. نُوحّدها ونُهندسها في طبقة واحدة، ثم نُحوّلها عبر التحليل اللحظي إلى
+                        مؤشّرات حيّة تقرأ حالة مدرستك في لمحة — حضورًا وصحّةً وتعلّمًا وأنشطةً ومخاطر.
                     </p>
                 </div>
 
