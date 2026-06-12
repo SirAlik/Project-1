@@ -22,8 +22,12 @@ export const GlobalHeader = () => {
     });
 
     // Hide app header on login + public landing ('/') + portal + the platform/system-owner area
-    // ('/portal' and '/platform/*' use their own سِدرة shells).
-    if (pathname === '/login' || pathname === '/' || pathname === '/portal' || pathname.startsWith('/platform')) return null;
+    // ('/portal' and '/platform/*' use their own سِدرة shells). كذلك صفحات المدرسة التي تبنّت
+    // SchoolDashboardShell (لها ترويستها الخاصة) — نُخفي الترويسة العامة عليها فقط، وتُضاف الصفحات
+    // تباعاً عند تحويلها للإطار (بقية صفحات /school تبقى دون تغيير).
+    // كذلك مركز مصادر التعلم `/lrc` تبنّى إطار سِدرة بترويسته الخاصة (LrcWorkspace).
+    const isSchoolShellRoute = /^\/school\/[^/]+\/(dashboard|staff|staff\/new)$/.test(pathname);
+    if (pathname === '/login' || pathname === '/' || pathname === '/portal' || pathname.startsWith('/platform') || pathname === '/lrc' || isSchoolShellRoute) return null;
 
     // Dynamic contrast styles
     const isTransparent = isHome && !isScrolled;

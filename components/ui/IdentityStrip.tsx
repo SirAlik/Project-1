@@ -36,7 +36,7 @@ export function IdentityStrip({
                         السياق الحالي:
                     </span>
                     <span className="text-primary-foreground bg-primary/90 px-2 py-0.5 rounded border border-primary/20">
-                        {roleInfo.label}
+                        {roleInfo.labelAr}
                     </span>
                 </div>
 

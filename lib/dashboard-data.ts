@@ -4,6 +4,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { unstable_cache } from "next/cache";
 import { supabaseAdmin } from './db/supabase-admin';
 import { getActivePersona } from './auth/context-service';
+import { toSafeNumber } from './utils';
 
 // ============================================================
 // TYPES
@@ -52,6 +53,7 @@ export interface SchoolStats {
     totalStudents: number;
     totalTeachers: number;
     totalStaff: number;
+    totalClasses: number;
     schoolName: string;
 }
 
@@ -163,15 +165,49 @@ async function querySchoolStats(supabase: SupabaseClient, schoolId: string): Pro
             ]),
         ]);
 
+        // عدد الفصول — قراءة معزولة بـ try خاص حتى لا يُسقِط فشلُها بقيةَ العدّادات (degrade → 0).
+        let totalClasses = 0;
+        try {
+            const classesRes = await supabase
+                .from('classes')
+                .select('*', { count: 'exact', head: true })
+                .eq('school_id', schoolId);
+            totalClasses = classesRes.count || 0;
+        } catch (classesError) {
+            console.error('[querySchoolStats] classes count failed:', classesError);
+        }
+
         return {
             schoolName:     schoolRes.data?.name || 'مدرسة غير معروفة',
             totalStudents:  studentsRes.count || 0,
             totalTeachers:  teachersRes.count || 0,
             totalStaff:     staffRes.count || 0,
+            totalClasses,
         };
     } catch (error) {
         console.error('[querySchoolStats] Error:', error);
-        return { schoolName: 'خطأ في التحميل', totalStudents: 0, totalTeachers: 0, totalStaff: 0 };
+        return { schoolName: 'خطأ في التحميل', totalStudents: 0, totalTeachers: 0, totalStaff: 0, totalClasses: 0 };
+    }
+}
+
+// قراءة دفاعية لسجل تدقيق المدرسة (معزول بـ school_id) — حالة فارغة صادقة عند الفشل.
+async function querySchoolAudit(supabase: SupabaseClient, schoolId: string, limit: number): Promise<PlatformAudit> {
+    try {
+        const { data, error } = await supabase
+            .from('action_audit_log')
+            .select('id, action_name, role, school_id, status, created_at')
+            .eq('school_id', schoolId)
+            .order('created_at', { ascending: false })
+            .limit(limit);
+
+        if (error) {
+            console.error('[querySchoolAudit] Error:', error);
+            return { connected: false, entries: [] };
+        }
+        return { connected: true, entries: (data ?? []) as AuditEntry[] };
+    } catch (error) {
+        console.error('[querySchoolAudit] Error:', error);
+        return { connected: false, entries: [] };
     }
 }
 
@@ -197,11 +233,33 @@ export const getCachedSchoolsList = unstable_cache(
     { revalidate: 60 }
 );
 
-export async function getCachedSchoolStats(schoolId: string) {
-    return unstable_cache(
+// تطبيع عقد إحصاءات المدرسة: يضمن أرقاماً كاملة آمنة حتى لو خدم الكاش شكلاً قديماً
+// (مثل إدخال سابق لإضافة totalClasses) أو رجعت بيانات جزئية — فلا يصل undefined إلى طبقة العرض.
+function normalizeSchoolStats(raw: Partial<SchoolStats> | null | undefined): SchoolStats {
+    return {
+        schoolName:    raw?.schoolName || 'مدرسة غير معروفة',
+        totalStudents: toSafeNumber(raw?.totalStudents),
+        totalTeachers: toSafeNumber(raw?.totalTeachers),
+        totalStaff:    toSafeNumber(raw?.totalStaff),
+        totalClasses:  toSafeNumber(raw?.totalClasses),
+    };
+}
+
+export async function getCachedSchoolStats(schoolId: string): Promise<SchoolStats> {
+    // مفتاح الكاش مُرقّى (v2) بعد إضافة totalClasses حتى لا يُخدَم أي إدخال قديم بلا الحقل الجديد.
+    const raw = await unstable_cache(
         async (): Promise<SchoolStats> => querySchoolStats(supabaseAdmin, schoolId),
-        [`school-stats-${schoolId}`],
+        [`school-stats-v2-${schoolId}`],
         { revalidate: 60 }
+    )();
+    return normalizeSchoolStats(raw);
+}
+
+export async function getCachedSchoolAudit(schoolId: string) {
+    return unstable_cache(
+        async (): Promise<PlatformAudit> => querySchoolAudit(supabaseAdmin, schoolId, 8),
+        [`school-audit-${schoolId}`],
+        { revalidate: 30 }
     )();
 }
 

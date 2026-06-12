@@ -90,7 +90,7 @@ export const UserMenu = () => {
                         {fullName || "مستخدم"}
                     </p>
                     <p className="text-[10px] opacity-80 truncate max-w-[100px] text-muted-foreground">
-                        {currentRoleInfo?.label || "ضيف"}
+                        {currentRoleInfo?.labelAr || "ضيف"}
                     </p>
                 </div>
 
@@ -154,7 +154,7 @@ export const UserMenu = () => {
                                                             const RoleIcon = rInfo.icon;
                                                             return <RoleIcon size={12} />;
                                                         })()}
-                                                        <span>{rInfo.label}</span>
+                                                        <span>{rInfo.labelAr}</span>
                                                         {p.schoolName && (
                                                             <span className="opacity-70 text-[10px]">
                                                                 ({p.schoolName})
@@ -174,7 +174,7 @@ export const UserMenu = () => {
                                                     const CurrentIcon = currentRoleInfo.icon;
                                                     return <CurrentIcon size={14} className="text-primary" />;
                                                 })()}
-                                                <span>{currentRoleInfo.label}</span>
+                                                <span>{currentRoleInfo.labelAr}</span>
                                             </>
                                         ) : (
                                             <span>ضيف</span>

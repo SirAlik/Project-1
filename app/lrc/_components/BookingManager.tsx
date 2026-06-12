@@ -15,48 +15,48 @@ export function BookingManager({ bookings, onUpdateStatus }: Props) {
     return (
         <div className="grid gap-6 lg:grid-cols-12">
             <div className="lg:col-span-12">
-                <Card title="طلبات الحجز المعلقة" className="border-[hsla(var(--gold),.20)] bg-[hsla(var(--gold),.05)]">
+                <Card title="طلبات الحجز المعلقة" className="border-primary/20 bg-primary/5">
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {pending.length === 0 && (
-                            <div className="col-span-full text-center py-8 text-stone-500">لا توجد طلبات حجز معلقة حالياً.</div>
+                            <div className="col-span-full text-center py-8 text-muted-foreground">لا توجد طلبات حجز معلقة حالياً.</div>
                         )}
                         {pending.map(b => (
-                            <div key={b.id} className="p-4 rounded-xl border border-[hsla(var(--gold),.20)] bg-stone-100 shadow-xl space-y-4">
+                            <div key={b.id} className="p-4 rounded-xl border border-primary/20 bg-surface-soft shadow-xl space-y-4">
                                 <div className="flex justify-between items-start">
-                                    <div className="p-2 rounded-lg bg-[hsla(var(--gold),.10)] text-[hsl(var(--gold))]">
+                                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
                                         <Calendar className="w-5 h-5" />
                                     </div>
-                                    <div className="text-left px-2 py-1 rounded bg-stone-200 text-[10px] font-bold text-stone-500">
+                                    <div className="text-left px-2 py-1 rounded bg-muted text-[10px] font-bold text-muted-foreground">
                                         الحصة {b.period_number ?? '-'}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <div className="font-bold text-stone-800 flex items-center gap-2">
-                                        <User className="w-4 h-4 text-stone-500" /> {b.teacher_name}
+                                    <div className="font-bold text-foreground flex items-center gap-2">
+                                        <User className="w-4 h-4 text-muted-foreground" /> {b.teacher_name}
                                     </div>
-                                    <div className="text-sm text-stone-500 flex items-center gap-2 mt-1">
-                                        <Users className="w-4 h-4 text-stone-500" /> {b.class_name}
+                                    <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                                        <Users className="w-4 h-4 text-muted-foreground" /> {b.class_name}
                                     </div>
-                                    <div className="text-sm text-[hsl(var(--gold))] flex items-center gap-2 mt-2">
+                                    <div className="text-sm text-primary flex items-center gap-2 mt-2">
                                         <BookOpen className="w-4 h-4" /> {b.subject}
                                     </div>
                                 </div>
 
-                                <div className="text-xs text-stone-500 border-t border-stone-200 pt-3">
+                                <div className="text-xs text-muted-foreground border-t border-border pt-3">
                                     التاريخ: {new Date(b.booking_date).toLocaleDateString("ar-SA")}
                                 </div>
 
                                 <div className="flex gap-2 pt-2">
                                     <button
                                         onClick={() => onUpdateStatus(b.id, "approved")}
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg py-2 text-xs font-bold flex items-center justify-center gap-1 transition-all"
+                                        className="flex-1 bg-primary hover:opacity-90 text-white rounded-lg py-2 text-xs font-bold flex items-center justify-center gap-1 transition-all"
                                     >
                                         <Check className="w-3 h-3" /> قبول
                                     </button>
                                     <button
                                         onClick={() => onUpdateStatus(b.id, "rejected")}
-                                        className="flex-1 bg-rose-900/40 hover:bg-rose-900/60 text-rose-400 border border-rose-900/50 rounded-lg py-2 text-xs font-bold flex items-center justify-center gap-1 transition-all"
+                                        className="flex-1 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded-lg py-2 text-xs font-bold flex items-center justify-center gap-1 transition-all"
                                     >
                                         <X className="w-3 h-3" /> رفض
                                     </button>
@@ -72,7 +72,7 @@ export function BookingManager({ bookings, onUpdateStatus }: Props) {
                     <div className="overflow-x-auto">
                         <table className="w-full text-right text-sm">
                             <thead>
-                                <tr className="border-b border-stone-200 text-stone-500">
+                                <tr className="border-b border-border text-muted-foreground">
                                     <th className="pb-3 pr-4">المعلم</th>
                                     <th className="pb-3 text-center">الفصل</th>
                                     <th className="pb-3 text-center">المادة</th>
@@ -80,15 +80,15 @@ export function BookingManager({ bookings, onUpdateStatus }: Props) {
                                     <th className="pb-3 text-left pl-4">الحالة</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-zinc-800/50">
+                            <tbody className="divide-y divide-border">
                                 {history.map(b => (
-                                    <tr key={b.id} className="hover:bg-stone-100/80 transition-colors">
+                                    <tr key={b.id} className="hover:bg-surface-soft transition-colors">
                                         <td className="py-4 pr-4 font-medium">{b.teacher_name}</td>
                                         <td className="py-4 text-center">{b.class_name}</td>
-                                        <td className="py-4 text-center text-stone-500">{b.subject}</td>
+                                        <td className="py-4 text-center text-muted-foreground">{b.subject}</td>
                                         <td className="py-4 text-center text-xs">{new Date(b.booking_date).toLocaleDateString("ar-SA")}</td>
                                         <td className="py-4 text-left pl-4">
-                                            <span className={`px-2 py-1 rounded text-[10px] font-bold ${b.status === "approved" ? "bg-emerald-500/10 text-emerald-400" : "bg-rose-500/10 text-rose-400"
+                                            <span className={`px-2 py-1 rounded text-[10px] font-bold ${b.status === "approved" ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"
                                                 }`}>
                                                 {b.status === "approved" ? "مقبول" : "مرفوض"}
                                             </span>
@@ -97,7 +97,7 @@ export function BookingManager({ bookings, onUpdateStatus }: Props) {
                                 ))}
                                 {history.length === 0 && (
                                     <tr>
-                                        <td colSpan={5} className="py-8 text-center text-stone-500 italic">لا يوجد سجل للطلبات السابقة.</td>
+                                        <td colSpan={5} className="py-8 text-center text-muted-foreground italic">لا يوجد سجل للطلبات السابقة.</td>
                                     </tr>
                                 )}
                             </tbody>

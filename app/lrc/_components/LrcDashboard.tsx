@@ -33,52 +33,52 @@ interface LrcDashboardProps {
 export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps) {
     if (!stats) return null;
 
-    const COLORS = ["hsl(var(--gold))", "#6366f1", "#10b981", "#ef4444", "#8b5cf6", "#ec4899"];
+    const COLORS = ["#0D9488", "#3B6FE0", "#10b981", "#0891B2", "#0EA5E9", "#14B8A6"];
 
     return (
         <div className="space-y-6">
             {/* Top Row: Quick Analysis Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500 flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <CheckCircle className="w-4 h-4 text-emerald-500" />
                             نسبة الكتب المعادة
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-emerald-400">{stats.returnRate}%</div>
-                        <div className="w-full bg-stone-200 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="text-2xl font-bold text-emerald-600">{stats.returnRate}%</div>
+                        <div className="w-full bg-muted h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-emerald-500 h-full transition-all" style={{ width: `${stats.returnRate}%` }} />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500 flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <Clock className="w-4 h-4 text-indigo-500" />
                             نسبة الكتب قيد الإعارة
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-indigo-400">{stats.activeRate}%</div>
-                        <div className="w-full bg-stone-200 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="text-2xl font-bold text-indigo-600">{stats.activeRate}%</div>
+                        <div className="w-full bg-muted h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-indigo-500 h-full transition-all" style={{ width: `${stats.activeRate}%` }} />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-stone-500 flex items-center gap-2">
+                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                             <AlertCircle className="w-4 h-4 text-rose-500" />
                             تنبيه التأخير (+7 أيام)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-rose-400">{stats.overdueRate}%</div>
-                        <div className="w-full bg-stone-200 h-2 rounded-full mt-2 overflow-hidden">
+                        <div className="text-2xl font-bold text-rose-600">{stats.overdueRate}%</div>
+                        <div className="w-full bg-muted h-2 rounded-full mt-2 overflow-hidden">
                             <div className="bg-rose-500 h-full transition-all" style={{ width: `${stats.overdueRate}%` }} />
                         </div>
                     </CardContent>
@@ -88,16 +88,16 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Top 10 Students */}
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-lg font-bold flex items-center gap-2">
-                            <Trophy className="w-5 h-5 text-[hsl(var(--gold))]" />
+                            <Trophy className="w-5 h-5 text-primary" />
                             أكثر 10 طلاب استعارة
                         </CardTitle>
                         {stats.topStudents?.[0] && (
                             <button
                                 onClick={() => onGenerateCertificate(stats.topStudents[0].name)}
-                                className="text-xs px-3 py-1 bg-[hsl(var(--gold),.10)] hover:bg-[hsl(var(--gold),.20)] text-[hsl(var(--gold))] rounded-lg border border-[hsl(var(--gold),.20)] transition-colors"
+                                className="text-xs px-3 py-1 bg-primary/10 hover:bg-primary/10 text-primary rounded-lg border border-primary/20 transition-colors"
                             >
                                 إصدار شهادة للأول
                             </button>
@@ -106,12 +106,12 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                     <CardContent>
                         <ChartContainer height={300}>
                             <BarChart data={stats.topStudents} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" horizontal={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#E8E1D4" horizontal={false} />
                                 <XAxis type="number" hide />
-                                <YAxis dataKey="name" type="category" width={100} tick={{ fill: '#a1a1aa', fontSize: 12 }} />
+                                <YAxis dataKey="name" type="category" width={100} tick={{ fill: '#6B7280', fontSize: 12 }} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px' }}
-                                    itemStyle={{ color: 'hsl(var(--gold))' }}
+                                    contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E1D4', borderRadius: '12px', color: '#111827' }}
+                                    itemStyle={{ color: '#0D9488' }}
                                 />
                                 <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                                     {stats.topStudents?.map((entry: NameCount, index: number) => (
@@ -124,7 +124,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                 </Card>
 
                 {/* Top 10 Books */}
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold flex items-center gap-2">
                             <Book className="w-5 h-5 text-indigo-500" />
@@ -134,14 +134,14 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                     <CardContent>
                         <ChartContainer height={300}>
                             <BarChart data={stats.topBooks} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" horizontal={false} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#E8E1D4" horizontal={false} />
                                 <XAxis type="number" hide />
-                                <YAxis dataKey="title" type="category" width={150} tick={{ fill: '#a1a1aa', fontSize: 11 }} />
+                                <YAxis dataKey="title" type="category" width={150} tick={{ fill: '#6B7280', fontSize: 11 }} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: '#18181b', border: '1px solid #3f3f46', borderRadius: '8px' }}
-                                    itemStyle={{ color: '#6366f1' }}
+                                    contentStyle={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E1D4', borderRadius: '12px', color: '#111827' }}
+                                    itemStyle={{ color: '#3B6FE0' }}
                                 />
-                                <Bar dataKey="count" fill="#6366f1" radius={[0, 4, 4, 0]} />
+                                <Bar dataKey="count" fill="#3B6FE0" radius={[0, 4, 4, 0]} />
                             </BarChart>
                         </ChartContainer>
                     </CardContent>
@@ -151,7 +151,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
             {/* Bottom Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Top Authors */}
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold flex items-center gap-2">
                             <User className="w-5 h-5 text-emerald-500" />
@@ -161,9 +161,9 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                     <CardContent>
                         <div className="space-y-3">
                             {stats.topAuthors?.map((author: NameCount, idx: number) => (
-                                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-stone-100/80">
-                                    <span className="text-sm text-stone-600">{author.name}</span>
-                                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-500">{author.count}</span>
+                                <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-surface-soft">
+                                    <span className="text-sm text-foreground">{author.name}</span>
+                                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-600">{author.count}</span>
                                 </div>
                             ))}
                         </div>
@@ -171,7 +171,7 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                 </Card>
 
                 {/* Class Ranking */}
-                <Card className="bg-stone-100 border-stone-200">
+                <Card className="bg-surface-soft border-border">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold">ترتيب الفصول (الأكثر استعارة)</CardTitle>
                     </CardHeader>
@@ -179,15 +179,15 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                         <div className="space-y-3">
                             {stats.rankedClasses?.map((cls: NameCount, idx: number) => (
                                 <div key={idx} className="flex items-center gap-3">
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx < 3 ? 'bg-[hsl(var(--gold))] text-black' : 'bg-stone-200 text-stone-500'}`}>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${idx < 3 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
                                         {idx + 1}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between text-sm mb-1">
                                             <span>{cls.name}</span>
-                                            <span className="text-stone-500">{cls.count}</span>
+                                            <span className="text-muted-foreground">{cls.count}</span>
                                         </div>
-                                        <div className="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden">
+                                        <div className="w-full bg-muted h-1.5 rounded-full overflow-hidden">
                                             <div
                                                 className="bg-indigo-500 h-full transition-all"
                                                 style={{ width: `${(cls.count / (stats.rankedClasses[0]?.count || 1)) * 100}%` }}
@@ -201,20 +201,20 @@ export function LrcDashboard({ stats, onGenerateCertificate }: LrcDashboardProps
                 </Card>
 
                 {/* Bottom Classes Area */}
-                <Card className="bg-stone-100 border-stone-200 border-dashed border-rose-500/20">
+                <Card className="bg-surface-soft border-border border-dashed border-rose-200">
                     <CardHeader>
-                        <CardTitle className="text-lg font-bold text-rose-400 flex items-center gap-2">
+                        <CardTitle className="text-lg font-bold text-rose-600 flex items-center gap-2">
                             <TrendingDown className="w-5 h-5" />
                             فصول تحتاج تشجيع
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-xs text-stone-500 mb-4">هذه الفصول لديها أقل معدلات استعارة هذا الشهر.</p>
+                        <p className="text-xs text-muted-foreground mb-4">هذه الفصول لديها أقل معدلات استعارة هذا الشهر.</p>
                         <div className="space-y-3">
                             {stats.bottomClasses?.map((cls: NameCount, idx: number) => (
-                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-rose-500/5 border border-rose-500/10">
-                                    <span className="text-sm font-medium text-rose-200">{cls.name}</span>
-                                    <span className="text-xs text-rose-500/70">{cls.count} إعارات</span>
+                                <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-rose-50 border border-rose-200">
+                                    <span className="text-sm font-medium text-rose-700">{cls.name}</span>
+                                    <span className="text-xs text-rose-600/70">{cls.count} إعارات</span>
                                 </div>
                             ))}
                         </div>

@@ -106,7 +106,7 @@ export const RoleSwitcher = () => {
                     ) : (
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-success animate-pulse"></span>
-                            <span className="font-bold text-sm hidden sm:block text-foreground">{currentConfig.label}</span>
+                            <span className="font-bold text-sm hidden sm:block text-foreground">{currentConfig.labelAr}</span>
                             <ChevronDown
                                 size={14}
                                 className={`text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -156,7 +156,7 @@ export const RoleSwitcher = () => {
                                                 </div>
                                                 <div className="flex flex-col items-start leading-none gap-1">
                                                     <span className={`font-bold text-xs ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                                                        {Config.label}
+                                                        {Config.labelAr}
                                                     </span>
                                                     {persona.schoolName && (
                                                         <span className="text-[9px] text-muted-foreground/70 truncate max-w-[150px]">
@@ -207,7 +207,7 @@ export const RoleSwitcher = () => {
                                 <h3 className="text-lg font-bold mb-2">تأكيد تغيير الدور</h3>
                                 <p className="text-sm text-muted-foreground mb-6">
                                     هل أنت متأكد من رغبتك بالانتقال إلى دور
-                                    <span className="font-bold text-foreground mx-1">{pendingConfig.label}</span>
+                                    <span className="font-bold text-foreground mx-1">{pendingConfig.labelAr}</span>
                                     {pendingPersona.schoolName && <span> في {pendingPersona.schoolName}</span>}؟
                                 </p>
 

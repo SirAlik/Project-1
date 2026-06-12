@@ -14,17 +14,17 @@ export function LrcStats({ books, loans, visits }: Props) {
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-900/20 to-purple-900/20 border border-indigo-500/10 backdrop-blur-sm">
-                <div className="text-sm text-zinc-400">المخزون الكلي</div>
-                <div className="text-3xl font-bold text-indigo-400 mt-1">{totalBooks}</div>
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-sm">
+                <div className="text-sm text-muted-foreground">المخزون الكلي</div>
+                <div className="text-3xl font-bold text-foreground mt-1">{totalBooks}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-[hsla(var(--gold),.10)] to-[hsla(var(--gold-strong),.10)] border border-[hsla(var(--gold),.20)] backdrop-blur-sm">
-                <div className="text-sm text-zinc-400">كتب معارة</div>
-                <div className="text-3xl font-bold text-[hsl(var(--gold))] mt-1">{activeLoans}</div>
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-sm">
+                <div className="text-sm text-muted-foreground">كتب معارة</div>
+                <div className="text-3xl font-bold text-primary mt-1">{activeLoans}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-900/20 to-cyan-900/20 border border-blue-500/10 backdrop-blur-sm">
-                <div className="text-sm text-zinc-400">زيارات الفصول</div>
-                <div className="text-3xl font-bold text-blue-400 mt-1">{totalVisits}</div>
+            <div className="p-4 rounded-2xl bg-card border border-border shadow-sm">
+                <div className="text-sm text-muted-foreground">زيارات الفصول</div>
+                <div className="text-3xl font-bold text-blue-600 mt-1">{totalVisits}</div>
             </div>
         </div>
     );

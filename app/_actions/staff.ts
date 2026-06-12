@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import crypto from 'crypto';
 import { UserRole } from '@/lib/auth/roles';
+import { isStaffAssignableRole } from '@/lib/auth/staff-roles';
 
 // Allowed roles لإدارة الموظفين. (Phase 2C) أُزيل school_affairs_vp — دوره يقتصر على
 // صفحات الشؤون المدرسية لا إدارة الموظفين. تضييق فقط، بلا توسيع.
@@ -35,29 +36,8 @@ type PersonaWithProfile = {
 // Staff = all users with user_personas entries for the school + pending invites
 // ============================================================================
 
-/**
- * Allowed staff roles that can be assigned via createStaff.
- * Excludes privileged system-level roles to prevent escalation.
- */
-/**
- * Allowed staff roles that can be assigned via createStaff.
- * Excludes privileged system-level roles to prevent escalation.
- */
-const ALLOWED_STAFF_ROLES = [
-    'school_principal',
-    'school_affairs_vp',
-    'student_affairs_vp',
-    'student_counselor',
-    'teacher',
-    'school_secretary',
-    'health_coordinator',
-    'lab_technician',
-    'school_librarian',
-    'activity_leader',
-    'school_admin',
-] as const;
-
-type AllowedStaffRole = (typeof ALLOWED_STAFF_ROLES)[number];
+// الأدوار القابلة للإسناد للمنسوبين = المصدر الواحد المعتمد في lib/auth/staff-roles.ts
+// (يستبعد system_owner و student/parent). أُزيل المصفوف المحلي المكرّر/الناقص.
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -282,10 +262,8 @@ export const createStaff = createSafeAction({
             // If we reach this point, auth + RBAC + school-match all passed
         });
 
-        // 1) Validate roles strictly
-        const validRoles = roles.filter((r): r is AllowedStaffRole =>
-            ALLOWED_STAFF_ROLES.includes(r as AllowedStaffRole)
-        );
+        // 1) Validate roles strictly — المصدر الواحد المعتمد (يستبعد system_owner و student/parent)
+        const validRoles = roles.filter(isStaffAssignableRole);
 
         if (validRoles.length === 0) {
             throw new Error('لم يتم تحديد أدوار صالحة');

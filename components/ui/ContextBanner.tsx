@@ -11,7 +11,7 @@ interface ContextBannerProps {
 }
 
 const ROLE_LABELS: Record<string, string> = {
-    system_owner: "مالك النظام (System Owner)",
+    system_owner: "مالك النظام",
     school_admin: "منسق المدرسة",
     school_affairs_vp: "وكيل الشؤون المدرسية",
     academic_vp: "وكيل الشؤون التعليمية",

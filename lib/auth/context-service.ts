@@ -21,8 +21,12 @@ export interface PersonaContext {
  * 
  * SECURITY GUARANTEES:
  * 1. Source of Truth: Supabase `app_metadata` (NOT user_metadata, NOT cookies).
- * 2. Fail Closed: If cookie claims mismatch `app_metadata`, return NULL.
- * 3. Scope Enforcement: System Owners can masquerade (if implemented), others cannot.
+ * 2. Fail Closed: If a non-owner's cookie claims mismatch `app_metadata`, return NULL.
+ * 3. Scope Enforcement (Masquerade): System Owners MAY adopt a school role via a verified,
+ *    HMAC-signed `active_persona` cookie (set only AFTER /api/persona/select verifies the
+ *    matching `user_personas` row). Non-owners can NEVER masquerade — their role/school are
+ *    forced to `app_metadata`. `isSystemOwner` always reflects the real app_metadata authority
+ *    (it stays true even while masquerading), so platform/owner access is never lost.
  */
 export async function getActivePersona(): Promise<PersonaContext | null> {
     const supabase = await createSupabaseServerClient();
@@ -72,18 +76,21 @@ export async function getActivePersona(): Promise<PersonaContext | null> {
         }
     }
 
-    // B. Role Escalation
-    // Users cannot claim a role higher than their authority.
-    // Current authority model: the verified JWT role is authoritative.
-    if (requestedRole !== authorityRole) {
-        // console.warn(`[Security] Role mismatch. Asserting authority role.`);
+    // B. Role Escalation / Masquerade
+    // غير مالك النظام: لا انتحال إطلاقاً — يُفرض دور السلطة (fail-closed، عزل صارم).
+    // مالك النظام: يُحترَم الدور المُختار من الكوكي الموقّع (انتحال للاختبار). الكوكي يُضبط فقط بعد تحقّق
+    // /api/persona/select من صفّ user_personas، وهو موقّع بـ HMAC فلا يُزوَّر — ومالك النظام يملك سلطة
+    // كاملة أصلاً، فالانتحال يبدّل سياق العرض لا يمنح صلاحية جديدة.
+    if (!isSystemOwner && requestedRole !== authorityRole) {
         requestedRole = authorityRole;
     }
 
     return {
         userId: user.id,
         role: requestedRole,
-        schoolId: authoritySchoolId,
+        // مالك النظام: مدرسة الدور المُنتحَل من الكوكي. غير المالك: requestedSchoolId == authoritySchoolId
+        // دائماً (الكوكي لا يُقرأ له + فحص العزل أعلاه)، فلا تغيّر في سلوكه.
+        schoolId: requestedSchoolId,
         isSystemOwner,
         displayName: user.user_metadata?.full_name,
         email: user.email

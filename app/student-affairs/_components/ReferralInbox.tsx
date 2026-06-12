@@ -105,7 +105,7 @@ export function ReferralInbox({ referrals, onSend, onResolve, onEscalate, role }
                                             className="w-full lg:w-auto px-6 py-4 bg-destructive text-destructive-foreground rounded-2xl text-xs font-black flex items-center justify-center gap-2 hover:bg-destructive/90 transition-all shadow-lg shadow-destructive/20"
                                         >
                                             <Send className="w-4 h-4" />
-                                            Send to Counselor
+                                            إرسال إلى الموجه الطلابي
                                         </button>
                                     )}
 
@@ -138,7 +138,7 @@ export function ReferralInbox({ referrals, onSend, onResolve, onEscalate, role }
                                                 }}
                                                 className="px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-xl text-[8px] font-black uppercase hover:bg-destructive hover:text-destructive-foreground transition-all"
                                             >
-                                                Escalate to Principal
+                                                التصعيد إلى مدير المدرسة
                                             </button>
                                         )}
                                     </div>
