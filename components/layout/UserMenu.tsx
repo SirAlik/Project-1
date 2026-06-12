@@ -36,11 +36,6 @@ export const UserMenu = () => {
     const currentRoleInfo = role ? getRoleInfo(role) : null;
     const hasMultiplePersonas = allPersonas && allPersonas.length > 1;
 
-    // DEBUG: trace role for identity display
-    if (process.env.NODE_ENV === 'development') {
-        console.log('[UserMenu] role context:', { activeRole: role, label: currentRoleInfo?.label });
-    }
-
     const handleSignOut = async () => {
         setIsLoading(true);
         // Use singleton client from context

@@ -49,7 +49,7 @@ export default function HealthPage() {
                             <div className="w-8 h-8 bg-[var(--primary)]/10 rounded-lg flex items-center justify-center">
                                 <HeartPulse className="w-4 h-4 text-[var(--primary)]" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">School OS • Health Clinic</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Health Clinic</span>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight">
                             الموجّه <span className="text-[var(--primary)]">الصحي</span>

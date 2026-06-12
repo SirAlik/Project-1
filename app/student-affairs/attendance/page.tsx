@@ -6,7 +6,7 @@ import { getActivePersona }  from '@/lib/auth/context-service';
 import { getClassesForAttendance } from '@/lib/services/student-attendance-service';
 import { AttendanceSheet }   from './AttendanceSheet';
 
-export const metadata: Metadata = { title: 'تسجيل الحضور — Sidra OS' };
+export const metadata: Metadata = { title: 'تسجيل الحضور — سِدرة' };
 
 const ALLOWED = [
   'student_affairs_vp', 'school_affairs_vp',

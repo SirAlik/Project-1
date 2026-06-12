@@ -100,7 +100,7 @@ async function buildPdf(form: GeneratedFormRow): Promise<Uint8Array> {
   // تذييل الصفحة
   const pages = doc.getPages();
   pages.forEach((p, i) => {
-    p.drawText(`Sidra OS — ${form.form_code}  |  Page ${i + 1} of ${pages.length}`, {
+    p.drawText(`Sidra — ${form.form_code}  |  Page ${i + 1} of ${pages.length}`, {
       x: 50, y: 30, size: 8, font,
       color: rgb(0.6, 0.6, 0.6),
     });

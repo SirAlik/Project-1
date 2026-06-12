@@ -4,8 +4,9 @@ import { redirect }         from 'next/navigation';
 import { Plus, ClipboardCheck, Clock, CheckCircle2, FileText, XCircle } from 'lucide-react';
 import { getActivePersona } from '@/lib/auth/context-service';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
+import { getRoleInfo, type UserRole } from '@/lib/auth/roles';
 
-export const metadata: Metadata = { title: 'تقييمات الأداء — Sidra OS' };
+export const metadata: Metadata = { title: 'تقييمات الأداء — سِدرة' };
 
 interface EvalRow {
   id: string;
@@ -34,22 +35,6 @@ const LEVEL_CONFIG: Record<string, { label: string; color: string }> = {
   good:              { label: 'جيد',           color: 'text-sky-500'    },
   satisfactory:      { label: 'مقبول',         color: 'text-amber-500'  },
   needs_improvement: { label: 'يحتاج تحسيناً', color: 'text-rose-500'   },
-};
-
-const ROLE_LABELS: Record<string, string> = {
-  school_principal:    'مدير المدرسة',
-  school_admin:        'منسق المدرسة',
-  school_secretary:    'سكرتير',
-  quality_coordinator: 'منسق الجودة',
-  teacher:             'معلم',
-  school_librarian:    'أمين مصادر التعلم',
-  health_coordinator:  'موجه صحي',
-  lab_technician:      'محضر مختبر',
-  activity_leader:     'رائد نشاط',
-  student_counselor:   'موجه طلابي',
-  academic_vp:         'وكيل تعليمي',
-  student_affairs_vp:  'وكيل طلابي',
-  school_affairs_vp:   'وكيل شؤون مدرسية',
 };
 
 function formatDateAr(iso: string): string {
@@ -173,7 +158,7 @@ export default async function StaffEvaluationListPage() {
                           {r.evaluation_number}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {ROLE_LABELS[r.evaluatee_role_snapshot] ?? r.evaluatee_role_snapshot}
+                          {getRoleInfo(r.evaluatee_role_snapshot as UserRole).labelAr}
                         </span>
                         <span className="text-xs text-muted-foreground">· {r.academic_year}</span>
                       </div>

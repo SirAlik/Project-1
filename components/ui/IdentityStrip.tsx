@@ -21,10 +21,6 @@ export function IdentityStrip({
     const role: UserRole = propRole || contextRole || "system_owner";
     const schoolName = propSchoolName || contextSchoolName;
 
-    if (process.env.NODE_ENV === 'development') {
-        console.log('[Identity] roles', { activePersonaRole: role, contextRole });
-    }
-
     const roleInfo = getRoleInfo(role);
 
     return (

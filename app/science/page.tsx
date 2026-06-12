@@ -29,7 +29,7 @@ export default function SciencePage() {
                             <div className="w-8 h-8 bg-cyan-500/10 rounded-lg flex items-center justify-center">
                                 <Beaker className="w-4 h-4 text-cyan-500" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">School OS • Science Laboratory</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Science Laboratory</span>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight">
                             المختبر <span className="text-cyan-500">العلمي</span>

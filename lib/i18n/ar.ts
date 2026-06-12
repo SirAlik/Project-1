@@ -1,4 +1,4 @@
-// Arabic Localization for School OS
+// Arabic Localization — سِدرة
 // مصطلحات وزارة التعليم السعودية
 
 export const ar = {

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FileText, Download, Workflow, Sparkles, FileCheck2 } from 'lucide-react';
+import { FileText, Download, Workflow, FileCheck2 } from 'lucide-react';
 import { LRC_QUALITY_FORMS, type QualityFormDef } from '@/lib/quality/quality-forms';
 import { generateLRCCertificate } from './CertificateGenerator';
 
@@ -84,15 +84,5 @@ function QualityFormRow({ form, topStudentName }: { form: QualityFormDef; topStu
             </span>
             <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[9px] font-black text-muted-foreground">قريباً</span>
         </li>
-    );
-}
-
-// مكوّن تلميح صغير لطبقة الذكاء (يبقى الذكاء الحقيقي عبر AIInsightCard في الرئيسية)
-export function AiLayerHint() {
-    return (
-        <span className="inline-flex items-center gap-1 text-[11px] font-bold text-muted-foreground">
-            <Sparkles className="h-3 w-3 text-primary" />
-            طبقة الذكاء تعرض رؤى حقيقية فقط
-        </span>
     );
 }

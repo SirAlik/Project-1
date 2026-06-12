@@ -6,7 +6,7 @@ import { getActivePersona }  from '@/lib/auth/context-service';
 import { getStaffForEvaluation } from '@/lib/services/staff-evaluation-service';
 import { EvalForm }          from './EvalForm';
 
-export const metadata: Metadata = { title: 'تقييم جديد — Sidra OS' };
+export const metadata: Metadata = { title: 'تقييم جديد — سِدرة' };
 
 const ALLOWED = ['school_principal', 'school_admin'];
 

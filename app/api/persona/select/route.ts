@@ -68,15 +68,6 @@ export async function POST(request: NextRequest) {
         // Extract rawSchoolId for debugging and normalization
         const rawSchoolId = body.schoolId;
 
-        // TEMP DEBUG: trace the raw value BEFORE any normalization
-        console.log('[API/persona/select] Raw body received:', {
-            originalRole: role,
-            requestedRole, // Normalized
-            rawSchoolId,
-            rawSchoolIdType: typeof rawSchoolId,
-            redirectTo,
-        });
-
 
         // Normalize schoolId: treat undefined/null/"null"/"undefined"/"" as missing
         // Belt + suspenders: explicit typeof check to catch any edge cases
@@ -88,13 +79,6 @@ export async function POST(request: NextRequest) {
                 rawSchoolId !== ''
                 ? rawSchoolId
                 : undefined;
-
-        // TEMP DEBUG: show the result
-        console.log('[API/persona/select] Normalization result:', {
-            requestedRole,
-            normalizedSchoolId: normalizedSchoolId ? '***' : 'undefined (actual)',
-        });
-
 
         if (!requestedRole || typeof requestedRole !== 'string') {
             return NextResponse.json({ success: false, error: 'Role is required' }, { status: 400 });
@@ -108,7 +92,6 @@ export async function POST(request: NextRequest) {
 
         // SCOPE ENFORCEMENT: School-scoped roles REQUIRE schoolId
         if (!isGlobalRole && !normalizedSchoolId) {
-            console.log('[API/persona/select] School-scoped role without schoolId:', requestedRole);
             return NextResponse.json({
                 success: false,
                 error: 'SCHOOL_CONTEXT_REQUIRED',
@@ -224,9 +207,6 @@ export async function POST(request: NextRequest) {
             path: '/',
             maxAge: 60 * 60 * 24, // 24 hours
         });
-
-        // TEMP DEBUG
-        console.log('[API/persona/select] Cookie set on response, redirectPath:', redirectPath);
 
         return response;
     } catch (error) {

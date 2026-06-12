@@ -5,7 +5,7 @@ import { getActivePersona } from '@/lib/auth/context-service';
 import { getMyNotifications } from '@/lib/services/notification-service';
 import { NotificationsClient }  from './NotificationsClient';
 
-export const metadata: Metadata = { title: 'الإشعارات — Sidra OS' };
+export const metadata: Metadata = { title: 'الإشعارات — سِدرة' };
 
 export default async function NotificationsPage() {
   const persona = await getActivePersona();

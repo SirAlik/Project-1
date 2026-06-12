@@ -6,7 +6,7 @@ import { getActivePersona }  from '@/lib/auth/context-service';
 import { getClassesForTeacher } from '@/lib/services/period-attendance-service';
 import { PeriodSheet }       from './PeriodSheet';
 
-export const metadata: Metadata = { title: 'حضور الحصص — Sidra OS' };
+export const metadata: Metadata = { title: 'حضور الحصص — سِدرة' };
 
 const ALLOWED = [
   'teacher', 'student_affairs_vp', 'school_affairs_vp',

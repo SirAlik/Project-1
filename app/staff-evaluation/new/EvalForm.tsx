@@ -5,6 +5,7 @@ import { useRouter }               from 'next/navigation';
 import { Loader2, ChevronLeft }    from 'lucide-react';
 import { createEvalAction }        from './_actions';
 import type { StaffOption }        from '@/lib/services/staff-evaluation-service';
+import { getRoleInfo, type UserRole } from '@/lib/auth/roles';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -21,22 +22,6 @@ const CRITERIA = [
 type CriterionId = (typeof CRITERIA)[number]['id'];
 
 const MAX_TOTAL = CRITERIA.reduce((sum, c) => sum + c.max, 0); // 100
-
-const ROLE_LABELS: Record<string, string> = {
-  school_principal:    'مدير المدرسة',
-  school_admin:        'منسق المدرسة',
-  school_secretary:    'سكرتير',
-  quality_coordinator: 'منسق الجودة',
-  teacher:             'معلم',
-  school_librarian:    'أمين مصادر التعلم',
-  health_coordinator:  'موجه صحي',
-  lab_technician:      'محضر مختبر',
-  activity_leader:     'رائد نشاط',
-  student_counselor:   'موجه طلابي',
-  academic_vp:         'وكيل تعليمي',
-  student_affairs_vp:  'وكيل طلابي',
-  school_affairs_vp:   'وكيل شؤون مدرسية',
-};
 
 function getLevelInfo(pct: number): { label: string; color: string; barColor: string } {
   if (pct >= 90) return { label: 'ممتاز',         color: 'text-emerald-500', barColor: 'bg-emerald-500' };
@@ -136,7 +121,7 @@ export function EvalForm({ staffList }: { staffList: StaffOption[] }) {
             <option value="">— اختر موظفاً —</option>
             {staffList.map(s => (
               <option key={s.persona_id} value={s.persona_id}>
-                {s.full_name} — {ROLE_LABELS[s.role] ?? s.role}
+                {s.full_name} — {getRoleInfo(s.role as UserRole).labelAr}
               </option>
             ))}
           </select>

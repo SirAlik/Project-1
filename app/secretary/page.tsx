@@ -35,7 +35,7 @@ export default function SecretaryPage() {
                             <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                                 <ShieldCheck className="w-4 h-4 text-primary" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">School OS • Administrative Office</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Administrative Office</span>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight">
                             نظام السكرتارية <span className="text-primary">الذكي</span>

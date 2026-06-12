@@ -253,15 +253,6 @@ export const createStaff = createSafeAction({
     async handler({ schoolId, fullName, email, mobileNumber, roles }): Promise<CreateStaffResult> {
         const cleanEmail = normalizeEmail(email);
 
-        // ─── DEBUG: trace context for staff creation diagnosis ───
-        console.log('[createStaff] Handler entry:', {
-            requestedSchoolId: schoolId,
-            email: cleanEmail,
-            rolesRequested: roles,
-            // NOTE: persona context is checked by createSafeAction BEFORE reaching here
-            // If we reach this point, auth + RBAC + school-match all passed
-        });
-
         // 1) Validate roles strictly — المصدر الواحد المعتمد (يستبعد system_owner و student/parent)
         const validRoles = roles.filter(isStaffAssignableRole);
 

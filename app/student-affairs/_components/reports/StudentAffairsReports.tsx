@@ -152,7 +152,7 @@ const QFHeader = ({ qf }: { title?: string; qf: string }) => (
 const QFFooter = () => (
     <View style={styles.footer}>
         <Text>التاريخ: {new Date().toLocaleDateString('ar-SA')}</Text>
-        <Text>نظام إدارة المدارس - School OS</Text>
+        <Text>نظام إدارة المدارس - سِدرة</Text>
         <Text>صفحة 1 من 1</Text>
     </View>
 );

@@ -106,7 +106,7 @@ export function ClassNavigatorModal({ isOpen, onClose, classes }: ClassNavigator
 
                         {/* Footer */}
                         <div className="p-6 bg-slate-100 border-t border-slate-200 text-center">
-                            <p className="text-[10px] text-stone-500 uppercase font-black tracking-widest">Antigravity Design System • Class Cockpit v2.0</p>
+                            <p className="text-[10px] text-stone-500 uppercase font-black tracking-widest">سِدرة • Class Cockpit v2.0</p>
                         </div>
                     </motion.div>
                 </div>

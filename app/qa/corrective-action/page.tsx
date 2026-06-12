@@ -5,7 +5,7 @@ import { Plus, ShieldAlert, CheckCircle2, Clock, XCircle, FileSearch } from 'luc
 import { getActivePersona } from '@/lib/auth/context-service';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 
-export const metadata: Metadata = { title: 'الإجراءات التصحيحية — Sidra OS' };
+export const metadata: Metadata = { title: 'الإجراءات التصحيحية — سِدرة' };
 
 interface NcrRow {
   id: string;

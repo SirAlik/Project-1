@@ -120,7 +120,7 @@ const ReportHeader = ({ code }: { code: string; title?: string }) => (
         <PdfImage src={qualityLogo.src} style={styles.logo} />
 
         <View style={styles.qualityInfo}>
-            <Text style={{ fontSize: 11, fontFamily: 'TajawalBold', color: '#495057' }}>ظ†ط¸ط§ظ… ط¥ط¯ط§ط±ط© ط§ظ„ط¬ظˆط¯ط©</Text>
+            <Text style={{ fontSize: 11, fontFamily: 'TajawalBold', color: '#495057' }}>نظام إدارة الجودة</Text>
             <Text style={{ fontSize: 10, marginTop: 4 }}>{code}</Text>
         </View>
     </View>
@@ -128,9 +128,9 @@ const ReportHeader = ({ code }: { code: string; title?: string }) => (
 
 const ReportFooter = ({ code }: { code: string }) => (
     <View style={styles.footerContainer}>
-        <Text>ظ†ط¸ط§ظ… ط§ظ„ط£طھظ…طھط© ط§ظ„ظ…ط¯ط±ط³ظٹط© School OS - ط±ط§ط¦ط¯ ط§ظ„ظ†ط´ط§ط·</Text>
-        <Text>ظƒظˆط¯ ط§ظ„ظ†ظ…ظˆط°ط¬: {code}</Text>
-        <Text>طھط§ط±ظٹط® ط§ظ„ط·ط¨ط§ط¹ط©: {new Date().toLocaleDateString('ar-SA')}</Text>
+        <Text>نظام سِدرة • رائد النشاط</Text>
+        <Text>كود النموذج: {code}</Text>
+        <Text>تاريخ الطباعة: {new Date().toLocaleDateString('ar-SA')}</Text>
     </View>
 );
 

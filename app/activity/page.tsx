@@ -35,7 +35,7 @@ export default function ActivityLeaderPage() {
                             <div className="w-8 h-8 bg-[hsl(var(--gold))] rounded-lg flex items-center justify-center">
                                 <Sparkles className="w-4 h-4 text-white" />
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">School OS • Student Activities</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Student Activities</span>
                         </div>
                         <h1 className="text-4xl font-bold tracking-tight">
                             وحدة رائد <span className="text-[hsl(var(--gold))]">النشاط</span>

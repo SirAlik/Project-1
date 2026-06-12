@@ -61,12 +61,6 @@ export async function switchPersonaAction(
     const correlationId = input?.correlationId || 'no-id';
 
     try {
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`[ServerAction][${correlationId}] received =>`, JSON.stringify({
-                role: input?.role,
-                schoolId: redactSchoolId(input?.schoolId),
-            }, null, 2));
-        }
 
         const parsed = switchPersonaSchema.safeParse(input);
         if (!parsed.success) {
@@ -151,14 +145,6 @@ export async function switchPersonaAction(
             schoolId: schoolId || userPersona.school_id,
             timestamp: Date.now(),
         };
-
-        // DEBUG: log final persona context being stored
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`[switchPersona][${correlationId}] persona context =>`, {
-                role: personaContext.role,
-                schoolId: redactSchoolId(personaContext.schoolId),
-            });
-        }
 
         const token = await signPersonaToken({ ...personaContext, timestamp: personaContext.timestamp! });
 

@@ -34,7 +34,7 @@ export default function QADashboard() {
                                 <div className="w-8 h-8 bg-sky-500/10 rounded-lg flex items-center justify-center">
                                     <ShieldCheck className="w-4 h-4 text-sky-500" />
                                 </div>
-                                <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">School OS • Quality Assurance</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Quality Assurance</span>
                             </div>
                             <h1 className="text-4xl font-bold tracking-tight">
                                 ضمان <span className="text-sky-500">الجودة</span>

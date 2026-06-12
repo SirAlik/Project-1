@@ -52,7 +52,7 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
 
             <footer className="mt-10 pt-6 border-t border-stone-200 flex justify-between items-center bg-white/5 -mx-10 -mb-10 p-8">
                 <div className="text-[10px] text-stone-500 font-black uppercase tracking-widest">
-                    Generated via Antigravity School OS
+                    تم التوليد عبر سِدرة
                 </div>
                 <button
                     onClick={() => exportToOfficialPDF(id, fileName, code)}

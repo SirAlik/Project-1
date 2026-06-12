@@ -3,26 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { Shield, RefreshCw, Building2, Layers } from "lucide-react";
+import { getRoleInfo, type UserRole } from "@/lib/auth/roles";
 
 interface ContextBannerProps {
     role: string;
     schoolName?: string;
     variant?: 'global' | 'school';
 }
-
-const ROLE_LABELS: Record<string, string> = {
-    system_owner: "مالك النظام",
-    school_admin: "منسق المدرسة",
-    school_affairs_vp: "وكيل الشؤون المدرسية",
-    academic_vp: "وكيل الشؤون التعليمية",
-    student_affairs_vp: "وكيل شؤون الطلاب",
-    school_librarian: "أمين مصادر التعلم",
-    quality_coordinator: "منسق الجودة",
-    school_principal: "مدير المدرسة",
-    teacher: "معلم",
-    student: "طالب",
-    parent: "ولي أمر",
-};
 
 const ROLE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
     system_owner: { bg: "bg-rose-500/10", text: "text-rose-400", border: "border-rose-500/20" },
@@ -44,7 +31,7 @@ const ROLE_ICONS: Record<string, React.ReactNode> = {
 
 export function ContextBanner({ role, schoolName, variant = 'school' }: ContextBannerProps) {
     const colors = ROLE_COLORS[role] || ROLE_COLORS.default;
-    const label = ROLE_LABELS[role] || role;
+    const label = getRoleInfo(role as UserRole).labelAr;
     const icon = ROLE_ICONS[role] || ROLE_ICONS.default;
     const scope = variant === 'global' ? "نطاق البيانات: النظام بالكامل" : `نطاق البيانات: ${schoolName || 'هذه المدرسة فقط'}`;
 

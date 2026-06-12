@@ -115,7 +115,7 @@ const ReportHeader = ({ title, code }: { title: string; code: string }) => (
 
 const ReportFooter = ({ code }: { code: string }) => (
     <View style={styles.footer}>
-        <Text>تم التوليد بواسطة نظام School OS</Text>
+        <Text>تم التوليد بواسطة نظام سِدرة</Text>
         <Text>{code}</Text>
     </View>
 );
