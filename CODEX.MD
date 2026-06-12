@@ -436,3 +436,25 @@ Work in stages. For every stage:
 6. Continue to the next stage.
 
 Do not wait until the end to report everything. After each stage, give the user a clear result before continuing.
+
+---
+
+## System Doctrine — Mandatory Reading Before Modification (2026-06-12)
+
+**Phase 1 (Documentation & Doctrine) is complete.** Sidra's system doctrine now lives in `docs/`. **Binding rule:** before modifying any **role page · operational workflow · dashboard · PDF export · AI feature · analytics feature · DB workflow**, READ these six documents first:
+
+1. `docs/architecture/SIDRA_SYSTEM_DOCTRINE.md` — master doctrine.
+2. `docs/architecture/SIDRA_LAYERS.md` — the 11 layers.
+3. `docs/quality/QUALITY_FORMS_AND_AUTOFILL_LAYER.md` — quality + auto-fill.
+4. `docs/quality/ROLE_QUALITY_FORMS_MATRIX.md` — form ownership (11 own / 4 feed).
+5. `docs/quality/TENANT_QUALITY_TEMPLATES.md` — per-tenant templates.
+6. `docs/roadmap/SIDRA_IMPLEMENTATION_ROADMAP.md` — phases.
+
+### Doctrine highlights (binding)
+
+- Visible brand is **«سِدرة» always**. Never show `Sidra OS` / `School OS` / `Smart School OS` / `سِدرة OS` in the UI. ("Sidra OS" is the internal repo name only — never user-facing.)
+- **Tenant/school name is dynamic** from `schools.name` of the logged-in user. Never hardcode a school name in a reusable template — that breaks multi-tenancy. (Confirmed leak: `app/health/_components/HealthReports.tsx:103`.)
+- **Al-Falah quality forms/codes are TENANT-SPECIFIC to Al-Falah, NOT global Sidra defaults.** A school without a quality program must not see Al-Falah forms. The capability is global; templates/codes/headers/availability are per-tenant (`school_id`-scoped).
+- **Layers (6) Auto-Fill Engine and (7) Quality Forms are mandatory cross-cutting layers** linking: operational action → structured data → auto-fill record → quality form → official PDF → analytics → AI. No fake AI/analytics/PDF/health.
+- Roadmap: **Phase 2 = Shell/Layout Unification + structural cleanup (6-agent audit plan); Phase 3 = Quality Forms & PDF layer.** Do NOT implement Phase 2/3 now — document only.
+- `/login` is NOT a blocker (it was a stale `.next` cache; resolved locally). Do not work on it.

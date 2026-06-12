@@ -224,4 +224,17 @@ ALTER TABLE public.classes ALTER COLUMN school_id DROP DEFAULT;
 
 ---
 
+## Sidra Doctrine & Tenant Quality Templates — Documentation Pointer (2026-06-12)
+
+This database directory is governed by the system doctrine in `docs/` (Phase 1). **Documentation-only note — no schema / RLS / migration change accompanies it:**
+
+- **Multi-tenancy is the prime invariant.** Every active table carries `school_id uuid NOT NULL` with RLS enabled (see "Architecture Principles" above). Tenant scope is derived server-side from persona/JWT — never from client input.
+- **Dynamic tenant identity.** The product brand is «سِدرة» (constant); the school/tenant name is read dynamically from `schools.name` — never hardcoded into reusable templates.
+- **Future per-tenant quality templates.** When the Quality Forms layer is implemented (roadmap Phase 3), quality **templates / codes / headers / availability are per-school (`school_id`-scoped)** — the capability is global, the templates are tenant-specific. Existing Al-Falah forms are tenant-specific to Al-Falah, **not** global defaults. See `docs/quality/TENANT_QUALITY_TEMPLATES.md`.
+- **No RLS / schema change without migration review.** Any future quality-template DB support is a new migration, reviewed against tenant isolation. This Phase-1 documentation task introduces **zero** migrations.
+
+**Read before DB work:** `docs/architecture/SIDRA_SYSTEM_DOCTRINE.md` · `docs/quality/QUALITY_FORMS_AND_AUTOFILL_LAYER.md` · `docs/quality/TENANT_QUALITY_TEMPLATES.md`.
+
+---
+
 *This file reflects the pre-launch radical restructuring mandate defined in `CLAUDE.md`.*
