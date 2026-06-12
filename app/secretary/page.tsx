@@ -27,16 +27,10 @@ export default function SecretaryPage() {
     const [tab, setTab] = useState<SecretaryTab>("dashboard");
 
     return (
-        <main className="min-h-screen text-foreground font-sans pb-20" dir="rtl">
-            <div className="relative z-10 mx-auto max-w-7xl px-8 pt-16">
+        <main className="text-foreground font-sans pb-20" dir="rtl">
+            <div className="relative z-10">
                 <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                                <ShieldCheck className="w-4 h-4 text-primary" />
-                            </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Administrative Office</span>
-                        </div>
                         <h1 className="text-4xl font-bold tracking-tight">
                             نظام السكرتارية <span className="text-primary">الذكي</span>
                         </h1>

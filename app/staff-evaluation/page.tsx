@@ -78,7 +78,7 @@ export default async function StaffEvaluationListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6 md:p-8" dir="rtl">
+    <div dir="rtl">
       <div className="mx-auto max-w-4xl space-y-6">
 
         {/* Header */}

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronLeft, GraduationCap, Layers, Radio } from "lucide-react";
 import { supabase } from "@/lib/db/supabase";
 import { GlassSkeleton } from "@/components/ui/GlassSkeleton";
+import { RoleDashboardShell } from "@/components/layout/RoleDashboardShell";
 
 export default function ClassroomSelectionPage() {
   interface TeacherClass { id: string; name: string; }
@@ -54,16 +55,19 @@ export default function ClassroomSelectionPage() {
   }, []);
 
   if (loading) return (
-    <div className="p-12 space-y-12">
-      <GlassSkeleton className="h-32 rounded-3xl" />
-      <div className="grid grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map(i => <GlassSkeleton key={i} className="h-48 rounded-3xl" />)}
+    <RoleDashboardShell role="teacher">
+      <div className="space-y-12">
+        <GlassSkeleton className="h-32 rounded-3xl" />
+        <div className="grid grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(i => <GlassSkeleton key={i} className="h-48 rounded-3xl" />)}
+        </div>
       </div>
-    </div>
+    </RoleDashboardShell>
   );
 
   return (
-    <main className="min-h-screen text-foreground p-12" dir="rtl">
+    <RoleDashboardShell role="teacher">
+    <main className="text-foreground" dir="rtl">
       <div className="max-w-6xl mx-auto relative z-10">
         <header className="mb-16 text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-[2rem] bg-primary/10 border border-primary/20 mb-8 blur-in">
@@ -127,6 +131,7 @@ export default function ClassroomSelectionPage() {
         </div>
       </div>
     </main>
+    </RoleDashboardShell>
   );
 }
 

@@ -153,7 +153,7 @@ export default function StudentAffairsPage() {
   };
 
   return (
-    <main className="min-h-screen pb-32 text-[var(--text)]">
+    <main className="pb-32 text-[var(--text)]">
       <DisciplineKnightsModal
         isOpen={isKnightsOpen}
         onClose={() => setIsKnightsOpen(false)}

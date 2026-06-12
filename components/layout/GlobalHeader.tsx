@@ -8,6 +8,7 @@ import { NotificationsMenu } from './NotificationsMenu';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { isShellRoute } from '@/lib/navigation/shell-routes';
 
 export const GlobalHeader = () => {
     const { scrollY } = useScroll();
@@ -21,13 +22,10 @@ export const GlobalHeader = () => {
         setIsScrolled(latest > 20);
     });
 
-    // Hide app header on login + public landing ('/') + portal + the platform/system-owner area
-    // ('/portal' and '/platform/*' use their own سِدرة shells). كذلك صفحات المدرسة التي تبنّت
-    // SchoolDashboardShell (لها ترويستها الخاصة) — نُخفي الترويسة العامة عليها فقط، وتُضاف الصفحات
-    // تباعاً عند تحويلها للإطار (بقية صفحات /school تبقى دون تغيير).
-    // كذلك مركز مصادر التعلم `/lrc` تبنّى إطار سِدرة بترويسته الخاصة (LrcWorkspace).
-    const isSchoolShellRoute = /^\/school\/[^/]+\/(dashboard|staff|staff\/new)$/.test(pathname);
-    if (pathname === '/login' || pathname === '/' || pathname === '/portal' || pathname.startsWith('/platform') || pathname === '/lrc' || isSchoolShellRoute) return null;
+    // إخفاء الترويسة العامة على: الدخول + الهبوط العام (/) + البوابة + أي مسار يملك صدفة سِدرة
+    // الخاصة (PlatformShell · SchoolDashboardShell · LrcWorkspace · RoleDashboardShell) — كشف
+    // مركزي عبر isShellRoute. صفحات /student و/parent ليست أصدافاً → تبقى ترويستها العامة.
+    if (pathname === '/login' || pathname === '/' || pathname === '/portal' || isShellRoute(pathname)) return null;
 
     // Dynamic contrast styles
     const isTransparent = isHome && !isScrolled;

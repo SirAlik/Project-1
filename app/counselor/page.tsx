@@ -23,8 +23,8 @@ export default function CounselorPage() {
   const { msg, loading, user, currentUserName } = state;
 
   return (
-    <main className="min-h-screen text-[var(--text)] font-sans" dir="rtl">
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-8">
+    <main className="text-[var(--text)] font-sans" dir="rtl">
+      <div className="relative z-10">
         <header className="mb-10">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>

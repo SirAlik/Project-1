@@ -31,8 +31,8 @@ export default function PrincipalPage() {
     }, []);
 
     return (
-        <main className="min-h-screen bg-bg-canvas text-text-inverse font-sans pb-20" dir="rtl">
-            <div className="relative z-10 mx-auto max-w-7xl px-8 py-10">
+        <main className="bg-bg-canvas text-text-inverse font-sans pb-20" dir="rtl">
+            <div className="relative z-10">
                 {/* Futuristic Header */}
                 <header className="mb-10 flex justify-between items-center">
                     <div className="flex items-center gap-6">

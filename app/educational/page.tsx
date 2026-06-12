@@ -30,8 +30,8 @@ const MODULES = [
 
 export default function EducationalAffairsPage() {
     return (
-        <main className="min-h-screen bg-stone-50 text-foreground px-6 py-10" dir="rtl">
-            <div className="mx-auto max-w-7xl space-y-8">
+        <main dir="rtl">
+            <div className="space-y-8">
                 <header className="rounded-[2rem] border border-stone-200 bg-white/85 p-8 shadow-sm">
                     <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
                         <ShieldAlert className="h-7 w-7" />

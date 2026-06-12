@@ -19,6 +19,7 @@ import { StudentEngagement } from "./_components/StudentEngagement";
 import { EventManager } from "./_components/EventManager";
 import { ExportButtons } from "./_components/ExportButtons";
 import { KPICard } from "@/components/ui/KPICard";
+import { RoleDashboardShell } from "@/components/layout/RoleDashboardShell";
 
 export default function ActivityLeaderPage() {
     const { state, actions } = useActivities();
@@ -26,17 +27,12 @@ export default function ActivityLeaderPage() {
     const [activeTab, setActiveTab] = useState<ActivityTab>("financial");
 
     return (
-        <main className="min-h-screen text-[var(--text)] font-sans" dir="rtl">
-            <div className="relative z-10 mx-auto max-w-7xl px-8 pt-16 pb-24">
+        <RoleDashboardShell role="activity_leader">
+        <main className="text-[var(--text)] font-sans" dir="rtl">
+            <div className="relative z-10 pb-24">
                 {/* Modern Header */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 bg-[hsl(var(--gold))] rounded-lg flex items-center justify-center">
-                                <Sparkles className="w-4 h-4 text-white" />
-                            </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">سِدرة • Student Activities</span>
-                        </div>
                         <h1 className="text-4xl font-bold tracking-tight">
                             وحدة رائد <span className="text-[hsl(var(--gold))]">النشاط</span>
                         </h1>
@@ -162,5 +158,6 @@ export default function ActivityLeaderPage() {
                 </div>
             </div>
         </main>
+        </RoleDashboardShell>
     );
 }
