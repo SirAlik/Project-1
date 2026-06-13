@@ -63,7 +63,7 @@ export default function StudentAffairsDashboardLoading() {
                             {[
                                 { color: 'from-indigo-500/10 to-indigo-500/5 border-indigo-500/20' },
                                 { color: 'from-rose-500/10 to-rose-500/5 border-rose-500/20' },
-                                { color: 'from-[hsla(var(--gold),.15)] to-[hsla(var(--gold),.05)] border-[hsla(var(--gold),.25)]' },
+                                { color: 'from-[hsla(var(--accent-primary),.15)] to-[hsla(var(--accent-primary),.05)] border-[hsla(var(--accent-primary),.25)]' },
                                 { color: 'from-indigo-500/10 to-indigo-500/5 border-indigo-500/20' },
                             ].map((item, i) => (
                                 <div key={i} className={`bg-gradient-to-br ${item.color} border p-8 rounded-[2.5rem] min-h-[140px]`}>
@@ -81,7 +81,7 @@ export default function StudentAffairsDashboardLoading() {
                         {/* Lateness Queue + Discipline Trends - 1+2 columns */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Lateness Queue */}
-                            <div className="lg:col-span-1 bg-white/80 border border-[hsla(var(--gold),.25)] rounded-[2.5rem] p-8 min-h-[380px]">
+                            <div className="lg:col-span-1 bg-white/80 border border-[hsla(var(--accent-primary),.25)] rounded-[2.5rem] p-8 min-h-[380px]">
                                 <div className="flex items-center gap-2 mb-6">
                                     <GlassSkeleton variant="circle" className="w-4 h-4" />
                                     <GlassSkeleton variant="text" className="w-32 h-4" />
@@ -90,7 +90,7 @@ export default function StudentAffairsDashboardLoading() {
                                     {[1, 2, 3, 4].map((i) => (
                                         <div key={i} className="flex items-center justify-between p-4 bg-white/95 border border-stone-200 rounded-2xl">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-[hsla(var(--gold),.15)] rounded-xl flex items-center justify-center">
+                                                <div className="w-10 h-10 bg-[hsla(var(--accent-primary),.15)] rounded-xl flex items-center justify-center">
                                                     <GlassSkeleton variant="circle" className="w-5 h-5" />
                                                 </div>
                                                 <div>

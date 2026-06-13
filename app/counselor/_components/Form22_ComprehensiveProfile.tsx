@@ -90,7 +90,7 @@ export function Form22_ComprehensiveProfile({ studentsList, classesList }: Props
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 className="w-10 h-10 text-purple-500 animate-spin" />
+                        <Loader2 className="w-10 h-10 text-teal-500 animate-spin" />
                         <p className="text-stone-500">جاري جلب البيانات من السحاب...</p>
                     </div>
                 ) : studentData ? (
@@ -98,7 +98,7 @@ export function Form22_ComprehensiveProfile({ studentsList, classesList }: Props
                         {/* Header Info */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="bg-white/80 p-6 rounded-3xl border border-stone-200">
-                                <User className="w-6 h-6 text-purple-400 mb-3" />
+                                <User className="w-6 h-6 text-teal-400 mb-3" />
                                 <h3 className="text-sm font-bold text-stone-500">اسم الطالب</h3>
                                 <p className="text-lg font-bold text-foreground">{studentData.name}</p>
                                 <p className="text-xs text-stone-500 mt-1">الفصل: {className}</p>
@@ -113,7 +113,7 @@ export function Form22_ComprehensiveProfile({ studentsList, classesList }: Props
                                 </div>
                             </div>
                             <div className="bg-white/80 p-6 rounded-3xl border border-stone-200">
-                                <ShieldAlert className="w-6 h-6 text-[hsla(var(--gold),.90)] mb-3" />
+                                <ShieldAlert className="w-6 h-6 text-[hsla(var(--accent-primary),.90)] mb-3" />
                                 <h3 className="text-sm font-bold text-stone-500">سجل الانضباط</h3>
                                 <p className="text-lg font-bold text-foreground">{events.filter(e => e.type === 'مخالفة').length} مخالفة</p>
                                 <p className="text-xs text-stone-500 mt-1">إجمالي الغياب: {events.filter(e => e.type === 'غياب').length} أيام</p>
@@ -140,7 +140,7 @@ export function Form22_ComprehensiveProfile({ studentsList, classesList }: Props
                                                 <td className="px-6 py-4 text-stone-600">{ev.event_date}</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`px-2 py-1 rounded-lg text-[10px] font-bold ${ev.type === 'غياب' ? 'bg-stone-200 text-stone-500' :
-                                                        ev.type === 'تأخر' ? 'bg-[hsla(var(--gold),.10)] text-[hsl(var(--gold))]' :
+                                                        ev.type === 'تأخر' ? 'bg-[hsla(var(--accent-primary),.10)] text-[hsl(var(--accent-primary))]' :
                                                             'bg-rose-500/10 text-rose-500'
                                                         }`}>
                                                         {ev.type}

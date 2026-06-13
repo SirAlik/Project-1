@@ -248,7 +248,7 @@ export function SessionList({
                                 ) : null}
 
                                 {s.follow_up_required ? (
-                                    <div className="mt-2 text-xs text-[hsla(var(--gold),.65)]">
+                                    <div className="mt-2 text-xs text-[hsla(var(--accent-primary),.65)]">
                                         🔔 متابعة مطلوبة {s.follow_up_date ? `— تاريخ: ${s.follow_up_date}` : ""}
                                     </div>
                                 ) : null}

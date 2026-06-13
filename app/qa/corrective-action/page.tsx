@@ -21,7 +21,7 @@ interface NcrRow {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   open:                   { label: 'مفتوح',              color: 'text-amber-500  bg-amber-500/10  border-amber-500/20',  icon: <Clock      className="w-3 h-3" /> },
   in_progress:            { label: 'قيد التنفيذ',        color: 'text-blue-500   bg-blue-500/10   border-blue-500/20',   icon: <ShieldAlert className="w-3 h-3" /> },
-  awaiting_verification:  { label: 'بانتظار التحقق',     color: 'text-purple-500 bg-purple-500/10 border-purple-500/20', icon: <FileSearch  className="w-3 h-3" /> },
+  awaiting_verification:  { label: 'بانتظار التحقق',     color: 'text-teal-500 bg-teal-500/10 border-teal-500/20', icon: <FileSearch  className="w-3 h-3" /> },
   closed_effective:       { label: 'مغلق — فعّال',       color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20', icon: <CheckCircle2 className="w-3 h-3" /> },
   closed_ineffective:     { label: 'مغلق — غير فعّال',   color: 'text-rose-500   bg-rose-500/10   border-rose-500/20',   icon: <XCircle     className="w-3 h-3" /> },
   cancelled:              { label: 'ملغى',               color: 'text-muted-foreground bg-muted border-border',           icon: <XCircle     className="w-3 h-3" /> },
@@ -109,7 +109,7 @@ export default async function CorrectiveActionListPage() {
           {[
             { label: 'مفتوح',           value: counts.open,                 color: 'text-amber-500' },
             { label: 'قيد التنفيذ',     value: counts.in_progress,          color: 'text-blue-500' },
-            { label: 'بانتظار التحقق',  value: counts.awaiting_verification, color: 'text-purple-500' },
+            { label: 'بانتظار التحقق',  value: counts.awaiting_verification, color: 'text-teal-500' },
             { label: 'مغلق',            value: counts.closed,               color: 'text-emerald-500' },
           ].map(s => (
             <div key={s.label} className="border border-border rounded-2xl bg-card p-4 text-center">

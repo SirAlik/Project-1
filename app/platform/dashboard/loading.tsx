@@ -12,7 +12,7 @@ export default function SystemOwnerDashboardLoading() {
         <div className="min-h-screen bg-[var(--bg)] text-[var(--text)] p-6 lg:p-10" dir="rtl">
             <div className="max-w-7xl mx-auto space-y-10">
                 {/* Context Banner Skeleton - matches IdentityStrip */}
-                <div className="p-4 rounded-2xl bg-[hsla(var(--gold),.10)] border border-[hsla(var(--gold),.20)] flex items-center justify-between min-h-[56px]">
+                <div className="p-4 rounded-2xl bg-[hsla(var(--accent-primary),.10)] border border-[hsla(var(--accent-primary),.20)] flex items-center justify-between min-h-[56px]">
                     <div className="flex items-center gap-3">
                         <GlassSkeleton variant="circle" className="w-5 h-5" />
                         <GlassSkeleton variant="text" className="w-48 h-4" />
@@ -25,7 +25,7 @@ export default function SystemOwnerDashboardLoading() {
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 min-h-[72px]">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-10 h-10 rounded-xl bg-[hsla(var(--gold),.10)] flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-[hsla(var(--accent-primary),.10)] flex items-center justify-center">
                                 <GlassSkeleton variant="circle" className="w-5 h-5" />
                             </div>
                             <GlassSkeleton variant="text" className="w-40 h-8" />
@@ -85,7 +85,7 @@ export default function SystemOwnerDashboardLoading() {
                     {[1, 2, 3].map((i) => (
                         <div
                             key={i}
-                            className={`glass-card p-6 rounded-2xl border border-slate-200 min-h-[160px] ${i === 1 ? "border-l-4 border-l-[hsl(var(--gold))]" : ""
+                            className={`glass-card p-6 rounded-2xl border border-slate-200 min-h-[160px] ${i === 1 ? "border-l-4 border-l-[hsl(var(--accent-primary))]" : ""
                                 }`}
                         >
                             <GlassSkeleton variant="text" className="w-32 h-5 mb-4" />

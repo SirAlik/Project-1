@@ -100,8 +100,8 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
             <div className="bg-white border border-stone-200 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
                 <div className="p-6 border-b border-stone-200 flex justify-between items-center bg-white/80">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[hsla(var(--gold),.20)] flex items-center justify-center border border-[hsla(var(--gold),.20)]">
-                            <Upload className="w-5 h-5 text-[hsl(var(--gold))]" />
+                        <div className="w-10 h-10 rounded-xl bg-[hsla(var(--accent-primary),.20)] flex items-center justify-center border border-[hsla(var(--accent-primary),.20)]">
+                            <Upload className="w-5 h-5 text-[hsl(var(--accent-primary))]" />
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-stone-800">استيراد جماعي (CSV)</h2>
@@ -175,7 +175,7 @@ export function BulkUploadModal({ isOpen, onClose, onSuccess, classes }: Props) 
                             <button
                                 onClick={handleUpload}
                                 disabled={!file || loading}
-                                className="w-full bg-[hsl(var(--gold))] hover:opacity-90 text-black font-bold py-3 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                className="w-full bg-[hsl(var(--accent-primary))] hover:opacity-90 text-black font-bold py-3 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {loading ? (
                                     <><Loader2 className="w-4 h-4 animate-spin" /> جاري الاستيراد...</>

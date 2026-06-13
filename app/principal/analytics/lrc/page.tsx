@@ -69,7 +69,7 @@ export default function LRCAnalytics() {
                         { label: 'إعارات اليوم', value: stats.booksBorrowedToday, icon: Book, color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' },
                         { label: 'نسبة الإرجاع', value: `%${stats.returnRate}`, icon: RefreshCw, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
                         { label: 'كتب متأخرة', value: stats.overdueCount, icon: AlertCircle, color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/20' },
-                        { label: 'إجمالي الكتب', value: stats.totalBooks, icon: BookOpen, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'إجمالي الكتب', value: stats.totalBooks, icon: BookOpen, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                     ].map((item, idx) => (
                         <motion.div
                             key={idx}

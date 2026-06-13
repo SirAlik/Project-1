@@ -72,7 +72,7 @@ export function EventCalendar({ events, onSelectEvent }: EventCalendarProps) {
                                     <div
                                         key={event.id}
                                         onClick={(e) => { e.stopPropagation(); onSelectEvent(event); }}
-                                        className={`h-1.5 w-full rounded-full transition-all group-hover:scale-y-125 ${event.type === 'competition' ? 'bg-[hsl(var(--gold))]' :
+                                        className={`h-1.5 w-full rounded-full transition-all group-hover:scale-y-125 ${event.type === 'competition' ? 'bg-[hsl(var(--accent-primary))]' :
                                             event.type === 'meeting' ? 'bg-zinc-400' :
                                                 'bg-blue-500'
                                             }`}
@@ -97,7 +97,7 @@ export function EventCalendar({ events, onSelectEvent }: EventCalendarProps) {
                     <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">فعالية</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[hsl(var(--gold))]" />
+                    <div className="w-2 h-2 rounded-full bg-[hsl(var(--accent-primary))]" />
                     <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">مسابقة</span>
                 </div>
                 <div className="flex items-center gap-2">

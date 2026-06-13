@@ -21,7 +21,7 @@ export default function ClassCockpit() {
         return (
             <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-[hsla(var(--gold),.25)] border-t-[hsl(var(--gold))] rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-[hsla(var(--accent-primary),.25)] border-t-[hsl(var(--accent-primary))] rounded-full animate-spin" />
                     <p className="text-stone-500 font-medium animate-pulse">جاري تحليل &quot;شخصية&quot; الفصل...</p>
                 </div>
             </div>
@@ -32,7 +32,7 @@ export default function ClassCockpit() {
         <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[hsla(var(--gold),.05)] rounded-full blur-[120px]" />
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[hsla(var(--accent-primary),.05)] rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[120px]" />
             </div>
 
@@ -58,7 +58,7 @@ export default function ClassCockpit() {
 
                     <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md text-xs text-stone-500">
                         <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-[hsl(var(--gold))] rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-[hsl(var(--accent-primary))] rounded-full animate-pulse" />
                             تحليل ذكي للسلوك والتحصيل
                         </div>
                     </div>
@@ -73,7 +73,7 @@ export default function ClassCockpit() {
                                     <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#e7e5e4" strokeWidth="8" strokeLinecap="round" />
                                     <path
                                         d="M 10 50 A 40 40 0 0 1 90 50"
-                                        fill="none" stroke="hsl(var(--gold))" strokeWidth="8" strokeLinecap="round"
+                                        fill="none" stroke="hsl(var(--accent-primary))" strokeWidth="8" strokeLinecap="round"
                                         strokeDasharray="126"
                                         strokeDashoffset={126 - (126 * (stats.disciplineScore / 100))}
                                         className="transition-all duration-1000"

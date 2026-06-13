@@ -151,7 +151,7 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
                     <div className="bg-white/80 border border-stone-200 rounded-2xl overflow-hidden">
                         <div className="p-4 border-b border-stone-200">
                             <h3 className="text-sm font-black flex items-center gap-2">
-                                <TrendingUp className="w-4 h-4 text-[hsl(var(--gold))]" />
+                                <TrendingUp className="w-4 h-4 text-[hsl(var(--accent-primary))]" />
                                 أكثر الطلاب تأخراً (Top 10)
                             </h3>
                         </div>
@@ -164,7 +164,7 @@ export function DeepDiveModal({ isOpen, onClose, students, attendance, type }: D
                                         </div>
                                         <span className="text-sm font-bold">{student.name}</span>
                                     </div>
-                                    <span className={`px-3 py-1 rounded-lg text-xs font-black ${student.count >= 5 ? 'bg-rose-500/10 text-rose-500' : 'bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))]'}`}>
+                                    <span className={`px-3 py-1 rounded-lg text-xs font-black ${student.count >= 5 ? 'bg-rose-500/10 text-rose-500' : 'bg-[hsla(var(--accent-primary),.15)] text-[hsl(var(--accent-primary))]'}`}>
                                         {student.count} مرات
                                     </span>
                                 </div>

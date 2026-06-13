@@ -62,7 +62,7 @@ export function RandomPicker({
                                 </button>
                                 <button
                                     onClick={() => setPickerType("train")}
-                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${pickerType === 'train' ? 'bg-[hsl(var(--gold-strong))] text-white shadow-lg shadow-[hsla(var(--gold),.20)]' : 'bg-white/5 text-stone-500 hover:text-foreground'}`}
+                                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${pickerType === 'train' ? 'bg-[hsl(var(--accent-primary))] text-white shadow-lg shadow-[hsla(var(--accent-primary),.20)]' : 'bg-white/5 text-stone-500 hover:text-foreground'}`}
                                 >
                                     القطار السريع 🚅
                                 </button>
@@ -95,7 +95,7 @@ export function RandomPicker({
                                         >
                                             {pickedStudent.name[0]}
                                         </motion.div>
-                                        <div className="absolute -top-4 -right-4 w-12 h-12 bg-[hsl(var(--gold))] rounded-full flex items-center justify-center shadow-lg border-4 border-[#09090b]">
+                                        <div className="absolute -top-4 -right-4 w-12 h-12 bg-[hsl(var(--accent-primary))] rounded-full flex items-center justify-center shadow-lg border-4 border-[#09090b]">
                                             <Trophy className="text-white w-6 h-6" />
                                         </div>
                                     </div>

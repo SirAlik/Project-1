@@ -160,7 +160,7 @@ export function DryRunDashboard({ data, onValidated, onProceed, onBack }: DryRun
     const stats = [
         { label: 'إجمالي السجلات', value: data.length, icon: <RefreshCw size={14} />, color: 'bg-white/5 text-white' },
         { label: 'سجلات جديدة', value: readyCount, icon: <CheckCircle2 size={14} />, color: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-        { label: 'تحديث بيانات', value: updateCount, icon: <RefreshCw size={14} />, color: 'bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] border-[hsla(var(--gold),.25)]' },
+        { label: 'تحديث بيانات', value: updateCount, icon: <RefreshCw size={14} />, color: 'bg-[hsla(var(--accent-primary),.15)] text-[hsl(var(--accent-primary))] border-[hsla(var(--accent-primary),.25)]' },
         { label: 'أخطاء حرجة', value: errorCount, icon: <AlertCircle size={14} />, color: 'bg-rose-500/10 text-rose-400 border-rose-500/20' },
     ];
 
@@ -275,7 +275,7 @@ export function DryRunDashboard({ data, onValidated, onProceed, onBack }: DryRun
                                 return (
                                     <tr
                                         key={i}
-                                        className={`border-b border-white/5 transition-colors ${error ? 'bg-rose-500/5 hover:bg-rose-500/10' : (isUpdate ? 'bg-[hsla(var(--gold),.08)] hover:bg-[hsla(var(--gold),.15)]' : 'hover:bg-white/5')}`}
+                                        className={`border-b border-white/5 transition-colors ${error ? 'bg-rose-500/5 hover:bg-rose-500/10' : (isUpdate ? 'bg-[hsla(var(--accent-primary),.08)] hover:bg-[hsla(var(--accent-primary),.15)]' : 'hover:bg-white/5')}`}
                                     >
                                         <td className="p-4 text-sm font-bold text-white/90">{row.full_name}</td>
                                         <td className="p-4 text-xs font-mono text-muted">{row.email}</td>
@@ -287,7 +287,7 @@ export function DryRunDashboard({ data, onValidated, onProceed, onBack }: DryRun
                                                     <AlertCircle size={10} /> {error}
                                                 </div>
                                             ) : isUpdate ? (
-                                                <div className="flex items-center justify-center gap-1 text-[8px] font-black bg-[hsla(var(--gold),.25)] text-[hsl(var(--gold))] px-2 py-1 rounded-full border border-[hsla(var(--gold),.35)]">
+                                                <div className="flex items-center justify-center gap-1 text-[8px] font-black bg-[hsla(var(--accent-primary),.25)] text-[hsl(var(--accent-primary))] px-2 py-1 rounded-full border border-[hsla(var(--accent-primary),.35)]">
                                                     تحديث ملف
                                                 </div>
                                             ) : isNew ? (

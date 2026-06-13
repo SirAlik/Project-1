@@ -35,14 +35,14 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
                             className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform duration-500"
                         />
                     </div>
-                    <h1 className="text-xs font-black text-purple-400 bg-purple-500/10 px-8 py-2 rounded-full border border-purple-500/20 shadow-inner tracking-widest uppercase">
+                    <h1 className="text-xs font-black text-teal-400 bg-teal-500/10 px-8 py-2 rounded-full border border-teal-500/20 shadow-inner tracking-widest uppercase">
                         {title}
                     </h1>
                 </div>
 
                 <div className="text-center md:text-left">
                     <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">QMS Standard</p>
-                    <p className="text-[10px] text-purple-500 font-bold">{code}</p>
+                    <p className="text-[10px] text-teal-500 font-bold">{code}</p>
                 </div>
             </header>
 
@@ -56,7 +56,7 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
                 </div>
                 <button
                     onClick={() => exportToOfficialPDF(id, fileName, code)}
-                    className="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:scale-105 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-purple-600/20 active:scale-95"
+                    className="flex items-center gap-3 bg-gradient-to-r from-teal-600 to-blue-600 hover:scale-105 text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-teal-600/20 active:scale-95"
                 >
                     <Download className="w-4 h-4" /> تصدير PDF رسمي
                 </button>

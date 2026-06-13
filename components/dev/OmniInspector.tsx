@@ -90,7 +90,7 @@ function OmniInspectorInner() {
             {/* Toggle Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-4 right-4 z-[9998] w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+                className="fixed bottom-4 right-4 z-[9998] w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-teal-600 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
                 title="Omni-Inspector (Ctrl+Alt+P)"
                 aria-label="Toggle Omni-Inspector"
             >
@@ -108,7 +108,7 @@ function OmniInspectorInner() {
                         className="fixed bottom-16 right-4 z-[9999] w-[420px] max-h-[70vh] bg-slate-900/95 border border-cyan-500/30 rounded-2xl shadow-2xl backdrop-blur-lg overflow-hidden flex flex-col"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-gradient-to-r from-cyan-500/10 to-purple-500/10">
+                        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-gradient-to-r from-cyan-500/10 to-teal-500/10">
                             <div className="flex items-center gap-2">
                                 <Shield size={18} className="text-cyan-400" />
                                 <span className="font-bold text-sm text-white">Omni-Inspector</span>
@@ -324,7 +324,7 @@ function TimelineTab({ traces }: { traces: TraceEntry[] }) {
                             key={trace.traceId}
                             className={`flex items-center gap-2 py-1 text-[11px] border-l-2 pl-2 ${trace.type === 'auth' ? 'border-cyan-500' :
                                 trace.type === 'db' ? 'border-violet-400' :
-                                    'border-[hsl(var(--gold))]'
+                                    'border-[hsl(var(--accent-primary))]'
                                 }`}
                         >
                             <span className="text-white/40 w-16 shrink-0">

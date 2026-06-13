@@ -137,24 +137,24 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md animate-in fade-in duration-300">
             {/* Main Modal */}
             <Card className="w-full max-w-4xl bg-card p-0 relative overflow-hidden shadow-2xl shadow-primary/10 border-border">
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-600 via-blue-500 to-purple-600" />
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-600 via-blue-500 to-teal-600" />
 
                 <header className="p-8 border-b border-border flex justify-between items-center bg-muted/30">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
                             <Trophy className="text-white w-8 h-8" />
                         </div>
                         <div>
                             <h2 className="text-2xl font-black text-foreground flex items-center gap-3">
                                 قائمة فرسان الانضباط
-                                <span className="text-[10px] bg-purple-500/10 text-purple-500 px-3 py-1 rounded-full border border-purple-500/20 uppercase tracking-widest font-black">شهري</span>
+                                <span className="text-[10px] bg-teal-500/10 text-teal-500 px-3 py-1 rounded-full border border-teal-500/20 uppercase tracking-widest font-black">شهري</span>
                             </h2>
                             <p className="text-muted-foreground text-sm mt-1">الطلاب المتميزون بـ (صفر غياب، صفر تأخير، صفر مخالفات)</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="bg-background rounded-xl px-4 py-2 flex items-center gap-3 border border-border text-foreground">
-                            <Calendar className="w-4 h-4 text-purple-500" />
+                            <Calendar className="w-4 h-4 text-teal-500" />
                             <select
                                 value={selectedMonth}
                                 onChange={(e) => setSelectedMonth(Number(e.target.value))}
@@ -184,8 +184,8 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                                 <div key={student.id} className="group relative bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-all">
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-                                                <User className="text-purple-500 w-6 h-6" />
+                                            <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
+                                                <User className="text-teal-500 w-6 h-6" />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">{student.name}</h4>
@@ -198,7 +198,7 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                                                     disabled={!student.is_approved}
                                                     onClick={() => generatePDF(student)}
                                                     className={`font-black px-4 py-2 rounded-xl text-[10px] uppercase flex items-center gap-2 transition-all shadow-lg active:scale-95 ${student.is_approved
-                                                        ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-purple-600/20 hover:shadow-purple-600/40"
+                                                        ? "bg-gradient-to-r from-teal-600 to-blue-600 text-white shadow-teal-600/20 hover:shadow-teal-600/40"
                                                         : "bg-muted text-muted-foreground cursor-not-allowed border border-border"
                                                         }`}
                                                     title={!student.is_approved ? "بانتظار الموافقة على الشهادة" : ""}
@@ -207,7 +207,7 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                                                 </button>
                                             )}
                                             {!student.is_approved && (
-                                                <span className="text-[10px] text-purple-500/70 italic font-bold">بانتظار الموافقة</span>
+                                                <span className="text-[10px] text-teal-500/70 italic font-bold">بانتظار الموافقة</span>
                                             )}
                                         </div>
                                     </div>
@@ -238,8 +238,8 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                 {currentStudent && (
                     <div id="certificate-content" className="w-[1123px] h-[794px] bg-white p-20 relative text-zinc-900 font-serif" dir="rtl">
                         {/* Border Decoration */}
-                        <div className="absolute inset-4 border-[10px] border-[hsla(var(--gold),.20)]" />
-                        <div className="absolute inset-8 border-2 border-[hsl(var(--gold))]" />
+                        <div className="absolute inset-4 border-[10px] border-[hsla(var(--accent-primary),.20)]" />
+                        <div className="absolute inset-8 border-2 border-[hsl(var(--accent-primary))]" />
 
                         {/* Header */}
                         <div className="flex justify-between items-start mb-20 relative">
@@ -248,8 +248,8 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                                 <h3 className="text-xl font-bold">وزارة التعليم</h3>
                                 <h3 className="text-lg">مدرسة ذكية متطورة</h3>
                             </div>
-                            <div className="w-32 h-32 bg-zinc-100 rounded-full flex items-center justify-center border-2 border-[hsl(var(--gold))]">
-                                <ShieldCheck className="w-16 h-16 text-[hsl(var(--gold))]" />
+                            <div className="w-32 h-32 bg-zinc-100 rounded-full flex items-center justify-center border-2 border-[hsl(var(--accent-primary))]">
+                                <ShieldCheck className="w-16 h-16 text-[hsl(var(--accent-primary))]" />
                             </div>
                             <div className="text-center">
                                 <h3 className="text-sm font-bold">التاريخ: {new Date().toLocaleDateString('ar-SA')}هـ</h3>
@@ -259,15 +259,15 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
 
                         {/* Body */}
                         <div className="text-center relative">
-                            <h1 className="text-6xl font-black text-[hsl(var(--gold-strong))] mb-12">شهادة شكر وتقدير</h1>
+                            <h1 className="text-6xl font-black text-[hsl(var(--accent-primary))] mb-12">شهادة شكر وتقدير</h1>
                             <p className="text-2xl mb-8">يسر إدارة المدرسة أن تتقدم بوافر الشكر والتقدير للفارس:</p>
-                            <h2 className="text-5xl font-black text-zinc-900 border-b-4 border-[hsl(var(--gold))] inline-block px-12 py-4 mb-8">
+                            <h2 className="text-5xl font-black text-zinc-900 border-b-4 border-[hsl(var(--accent-primary))] inline-block px-12 py-4 mb-8">
                                 {currentStudent.name}
                             </h2>
                             <p className="text-2xl mb-12 leading-relaxed">
                                 من فصل: <span className="font-bold">{currentStudent.class}</span> <br />
                                 وذلك نظير انضباطه المتميز وتحقيقه (صفر) غياب وتأخير ومخالفات <br />
-                                خلال شهر <span className="font-bold text-[hsl(var(--gold-strong))]">{HIJRI_MONTHS[selectedMonth]}</span> لعام ١٤٤٥هـ
+                                خلال شهر <span className="font-bold text-[hsl(var(--accent-primary))]">{HIJRI_MONTHS[selectedMonth]}</span> لعام ١٤٤٥هـ
                             </p>
                         </div>
 
@@ -277,8 +277,8 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                                 <p className="text-xl font-bold mb-16">وكيل شؤون الطلاب</p>
                                 <p className="text-lg">..........................</p>
                             </div>
-                            <div className="w-40 h-40 border-4 border-dashed border-[hsla(var(--gold),.30)] flex items-center justify-center rounded-full opacity-50 rotate-12">
-                                <p className="text-[hsl(var(--gold))] font-bold text-sm text-center">ختم وتوقيع <br /> مدير المدرسة</p>
+                            <div className="w-40 h-40 border-4 border-dashed border-[hsla(var(--accent-primary),.30)] flex items-center justify-center rounded-full opacity-50 rotate-12">
+                                <p className="text-[hsl(var(--accent-primary))] font-bold text-sm text-center">ختم وتوقيع <br /> مدير المدرسة</p>
                             </div>
                             <div className="text-center">
                                 <p className="text-xl font-bold mb-16">مدير المدرسة</p>
@@ -287,7 +287,7 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                         </div>
 
                         {/* Decorative Icons */}
-                        <Trophy className="absolute bottom-10 right-10 w-24 h-24 text-[hsla(var(--gold),.10)] rotate-12" />
+                        <Trophy className="absolute bottom-10 right-10 w-24 h-24 text-[hsla(var(--accent-primary),.10)] rotate-12" />
                     </div>
                 )}
             </div>

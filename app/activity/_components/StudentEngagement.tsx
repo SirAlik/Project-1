@@ -57,7 +57,7 @@ export function StudentEngagement({
                             : "text-stone-500 hover:text-stone-600"
                             }`}
                     >
-                        <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-[hsl(var(--gold))]" : "text-stone-500"}`} />
+                        <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? "text-[hsl(var(--accent-primary))]" : "text-stone-500"}`} />
                         {tab.label}
                     </button>
                 ))}
@@ -72,7 +72,7 @@ export function StudentEngagement({
                         <div className="bg-white/80 border border-stone-200 rounded-[2.5rem] p-8">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-lg font-black text-foreground">إحصائيات الرغبات</h3>
-                                <span className="text-[10px] font-black bg-[hsla(var(--gold),.10)] text-[hsl(var(--gold))] px-3 py-1 rounded-full border border-[hsla(var(--gold),.20)] uppercase tracking-widest">مباشر</span>
+                                <span className="text-[10px] font-black bg-[hsla(var(--accent-primary),.10)] text-[hsl(var(--accent-primary))] px-3 py-1 rounded-full border border-[hsla(var(--accent-primary),.20)] uppercase tracking-widest">مباشر</span>
                             </div>
                             <div className="space-y-4">
                                 {clubs.map(club => {
@@ -86,7 +86,7 @@ export function StudentEngagement({
                                             </div>
                                             <div className="h-2 bg-white rounded-full overflow-hidden border border-stone-200 group">
                                                 <div
-                                                    className="h-full bg-gradient-to-r from-[hsl(var(--gold-strong))] to-[hsl(var(--gold))] transition-all duration-1000 group-hover:brightness-125"
+                                                    className="h-full bg-gradient-to-r from-[hsl(var(--accent-primary))] to-[hsl(var(--accent-primary))] transition-all duration-1000 group-hover:brightness-125"
                                                     style={{ width: `${Math.min((firstChoices / students.length) * 100 * 5, 100)}%` }}
                                                 />
                                             </div>
@@ -129,7 +129,7 @@ function StudentWishesForm({ clubs, students, onSubmit }: { clubs: ActivityClub[
 
     return (
         <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[hsla(var(--gold),.50)] to-transparent opacity-50" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[hsla(var(--accent-primary),.50)] to-transparent opacity-50" />
             <h3 className="text-lg font-black text-foreground mb-6">نموذج تسجيل الرغبات</h3>
 
             <div className="space-y-6">
@@ -137,7 +137,7 @@ function StudentWishesForm({ clubs, students, onSubmit }: { clubs: ActivityClub[
                     <label className="text-xs font-black text-stone-500 mr-2 uppercase tracking-widest">بحث عن الطالب</label>
                     <div className="relative">
                         <input
-                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all pr-12"
+                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all pr-12"
                             placeholder="اكتب اسم الطالب..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -151,7 +151,7 @@ function StudentWishesForm({ clubs, students, onSubmit }: { clubs: ActivityClub[
                                 <button
                                     key={student.id}
                                     onClick={() => { setFormData({ ...formData, student_id: student.id }); setSearch(student.name); }}
-                                    className={`w-full p-4 text-right text-xs font-bold border-b border-stone-200 last:border-0 hover:bg-stone-100 transition-all ${formData.student_id === student.id ? "bg-[hsla(var(--gold),.10)] text-[hsl(var(--gold))]" : "text-stone-500"}`}
+                                    className={`w-full p-4 text-right text-xs font-bold border-b border-stone-200 last:border-0 hover:bg-stone-100 transition-all ${formData.student_id === student.id ? "bg-[hsla(var(--accent-primary),.10)] text-[hsl(var(--accent-primary))]" : "text-stone-500"}`}
                                 >
                                     {student.name}
                                 </button>
@@ -162,14 +162,14 @@ function StudentWishesForm({ clubs, students, onSubmit }: { clubs: ActivityClub[
 
                 <div className="space-y-4 pt-4">
                     {[
-                        { id: "first_choice", label: "الرغبة الأولى", color: "text-[hsl(var(--gold))]" },
-                        { id: "second_choice", label: "الرغبة الثانية", color: "text-[hsl(var(--gold))]" },
-                        { id: "third_choice", label: "الرغبة الثالثة", color: "text-[hsl(var(--gold))]" },
+                        { id: "first_choice", label: "الرغبة الأولى", color: "text-[hsl(var(--accent-primary))]" },
+                        { id: "second_choice", label: "الرغبة الثانية", color: "text-[hsl(var(--accent-primary))]" },
+                        { id: "third_choice", label: "الرغبة الثالثة", color: "text-[hsl(var(--accent-primary))]" },
                     ].map((choice) => (
                         <div key={choice.id} className="space-y-2">
                             <label className={`text-[10px] font-black ${choice.color} mr-2 uppercase tracking-widest`}>{choice.label}</label>
                             <select
-                                className="w-full bg-stone-100 border border-stone-200 rounded-2xl px-5 py-4 text-xs font-black focus:border-[hsl(var(--gold))] outline-none appearance-none"
+                                className="w-full bg-stone-100 border border-stone-200 rounded-2xl px-5 py-4 text-xs font-black focus:border-[hsl(var(--accent-primary))] outline-none appearance-none"
                                 value={formData[choice.id as WishChoiceKey]}
                                 onChange={(e) => setFormData({ ...formData, [choice.id]: e.target.value })}
                                 aria-label={choice.label}
@@ -186,7 +186,7 @@ function StudentWishesForm({ clubs, students, onSubmit }: { clubs: ActivityClub[
                     onClick={() => onSubmit(formData)}
                     className="w-full bg-white hover:brightness-110 text-black py-4 rounded-2xl text-xs font-black tracking-widest flex items-center justify-center gap-2 transition-all disabled:opacity-20 mt-4"
                 >
-                    <CheckCircle className="w-4 h-4 text-[hsl(var(--gold))]" /> حفظ الرغبات
+                    <CheckCircle className="w-4 h-4 text-[hsl(var(--accent-primary))]" /> حفظ الرغبات
                 </button>
             </div>
         </div>
@@ -207,23 +207,23 @@ function HonorsSection({ honors, students, onAward }: { honors: StudentHonor[]; 
                     onClick={() => setShowModal(true)}
                     className="bg-stone-200 hover:bg-stone-300 text-stone-700 px-8 py-3 rounded-2xl text-xs font-black transition-all flex items-center gap-2"
                 >
-                    <Award className="w-4 h-4 text-[hsl(var(--gold))]" /> تكريم جديد
+                    <Award className="w-4 h-4 text-[hsl(var(--accent-primary))]" /> تكريم جديد
                 </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {honors.map(honor => (
-                    <div key={honor.id} className="bg-white/80 border border-stone-200 p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-[hsl(var(--gold),.30)] transition-all duration-500">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-[hsl(var(--gold),.05)] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="p-3 bg-[hsla(var(--gold),.10)] rounded-2xl w-fit mb-4">
-                            <Award className="w-6 h-6 text-[hsl(var(--gold))] shadow-[hsl(var(--gold),.20)]" />
+                    <div key={honor.id} className="bg-white/80 border border-stone-200 p-8 rounded-[2.5rem] relative overflow-hidden group hover:border-[hsl(var(--accent-primary),.30)] transition-all duration-500">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-[hsl(var(--accent-primary),.05)] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="p-3 bg-[hsla(var(--accent-primary),.10)] rounded-2xl w-fit mb-4">
+                            <Award className="w-6 h-6 text-[hsl(var(--accent-primary))] shadow-[hsl(var(--accent-primary),.20)]" />
                         </div>
                         <h4 className="text-sm font-black text-foreground mb-1">{honor.student_name}</h4>
                         <p className="text-[10px] text-stone-500 font-bold mb-4">{honor.reason}</p>
                         <div className="flex justify-between items-center pt-4 border-t border-stone-200">
                             <div>
                                 <p className="text-[8px] font-black text-stone-500 uppercase">الجائزة</p>
-                                <p className="text-[10px] font-black text-[hsl(var(--gold))]">{honor.prize || "شهادة تقدير"}</p>
+                                <p className="text-[10px] font-black text-[hsl(var(--accent-primary))]">{honor.prize || "شهادة تقدير"}</p>
                             </div>
                             <span className="text-[8px] bg-stone-200 px-2 py-1 rounded text-stone-500 font-black">{honor.awarded_date}</span>
                         </div>
@@ -260,7 +260,7 @@ function TripSection({ trips, consents, classes, onCreate }: { trips: ActivityTr
                 </div>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="bg-[hsl(var(--gold-strong))] hover:bg-[hsl(var(--gold))] text-white px-8 py-3 rounded-2xl text-xs font-black transition-all shadow-xl shadow-[hsla(var(--gold),.20)] flex items-center gap-2"
+                    className="bg-[hsl(var(--accent-primary))] hover:bg-[hsl(var(--accent-primary))] text-white px-8 py-3 rounded-2xl text-xs font-black transition-all shadow-xl shadow-[hsla(var(--accent-primary),.20)] flex items-center gap-2"
                 >
                     <Bus className="w-4 h-4" /> إنشاء رحلة جديدة
                 </button>
@@ -273,8 +273,8 @@ function TripSection({ trips, consents, classes, onCreate }: { trips: ActivityTr
                     return (
                         <div key={trip.id} className="bg-white/80 border border-stone-200 rounded-3xl p-6 flex flex-col md:flex-row justify-between items-center gap-6 hover:bg-white/80 transition-all">
                             <div className="flex items-center gap-4">
-                                <div className="p-4 bg-[hsla(var(--gold),.10)] rounded-2xl">
-                                    <Bus className="w-6 h-6 text-[hsl(var(--gold))]" />
+                                <div className="p-4 bg-[hsla(var(--accent-primary),.10)] rounded-2xl">
+                                    <Bus className="w-6 h-6 text-[hsl(var(--accent-primary))]" />
                                 </div>
                                 <div>
                                     <h4 className="text-base font-black text-foreground">{trip.title}</h4>
@@ -308,7 +308,7 @@ function TripSection({ trips, consents, classes, onCreate }: { trips: ActivityTr
                                         const firstConsent = tripConsents[0];
                                         if (firstConsent) copyToClipboard(`${window.location.origin}/activity/consent/${firstConsent.unique_link}`);
                                     }}
-                                    className="p-3 bg-stone-200 hover:bg-[hsla(var(--gold),.20)] hover:text-[hsl(var(--gold))] text-stone-500 rounded-2xl transition-all"
+                                    className="p-3 bg-stone-200 hover:bg-[hsla(var(--accent-primary),.20)] hover:text-[hsl(var(--accent-primary))] text-stone-500 rounded-2xl transition-all"
                                     title="نسخ رابط أول طالب (اختبار)"
                                     aria-label="نسخ رابط الاختبار"
                                 >
@@ -332,7 +332,7 @@ function TripSection({ trips, consents, classes, onCreate }: { trips: ActivityTr
                                                     </span>
                                                     <button
                                                         onClick={() => copyToClipboard(`${window.location.origin}/activity/consent/${c.unique_link}`)}
-                                                        className="p-2 hover:bg-[hsla(var(--gold),.10)] hover:text-[hsl(var(--gold))] text-stone-500 rounded-xl transition-all"
+                                                        className="p-2 hover:bg-[hsla(var(--accent-primary),.10)] hover:text-[hsl(var(--accent-primary))] text-stone-500 rounded-xl transition-all"
                                                         aria-label="نسخ رابط الموافقة"
                                                     >
                                                         <Share2 className="w-4 h-4" />
@@ -374,13 +374,13 @@ function AwardModal({ students, onClose, onSubmit }: { students: { id: string; n
             <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
                 <div className="p-8 border-b border-stone-200 bg-white/80 flex justify-between items-center">
                     <h3 className="text-xl font-black text-foreground">إضافة إنجاز طالب</h3>
-                    <Award className="w-6 h-6 text-[hsl(var(--gold))]" />
+                    <Award className="w-6 h-6 text-[hsl(var(--accent-primary))]" />
                 </div>
                 <div className="p-8 space-y-6">
                     <div className="space-y-2">
                         <label className="text-xs font-black text-stone-500 uppercase tracking-widest">اختيار الطالب المكرم</label>
                         <select
-                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none"
+                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none"
                             value={formData.student_id}
                             onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
                             aria-label="اختيار الطالب"
@@ -421,7 +421,7 @@ function AwardModal({ students, onClose, onSubmit }: { students: { id: string; n
                     <button
                         disabled={!formData.student_id}
                         onClick={() => onSubmit(formData)}
-                        className="flex-1 bg-[hsl(var(--gold))] hover:bg-[hsl(var(--gold-strong))] text-black py-4 rounded-2xl text-xs font-black transition-all disabled:opacity-30"
+                        className="flex-1 bg-[hsl(var(--accent-primary))] hover:bg-[hsl(var(--accent-primary))] text-black py-4 rounded-2xl text-xs font-black transition-all disabled:opacity-30"
                     >
                         اعتماد التكريم
                     </button>
@@ -446,13 +446,13 @@ function TripModal({ classes, onClose, onSubmit }: { classes: { id: string; name
             <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] w-full max-w-[600px] overflow-hidden shadow-2xl">
                 <div className="p-8 border-b border-stone-200 bg-white/80 flex justify-between items-center text-right">
                     <h3 className="text-xl font-black text-foreground">تخطيط رحلة أو زيارة خارجية</h3>
-                    <Bus className="w-6 h-6 text-[hsl(var(--gold))]" />
+                    <Bus className="w-6 h-6 text-[hsl(var(--accent-primary))]" />
                 </div>
                 <div className="p-8 grid grid-cols-2 gap-6">
                     <div className="col-span-2 space-y-2">
                         <label className="text-xs font-black text-stone-500 uppercase">مسمى البرنامج</label>
                         <input
-                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all placeholder:text-stone-400 text-right"
+                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all placeholder:text-stone-400 text-right"
                             placeholder="مثال: زيارة لمركز الملك عبد العزيز الإثرائي"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -488,7 +488,7 @@ function TripModal({ classes, onClose, onSubmit }: { classes: { id: string; name
                                         const exists = formData.target_classes.includes(c.id);
                                         setFormData({ ...formData, target_classes: exists ? formData.target_classes.filter(id => id !== c.id) : [...formData.target_classes, c.id] });
                                     }}
-                                    className={`px-3 py-2 rounded-xl text-[10px] font-black border transition-all ${formData.target_classes.includes(c.id) ? "bg-[hsl(var(--gold))] border-[hsl(var(--gold))] text-white" : "bg-white border-stone-200 text-stone-500 hover:border-stone-300"}`}
+                                    className={`px-3 py-2 rounded-xl text-[10px] font-black border transition-all ${formData.target_classes.includes(c.id) ? "bg-[hsl(var(--accent-primary))] border-[hsl(var(--accent-primary))] text-white" : "bg-white border-stone-200 text-stone-500 hover:border-stone-300"}`}
                                 >
                                     {c.name}
                                 </button>

@@ -33,7 +33,7 @@ export default function StudentAffairsAnalyticsPage() {
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-500/5 rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-teal-500/5 rounded-full blur-[120px]" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto pb-20">
@@ -82,7 +82,7 @@ export default function StudentAffairsAnalyticsPage() {
                     {[
                         { label: 'نسبة الحضور', value: `%${stats.attendanceRate}`, icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20' },
                         { label: 'نسبة الانضباط', value: `%${stats.disciplineRate}`, icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
-                        { label: 'نسبة التأخر الصباحي', value: `%${stats.lateRate}`, icon: Clock, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'نسبة التأخر الصباحي', value: `%${stats.lateRate}`, icon: Clock, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                         { label: 'طلاب تحت الملاحظة (EWS)', value: stats.activeEWS, icon: AlertTriangle, color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/20' },
                     ].map((item, idx) => (
                         <motion.div

@@ -158,7 +158,7 @@ export default function TeacherArena() {
                                                 key={p}
                                                 className={`aspect-square rounded-md border border-stone-200 transition-all
                                                 ${cell?.status === 'free' ? 'bg-emerald-500/20 border-emerald-500/30' :
-                                                        cell?.status === 'sub' ? 'bg-[hsla(var(--gold),.20)] border-[hsla(var(--gold),.30)] animate-pulse' :
+                                                        cell?.status === 'sub' ? 'bg-[hsla(var(--accent-primary),.20)] border-[hsla(var(--accent-primary),.30)] animate-pulse' :
                                                             'bg-stone-100/80'}`}
                                             />
                                         );
@@ -169,7 +169,7 @@ export default function TeacherArena() {
                         <div className="mt-6 flex justify-between items-center text-[9px] text-stone-500 uppercase font-black">
                             <div className="flex gap-4">
                                 <span className="flex items-center gap-1"><div className="w-2 h-2 bg-emerald-500/20 rounded-sm" /> متاح</span>
-                                <span className="flex items-center gap-1"><div className="w-2 h-2 bg-[hsla(var(--gold),.20)] rounded-sm" /> انتظار</span>
+                                <span className="flex items-center gap-1"><div className="w-2 h-2 bg-[hsla(var(--accent-primary),.20)] rounded-sm" /> انتظار</span>
                                 <span className="flex items-center gap-1"><div className="w-2 h-2 bg-stone-100/80 rounded-sm" /> مشغول</span>
                             </div>
                             <Link href="/classroom" className="text-indigo-400 hover:text-indigo-300">فتح الجدول الكامل ←</Link>

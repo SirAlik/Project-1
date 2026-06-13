@@ -91,7 +91,7 @@ export function ExportButtons({ data }: ExportButtonsProps) {
                 >
                     <div className="flex justify-between items-start mb-6">
                         <div className="p-4 bg-white rounded-2xl border border-stone-200">
-                            <FileDown className="w-5 h-5 text-stone-500 group-hover:text-[hsl(var(--gold))] transition-colors" />
+                            <FileDown className="w-5 h-5 text-stone-500 group-hover:text-[hsl(var(--accent-primary))] transition-colors" />
                         </div>
                         <span className="text-[10px] font-black text-stone-500 uppercase tracking-widest">{report.code}</span>
                     </div>
@@ -121,7 +121,7 @@ export function ExportButtons({ data }: ExportButtonsProps) {
 
 
             {/* Special Main Record */}
-            <div className="lg:col-span-1 group bg-gradient-to-br from-[hsl(var(--gold-strong))] to-[hsl(var(--gold))] p-8 rounded-[2.5rem] shadow-xl shadow-[hsla(var(--gold),.20)] transition-all duration-500 relative overflow-hidden">
+            <div className="lg:col-span-1 group bg-gradient-to-br from-[hsl(var(--accent-primary))] to-[hsl(var(--accent-primary))] p-8 rounded-[2.5rem] shadow-xl shadow-[hsla(var(--accent-primary),.20)] transition-all duration-500 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full bg-stone-200/70 opacity-0 group-hover:opacity-100 transition-opacity" />
                 <div className="flex justify-between items-start mb-6">
                     <div className="p-4 bg-white/20 backdrop-blur-md rounded-2xl border border-stone-200">
@@ -140,7 +140,7 @@ export function ExportButtons({ data }: ExportButtonsProps) {
                     {({ loading }) => (
                         <button
                             disabled={loading}
-                            className="w-full py-4 bg-white text-[hsl(var(--gold-strong))] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group-hover:scale-[1.02]"
+                            className="w-full py-4 bg-white text-[hsl(var(--accent-primary))] rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 group-hover:scale-[1.02]"
                         >
                             {loading ? (
                                 <>جاري التصدير... <Loader2 className="w-3 h-3 animate-spin" /></>

@@ -107,7 +107,7 @@ export function FinancialDashboard({
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as FinancialTab)}
                                 className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id
-                                    ? "bg-[hsla(var(--gold),.20)] text-[hsl(var(--gold))] shadow-inner"
+                                    ? "bg-[hsla(var(--accent-primary),.20)] text-[hsl(var(--accent-primary))] shadow-inner"
                                     : "text-stone-500 hover:text-stone-600"
                                     }`}
                             >
@@ -126,7 +126,7 @@ export function FinancialDashboard({
                         </button>
                         <button
                             onClick={() => setShowExpenseModal(true)}
-                            className="flex items-center gap-2 bg-[hsl(var(--gold-strong))] hover:bg-[hsl(var(--gold))] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-[hsla(var(--gold),.20)]"
+                            className="flex items-center gap-2 bg-[hsl(var(--accent-primary))] hover:bg-[hsl(var(--accent-primary))] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg shadow-[hsla(var(--accent-primary),.20)]"
                         >
                             <Receipt className="w-4 h-4" />
                             تسجيل مصروف
@@ -389,14 +389,14 @@ function ExpenseModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
             <div className="bg-stone-100 border border-stone-200 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="p-6 border-b border-stone-200 bg-white/80 text-right">
                     <h3 className="text-lg font-black text-foreground flex items-center gap-2 justify-end">
-                        تسجيل مصروف فعلي <Receipt className="w-5 h-5 text-[hsl(var(--gold))]" />
+                        تسجيل مصروف فعلي <Receipt className="w-5 h-5 text-[hsl(var(--accent-primary))]" />
                     </h3>
                 </div>
                 <div className="p-6 space-y-4">
                     <div className="space-y-1">
                         <label className="text-[10px] font-black text-stone-500 mr-1 uppercase">الوصف</label>
                         <input
-                            className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all text-right"
+                            className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all text-right"
                             placeholder="مثال: فاتورة شراء كؤوس الدوري"
                             value={formData.item_name}
                             onChange={(e) => setFormData({ ...formData, item_name: e.target.value })}
@@ -406,7 +406,7 @@ function ExpenseModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                         <div className="space-y-1">
                             <label className="text-[10px] font-black text-stone-500 mr-1 uppercase">رقم الفاتورة</label>
                             <input
-                                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all text-right"
+                                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all text-right"
                                 placeholder="INV-001"
                                 value={formData.invoice_number}
                                 onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
@@ -417,7 +417,7 @@ function ExpenseModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                             <label className="text-[10px] font-black text-stone-500 mr-1 uppercase">المبلغ المدفوع</label>
                             <input
                                 type="number"
-                                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all text-right"
+                                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all text-right"
                                 value={formData.amount}
                                 onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
                                 aria-label="المبلغ المدفوع"
@@ -429,7 +429,7 @@ function ExpenseModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                         <div className="relative">
                             <input
                                 type="date"
-                                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all text-right"
+                                className="w-full bg-white border border-stone-200 rounded-xl px-4 py-3 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all text-right"
                                 value={formData.date}
                                 aria-label="تاريخ الصرف"
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -441,7 +441,7 @@ function ExpenseModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                 <div className="p-6 bg-white/80 flex gap-2">
                     <button
                         onClick={() => onSubmit(formData)}
-                        className="flex-1 bg-[hsl(var(--gold-strong))] hover:bg-[hsl(var(--gold))] text-white py-3 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[hsla(var(--gold),.20)]"
+                        className="flex-1 bg-[hsl(var(--accent-primary))] hover:bg-[hsl(var(--accent-primary))] text-white py-3 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[hsla(var(--accent-primary),.20)]"
                     >
                         حفظ المصروف
                     </button>

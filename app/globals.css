@@ -118,10 +118,6 @@
   --shadow-depth-soft: 0 1px 2px rgba(17, 24, 39, 0.04), 0 4px 14px -6px rgba(17, 24, 39, 0.08);
   --shadow-depth-hover: 0 10px 28px -8px rgba(17, 24, 39, 0.12);
 
-  /* ===== Legacy gold tokens — NEUTRALIZED to teal (back-compat فقط) ===== */
-  --gold: 175 82% 32%;
-  --gold-strong: 175 84% 26%;
-
   /* ===== Glass fallbacks (deprecated → light) ===== */
   --glass-bg: var(--card);
   --glass-border: var(--border);

@@ -45,7 +45,7 @@ export function FormC51_MorningTardy() {
                                     <td className="p-3 text-stone-500 font-mono">
                                         {e.time_in ? new Date(`1970-01-01T${e.time_in}`).toLocaleTimeString("ar-SA", { hour: '2-digit', minute: '2-digit' }) : "—"}
                                     </td>
-                                    <td className="p-3 font-bold text-[hsl(var(--gold))]">
+                                    <td className="p-3 font-bold text-[hsl(var(--accent-primary))]">
                                         {e.excuse_reason || "غير محدد"}
                                     </td>
                                     <td className="p-3 text-xs text-stone-500">

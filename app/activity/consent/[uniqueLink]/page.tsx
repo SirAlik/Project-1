@@ -60,8 +60,8 @@ export default function TripConsentPage() {
         <main className="min-h-screen bg-white text-stone-800 font-sans p-6" dir="rtl">
             <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in duration-1000">
                 <header className="text-center space-y-4">
-                    <div className="inline-block p-4 bg-[hsla(var(--gold),.10)] rounded-3xl border border-[hsla(var(--gold),.20)]">
-                        <Bus className="w-10 h-10 text-[hsl(var(--gold))]" />
+                    <div className="inline-block p-4 bg-[hsla(var(--accent-primary),.10)] rounded-3xl border border-[hsla(var(--accent-primary),.20)]">
+                        <Bus className="w-10 h-10 text-[hsl(var(--accent-primary))]" />
                     </div>
                     <h1 className="text-3xl font-black text-foreground">نموذج موافقة ولي الأمر</h1>
                     <p className="text-stone-500 font-bold">بشأن المشاركة في الرحلات والزيارات الخارجية</p>
@@ -79,7 +79,7 @@ export default function TripConsentPage() {
                     <div className="p-8 space-y-6">
                         <div className="p-6 bg-white border border-stone-200 rounded-3xl">
                             <p className="text-sm text-stone-500 leading-relaxed">
-                                أنا ولي أمر الطالب <span className="text-[hsl(var(--gold))] font-black">({student?.name})</span>، أقر بموافقتي على مشاركة ابني في الرحلة المذكورة أعلاه، مع الالتزام بكافة التعليمات المنظمة للنشاط.
+                                أنا ولي أمر الطالب <span className="text-[hsl(var(--accent-primary))] font-black">({student?.name})</span>، أقر بموافقتي على مشاركة ابني في الرحلة المذكورة أعلاه، مع الالتزام بكافة التعليمات المنظمة للنشاط.
                             </p>
                         </div>
 
@@ -92,7 +92,7 @@ export default function TripConsentPage() {
                         ) : (
                             <button
                                 onClick={handleConsent}
-                                className="w-full py-5 bg-[hsl(var(--gold-strong))] hover:bg-[hsl(var(--gold))] text-white rounded-3xl text-sm font-black transition-all shadow-xl shadow-[hsla(var(--gold),.20)] flex items-center justify-center gap-3 group"
+                                className="w-full py-5 bg-[hsl(var(--accent-primary))] hover:bg-[hsl(var(--accent-primary))] text-white rounded-3xl text-sm font-black transition-all shadow-xl shadow-[hsla(var(--accent-primary),.20)] flex items-center justify-center gap-3 group"
                             >
                                 <ShieldCheck className="w-5 h-5 group-hover:scale-110 transition-transform" /> أوافق على المشاركة
                             </button>

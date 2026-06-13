@@ -32,7 +32,7 @@ export function QualityForms({ studentsList, classesList, cases, getAbsenceCount
                         key={tab.id}
                         onClick={() => setActiveForm(tab.id)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${activeForm === tab.id
-                            ? "bg-purple-600 text-white shadow-lg shadow-purple-500/20"
+                            ? "bg-teal-600 text-white shadow-lg shadow-teal-500/20"
                             : "bg-stone-100 text-stone-500 hover:bg-stone-200 border border-stone-200"
                             }`}
                     >

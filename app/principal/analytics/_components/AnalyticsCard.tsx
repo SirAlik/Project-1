@@ -18,7 +18,7 @@ export function AnalyticsCard({ title, children, className = "", subtitle }: Pro
             className={`relative group ${className}`}
         >
             {/* Glowing Border effect - kept as brand accent */}
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-blue-500/20 rounded-[2rem] blur-sm opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-indigo-500/20 via-teal-500/20 to-blue-500/20 rounded-[2rem] blur-sm opacity-50 group-hover:opacity-100 transition-opacity" />
 
             <div className="relative bg-card/50 backdrop-blur-xl border border-border rounded-[2rem] p-6 h-full overflow-hidden shadow-sm">
                 {/* Decorative glow */}

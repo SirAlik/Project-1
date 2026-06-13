@@ -21,9 +21,9 @@ export function StatsCards({ letters, leaves }: Props) {
                 <div className="text-sm text-zinc-400">الصادر (الكلي)</div>
                 <div className="text-3xl font-bold text-blue-400 mt-1">{outgoing}</div>
             </div>
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-[hsla(var(--gold),.10)] to-[hsla(var(--gold-strong),.10)] border border-[hsla(var(--gold),.20)] backdrop-blur-sm">
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-[hsla(var(--accent-primary),.10)] to-[hsla(var(--accent-primary),.10)] border border-[hsla(var(--accent-primary),.20)] backdrop-blur-sm">
                 <div className="text-sm text-zinc-400">إجازات معلقة</div>
-                <div className="text-3xl font-bold text-[hsl(var(--gold))] mt-1">{pendingLeaves}</div>
+                <div className="text-3xl font-bold text-[hsl(var(--accent-primary))] mt-1">{pendingLeaves}</div>
             </div>
         </div>
     );

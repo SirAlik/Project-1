@@ -108,8 +108,8 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                                     <Shuffle size={18} /> بدء التوزيع
                                 </button>
 
-                                <div className="p-4 rounded-2xl bg-[hsla(var(--gold),.05)] border border-[hsla(var(--gold),.10)]">
-                                    <p className="text-[10px] text-[hsla(var(--gold),.60)] font-medium leading-relaxed">
+                                <div className="p-4 rounded-2xl bg-[hsla(var(--accent-primary),.05)] border border-[hsla(var(--accent-primary),.10)]">
+                                    <p className="text-[10px] text-[hsla(var(--accent-primary),.60)] font-medium leading-relaxed">
                                         <Lock size={12} className="inline mr-1" /> يمكنك تثبيت طلاب معينين في مجموعاتهم الحالية قبل إعادة التوزيع.
                                     </p>
                                 </div>
@@ -143,7 +143,7 @@ export function GroupTool({ isOpen, onClose, students, onDistribute }: GroupTool
                                                                 <span className="text-xs font-bold text-stone-600">{student?.name}</span>
                                                                 <button
                                                                     onClick={() => togglePin(sid)}
-                                                                    className={`p-1.5 rounded-lg transition-all ${isPinned ? 'text-[hsl(var(--gold))] bg-[hsla(var(--gold),.10)]' : 'text-stone-500 hover:text-foreground opacity-0 group-hover/item:opacity-100'}`}
+                                                                    className={`p-1.5 rounded-lg transition-all ${isPinned ? 'text-[hsl(var(--accent-primary))] bg-[hsla(var(--accent-primary),.10)]' : 'text-stone-500 hover:text-foreground opacity-0 group-hover/item:opacity-100'}`}
                                                                 >
                                                                     {isPinned ? <Lock size={12} /> : <Unlock size={12} />}
                                                                 </button>

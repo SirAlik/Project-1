@@ -49,7 +49,7 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
                     <select
                         value={selectedStudent}
                         onChange={(e) => { setSelectedStudent(e.target.value); setSelectedCaseId(""); }}
-                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-teal-500 outline-none"
                         title="اختيار الطالب"
                     >
                         <option value="">-- اختر طالب --</option>
@@ -91,7 +91,7 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
             <div className="space-y-8">
                 <div className="bg-white/80 p-6 rounded-xl border border-stone-200">
                     <h3 className="text-sm font-bold text-stone-600 mb-4 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                        <span className="w-1.5 h-1.5 bg-teal-500 rounded-full"></span>
                         أسباب الغياب وخطوات المعالجة
                     </h3>
                     <div className="space-y-4">
@@ -112,7 +112,7 @@ export function Form82_AbsenceFollowUp({ studentsList, classesList, cases, getAb
                                 rows={3}
                                 value={actionTaken}
                                 onChange={(e) => setActionTaken(e.target.value)}
-                                className="w-full bg-white border border-stone-200 rounded-lg px-4 py-2 text-sm focus:border-purple-500 outline-none transition-all resize-none"
+                                className="w-full bg-white border border-stone-200 rounded-lg px-4 py-2 text-sm focus:border-teal-500 outline-none transition-all resize-none"
                                 aria-label="الإجراء المتخذ"
                             />
                         </div>

@@ -30,7 +30,7 @@ export function CounselorWorkbench({ referrals, onResolve }: CounselorWorkbenchP
                         <p className="text-[10px] font-black text-stone-500 uppercase tracking-widest mb-1">Pending Actions</p>
                         <h3 className="text-3xl font-black text-foreground italic">{stats.pending}</h3>
                     </div>
-                    <div className="p-4 bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] rounded-3xl border border-[hsla(var(--gold),.25)]">
+                    <div className="p-4 bg-[hsla(var(--accent-primary),.15)] text-[hsl(var(--accent-primary))] rounded-3xl border border-[hsla(var(--accent-primary),.25)]">
                         <Clock className="w-6 h-6" />
                     </div>
                 </div>

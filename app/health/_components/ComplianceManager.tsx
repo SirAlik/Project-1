@@ -115,7 +115,7 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <label className="text-xs font-bold text-stone-500 flex items-center gap-2">
-                                <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--gold))]" /> مستوى النظافة والتعقيم (1-5)
+                                <Sparkles className="w-3.5 h-3.5 text-[hsl(var(--accent-primary))]" /> مستوى النظافة والتعقيم (1-5)
                             </label>
                             <input
                                 type="range" min="1" max="5" step="1"
@@ -174,7 +174,7 @@ export function ComplianceManager({ hygieneLogs, canteenChecks, classes, onAddHy
                                 return (
                                     <div key={i} className="p-3 rounded-xl bg-white/80 border border-stone-200 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2 rounded-lg ${isHygiene ? "bg-emerald-500/10 text-emerald-500" : "bg-[hsla(var(--gold),.10)] text-[hsl(var(--gold))]"}`}>
+                                            <div className={`p-2 rounded-lg ${isHygiene ? "bg-emerald-500/10 text-emerald-500" : "bg-[hsla(var(--accent-primary),.10)] text-[hsl(var(--accent-primary))]"}`}>
                                                 {isHygiene ? <ClipboardCheck className="w-4 h-4" /> : <Utensils className="w-4 h-4" />}
                                             </div>
                                             <div>

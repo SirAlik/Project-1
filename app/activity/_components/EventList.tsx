@@ -74,7 +74,7 @@ export function EventList({ events, onUpdate }: EventListProps) {
                             </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    {event.type === 'competition' && <Trophy className="w-3.5 h-3.5 text-[hsl(var(--gold))]" />}
+                                    {event.type === 'competition' && <Trophy className="w-3.5 h-3.5 text-[hsl(var(--accent-primary))]" />}
                                     {event.type === 'meeting' && <Users className="w-3.5 h-3.5 text-stone-500" />}
                                     {event.type === 'event' && <Target className="w-3.5 h-3.5 text-blue-500" />}
                                     <span className="text-[9px] font-black text-stone-500 uppercase tracking-widest">{event.type}</span>

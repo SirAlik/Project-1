@@ -21,7 +21,7 @@ export default function ActivityAnalytics() {
         return (
             <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-[hsla(var(--gold),.25)] border-t-[hsl(var(--gold))] rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-[hsla(var(--accent-primary),.25)] border-t-[hsl(var(--accent-primary))] rounded-full animate-spin" />
                     <p className="text-stone-500 font-medium animate-pulse">جاري جلب بيانات النشاط...</p>
                 </div>
             </div>
@@ -32,7 +32,7 @@ export default function ActivityAnalytics() {
         <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[hsla(var(--gold),.05)] rounded-full blur-[120px]" />
+                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[hsla(var(--accent-primary),.05)] rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/5 rounded-full blur-[120px]" />
             </div>
 
@@ -58,7 +58,7 @@ export default function ActivityAnalytics() {
 
                     <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
                         <div className="flex items-center gap-2 text-xs text-stone-500">
-                            <div className="w-2 h-2 bg-[hsl(var(--gold))] rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-[hsl(var(--accent-primary))] rounded-full animate-pulse" />
                             رصد حي لمعدلات التفاعل اللاصفي
                         </div>
                     </div>
@@ -67,7 +67,7 @@ export default function ActivityAnalytics() {
                 {/* KPI Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
-                        { label: 'نسبة التفاعل', value: `%${stats.participationRate}`, icon: TrendingUp, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'نسبة التفاعل', value: `%${stats.participationRate}`, icon: TrendingUp, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                         { label: 'الأندية النشطة', value: stats.activeClubs, icon: Star, color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20' },
                         { label: 'إجمالي الفعاليات', value: stats.totalEvents, icon: Calendar, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
                         { label: 'فعاليات قادمة', value: stats.upcomingEvents, icon: Rocket, color: 'text-sky-400', bg: 'bg-sky-400/10', border: 'border-sky-400/20' },
@@ -159,7 +159,7 @@ export default function ActivityAnalytics() {
                                             <span className="text-[10px] text-stone-500 font-mono">{item.date}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${item.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-[hsla(var(--gold),.15)] text-[hsl(var(--gold))] border-[hsla(var(--gold),.25)]'}`}>
+                                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${item.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-[hsla(var(--accent-primary),.15)] text-[hsl(var(--accent-primary))] border-[hsla(var(--accent-primary),.25)]'}`}>
                                                 {item.status === 'completed' ? 'منجز' : 'قيد التنفيذ'}
                                             </span>
                                         </div>

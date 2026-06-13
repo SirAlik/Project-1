@@ -37,7 +37,7 @@ export function LeaveModal({ student, isOpen, onClose, onSave }: LeaveModalProps
                     </button>
                     <button
                         onClick={() => onSave(reason)}
-                        className="rounded-xl bg-[hsl(var(--gold))] px-6 py-2 text-sm font-semibold hover:bg-[hsl(var(--gold-strong))]"
+                        className="rounded-xl bg-[hsl(var(--accent-primary))] px-6 py-2 text-sm font-semibold hover:bg-[hsl(var(--accent-primary))]"
                     >
                         حفظ الاستئذان
                     </button>

@@ -33,7 +33,7 @@ export function Form43_FollowUp({ studentsList, classesList, cases }: Props) {
                     <select
                         value={selectedStudent}
                         onChange={(e) => { setSelectedStudent(e.target.value); setSelectedCaseId(""); }}
-                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-teal-500 outline-none"
                         title="اختيار الطالب"
                     >
                         <option value="">-- اختر طالب --</option>
@@ -46,7 +46,7 @@ export function Form43_FollowUp({ studentsList, classesList, cases }: Props) {
                     <select
                         value={selectedCaseId}
                         onChange={(e) => setSelectedCaseId(e.target.value)}
-                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-teal-500 outline-none"
                         disabled={!selectedStudent}
                         aria-label="ربط المعاملة"
                     >
@@ -71,7 +71,7 @@ export function Form43_FollowUp({ studentsList, classesList, cases }: Props) {
                         value={caseHistory}
                         onChange={(e) => setCaseHistory(e.target.value)}
                         placeholder="اذكر بإيجاز ما تم القيام به سابقاً لهذه الحالة..."
-                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all resize-none"
+                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all resize-none"
                     />
                 </div>
 
@@ -82,7 +82,7 @@ export function Form43_FollowUp({ studentsList, classesList, cases }: Props) {
                         value={followUpNotes}
                         onChange={(e) => setFollowUpNotes(e.target.value)}
                         placeholder="اكتب التطورات في حالة الطالب أو أي ملاحظات جديدة..."
-                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all resize-none"
+                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all resize-none"
                     />
                 </div>
             </div>

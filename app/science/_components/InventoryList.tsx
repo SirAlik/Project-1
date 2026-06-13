@@ -33,7 +33,7 @@ export function InventoryList({ items }: { items: InventoryItem[] }) {
 function StatusIndicator({ status }: { status: InventoryItem["status"] }) {
     const colors = {
         available: "bg-emerald-500",
-        low_stock: "bg-[hsl(var(--gold))]",
+        low_stock: "bg-[hsl(var(--accent-primary))]",
         out_of_stock: "bg-rose-500"
     };
     const labels = {

@@ -128,7 +128,7 @@ function JoinPageContent() {
             >
                 {/* Header Profile Identity */}
                 <div className="bg-slate-50 p-6 border-b border-slate-200 text-center">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 mx-auto mb-4 flex items-center justify-center text-2xl font-bold shadow-lg shadow-indigo-500/20">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-teal-500 mx-auto mb-4 flex items-center justify-center text-2xl font-bold shadow-lg shadow-indigo-500/20">
                         {inviteData.name[0]}
                     </div>
                     <h2 className="text-xl font-bold mb-1">مرحباً، {inviteData.name}</h2>

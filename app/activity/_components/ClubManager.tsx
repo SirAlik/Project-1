@@ -39,7 +39,7 @@ export function ClubManager({
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 className="text-xl font-black text-foreground flex items-center gap-2">
-                        <Layers className="w-6 h-6 text-[hsl(var(--gold))]" /> إدارة الأندية والبرامج
+                        <Layers className="w-6 h-6 text-[hsl(var(--accent-primary))]" /> إدارة الأندية والبرامج
                     </h2>
                     <p className="text-xs text-stone-500 font-bold mt-1">تنظيم المهام، توزيع المشرفين، ومتابعة الأداء</p>
                 </div>
@@ -47,7 +47,7 @@ export function ClubManager({
                     onClick={() => setShowAddClub(true)}
                     className="bg-stone-200 hover:bg-stone-300 text-stone-700 px-6 py-3 rounded-2xl text-xs font-bold transition-all border border-stone-300 flex items-center gap-2"
                 >
-                    <Plus className="w-4 h-4 text-[hsl(var(--gold))]" /> إضافة نادي جديد
+                    <Plus className="w-4 h-4 text-[hsl(var(--accent-primary))]" /> إضافة نادي جديد
                 </button>
             </div>
 
@@ -103,11 +103,11 @@ function ClubCard({
         : 0;
 
     return (
-        <div className="group bg-white/80 border border-stone-200 hover:border-[hsla(var(--gold),.30)] rounded-[2.5rem] overflow-hidden transition-all duration-500">
+        <div className="group bg-white/80 border border-stone-200 hover:border-[hsla(var(--accent-primary),.30)] rounded-[2.5rem] overflow-hidden transition-all duration-500">
             {/* Card Header Background */}
             <div className="h-24 bg-gradient-to-br from-white to-stone-100 relative p-6 flex justify-between items-start">
                 <div className="p-3 bg-white/80 backdrop-blur-md rounded-2xl border border-stone-200">
-                    <Layers className="w-5 h-5 text-[hsl(var(--gold))]" />
+                    <Layers className="w-5 h-5 text-[hsl(var(--accent-primary))]" />
                 </div>
                 <div className="flex gap-2">
                     <div className="text-[8px] font-black tracking-widest uppercase bg-white/95 backdrop-blur-md text-stone-500 px-3 py-1.5 rounded-full border border-stone-200">
@@ -151,7 +151,7 @@ function ClubCard({
                             {[1, 2, 3, 4, 5].map(i => (
                                 <Star
                                     key={i}
-                                    className={`w-3 h-3 ${i <= Math.round(avgPerf) ? "text-[hsl(var(--gold))] fill-[hsl(var(--gold))]" : "text-zinc-800"}`}
+                                    className={`w-3 h-3 ${i <= Math.round(avgPerf) ? "text-[hsl(var(--accent-primary))] fill-[hsl(var(--accent-primary))]" : "text-zinc-800"}`}
                                 />
                             ))}
                             <span className="text-[10px] text-stone-500 font-black mr-1">{avgPerf.toFixed(1)}</span>
@@ -168,7 +168,7 @@ function ClubCard({
                 {!assignment && (
                     <button
                         onClick={() => setShowAssignModal(true)}
-                        className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-[hsla(var(--gold),.10)] hover:bg-[hsla(var(--gold),.20)] text-[hsl(var(--gold))] rounded-2xl border border-[hsla(var(--gold),.20)] text-xs font-bold transition-all"
+                        className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-[hsla(var(--accent-primary),.10)] hover:bg-[hsla(var(--accent-primary),.20)] text-[hsl(var(--accent-primary))] rounded-2xl border border-[hsla(var(--accent-primary),.20)] text-xs font-bold transition-all"
                     >
                         <UserPlus className="w-4 h-4" />
                         تعيين مشرف لهذا النادي
@@ -217,14 +217,14 @@ function AddClubModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
             <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
                 <div className="p-8 border-b border-stone-200 bg-white/80">
                     <h3 className="text-xl font-black text-foreground flex items-center gap-3">
-                        <Plus className="w-6 h-6 text-[hsl(var(--gold))]" /> تأسيس نادي طلابي جديد
+                        <Plus className="w-6 h-6 text-[hsl(var(--accent-primary))]" /> تأسيس نادي طلابي جديد
                     </h3>
                 </div>
                 <div className="p-8 space-y-6">
                     <div className="space-y-2">
                         <label className="text-xs font-black text-stone-500 mr-2 uppercase tracking-widest">مسمى النادي</label>
                         <input
-                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all placeholder:text-stone-400"
+                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all placeholder:text-stone-400"
                             placeholder="مثال: نادي الابتكار والذكاء الاصطناعي"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -235,7 +235,7 @@ function AddClubModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                             <label className="text-xs font-black text-stone-500 mr-2 uppercase tracking-widest">المجال</label>
                             <select
                                 aria-label="اختر المجال"
-                                className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none appearance-none"
+                                className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none appearance-none"
                                 value={formData.category}
                                 onChange={(e) => setFormData({ ...formData, category: e.target.value as ActivityClub['category'] })}
                             >
@@ -250,7 +250,7 @@ function AddClubModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                             <input
                                 aria-label="السعة القصوى"
                                 type="number"
-                                className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all"
+                                className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all"
                                 value={formData.capacity}
                                 onChange={(e) => setFormData({ ...formData, capacity: parseInt(e.target.value) })}
                             />
@@ -259,7 +259,7 @@ function AddClubModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                     <div className="space-y-2">
                         <label className="text-xs font-black text-stone-500 mr-2 uppercase tracking-widest">الموقع (القاعة/المقر)</label>
                         <input
-                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none transition-all"
+                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none transition-all"
                             placeholder="مثال: مختبر الحاسب 1"
                             value={formData.location}
                             onChange={(e) => setFormData({ ...formData, location: e.target.value })}
@@ -269,7 +269,7 @@ function AddClubModal({ onClose, onSubmit }: { onClose: () => void; onSubmit: (d
                 <div className="p-8 bg-white/80 flex gap-4">
                     <button
                         onClick={() => onSubmit(formData)}
-                        className="flex-1 bg-[hsl(var(--gold-strong))] hover:bg-[hsl(var(--gold))] text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-[hsla(var(--gold),.20)]"
+                        className="flex-1 bg-[hsl(var(--accent-primary))] hover:bg-[hsl(var(--accent-primary))] text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-xl shadow-[hsla(var(--accent-primary),.20)]"
                     >
                         تأكيد الإنشاء
                     </button>
@@ -294,14 +294,14 @@ function AssignModal({ club, teachers, onClose, onSubmit }: { club: ActivityClub
             <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="p-8 bg-gradient-to-br from-white to-stone-100 border-b border-stone-200">
                     <h3 className="text-lg font-black text-foreground">{club.name}</h3>
-                    <p className="text-xs text-[hsl(var(--gold))] font-bold mt-1 uppercase tracking-wider italic">تكليف مشرف النادي</p>
+                    <p className="text-xs text-[hsl(var(--accent-primary))] font-bold mt-1 uppercase tracking-wider italic">تكليف مشرف النادي</p>
                 </div>
                 <div className="p-8 space-y-6">
                     <div className="space-y-2">
                         <label className="text-xs font-black text-stone-500 mr-2 uppercase">اختيار المعلم</label>
                         <select
                             aria-label="اختر المعلم"
-                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--gold))] outline-none"
+                            className="w-full bg-white border border-stone-200 rounded-2xl px-5 py-4 text-sm focus:border-[hsl(var(--accent-primary))] outline-none"
                             value={teacherId}
                             onChange={(e) => setTeacherId(e.target.value)}
                         >
@@ -314,7 +314,7 @@ function AssignModal({ club, teachers, onClose, onSubmit }: { club: ActivityClub
                         <div className="flex gap-2 p-1 bg-white rounded-2xl border border-stone-200">
                             <button
                                 onClick={() => setRole("supervisor")}
-                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${role === 'supervisor' ? "bg-[hsl(var(--gold))] text-white" : "text-stone-500 hover:text-stone-500"}`}
+                                className={`flex-1 py-3 rounded-xl text-[10px] font-black uppercase transition-all ${role === 'supervisor' ? "bg-[hsl(var(--accent-primary))] text-white" : "text-stone-500 hover:text-stone-500"}`}
                             >
                                 مشرف أساسي
                             </button>
@@ -363,9 +363,9 @@ function EvalModal({ assignment, onClose, onSubmit }: { assignment: ClubAssignme
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
                             <span className="text-[10px] font-black text-stone-500 uppercase">جودة تنفيذ الأنشطة</span>
-                            <span className="text-xs font-black text-[hsl(var(--gold))]">{performance}/5</span>
+                            <span className="text-xs font-black text-[hsl(var(--accent-primary))]">{performance}/5</span>
                         </div>
-                        <input aria-label="تقييم جودة التنفيذ" type="range" min="1" max="5" step="1" className="w-full accent-[hsl(var(--gold))]" value={performance} onChange={(e) => setPerformance(parseInt(e.target.value))} />
+                        <input aria-label="تقييم جودة التنفيذ" type="range" min="1" max="5" step="1" className="w-full accent-[hsl(var(--accent-primary))]" value={performance} onChange={(e) => setPerformance(parseInt(e.target.value))} />
                     </div>
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
@@ -377,7 +377,7 @@ function EvalModal({ assignment, onClose, onSubmit }: { assignment: ClubAssignme
                     <div className="space-y-2">
                         <label className="text-[10px] font-black text-stone-500 uppercase">ملاحظات التحسين</label>
                         <textarea
-                            className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-xs focus:border-[hsl(var(--gold))] outline-none min-h-[100px] text-right"
+                            className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-xs focus:border-[hsl(var(--accent-primary))] outline-none min-h-[100px] text-right"
                             placeholder="اكتب مرئياتك هنا..."
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}

@@ -72,7 +72,7 @@ export default function SecretaryAnalytics() {
                     {[
                         { label: 'وارد قيد المعالجة', value: stats.pendingInbox, icon: FileText, color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20' },
                         { label: 'صادر قيد الإرسال', value: stats.pendingOutbox, icon: Send, color: 'text-sky-400', bg: 'bg-sky-400/10', border: 'border-sky-400/20' },
-                        { label: 'طلبات إجازة معلقة', value: stats.activeLeaves, icon: Calendar, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'طلبات إجازة معلقة', value: stats.activeLeaves, icon: Calendar, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                         { label: 'طلبات شراء معلقة', value: stats.pendingProcurement, icon: HardDrive, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
                     ].map((item, idx) => (
                         <motion.div

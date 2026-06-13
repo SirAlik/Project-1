@@ -37,7 +37,7 @@ export default function QADashboard() {
                         <div className="flex flex-wrap gap-3">
                             <button
                                 onClick={() => setIsKnightsOpen(true)}
-                                className="glass-card px-5 py-2.5 rounded-2xl text-xs font-bold text-[hsl(var(--gold))] hover:bg-[hsla(var(--gold),.05)] transition-all border-[hsla(var(--gold),.20)] flex items-center gap-2"
+                                className="glass-card px-5 py-2.5 rounded-2xl text-xs font-bold text-[hsl(var(--accent-primary))] hover:bg-[hsla(var(--accent-primary),.05)] transition-all border-[hsla(var(--accent-primary),.20)] flex items-center gap-2"
                             >
                                 <Trophy className="w-4 h-4 shadow-pulse" /> فرسان الانضباط
                             </button>

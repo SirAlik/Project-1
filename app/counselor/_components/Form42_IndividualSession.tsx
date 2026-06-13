@@ -48,7 +48,7 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
                     <select
                         value={selectedStudent}
                         onChange={(e) => { setSelectedStudent(e.target.value); setSelectedCaseId(""); }}
-                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-teal-500 outline-none"
                         aria-label="اختيار الطالب"
                     >
                         <option value="">-- اختر طالب --</option>
@@ -61,7 +61,7 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
                     <select
                         value={selectedCaseId}
                         onChange={(e) => setSelectedCaseId(e.target.value)}
-                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-purple-500 outline-none"
+                        className="w-full bg-white border border-stone-200 rounded-lg px-3 py-2 text-sm focus:ring-1 focus:ring-teal-500 outline-none"
                         disabled={!selectedStudent}
                         aria-label="ربط المعاملة"
                     >
@@ -100,7 +100,7 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
                         placeholder="مثال: صعوبات دراسية، تحسين سلوك..."
-                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all"
+                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
                         aria-label="موضوع المقابلة"
                     />
                 </div>
@@ -111,7 +111,7 @@ export function Form42_IndividualSession({ studentsList, classesList, cases, use
                         rows={5}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none transition-all resize-none"
+                        className="w-full bg-stone-100 border border-stone-300 rounded-xl px-4 py-3 text-sm focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all resize-none"
                         aria-label="ملاحظات ونتائج الجلسة"
                     />
                 </div>

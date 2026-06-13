@@ -114,7 +114,7 @@ export function ToolsWidget({ onOpenPicker }: ToolsWidgetProps) {
                         />
                         <button
                             onClick={() => setLight("yellow")}
-                            className={`w-10 h-10 rounded-full border-4 transition-all ${light === 'yellow' ? 'bg-[hsl(var(--gold))] border-[hsla(var(--gold),.45)] shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'bg-stone-100 border-stone-200 opacity-30 hover:opacity-100'}`}
+                            className={`w-10 h-10 rounded-full border-4 transition-all ${light === 'yellow' ? 'bg-[hsl(var(--accent-primary))] border-[hsla(var(--accent-primary),.45)] shadow-[0_0_20px_rgba(245,158,11,0.5)]' : 'bg-stone-100 border-stone-200 opacity-30 hover:opacity-100'}`}
                             aria-label="ضوء أصفر"
                         />
                         <button
@@ -138,7 +138,7 @@ export function ToolsWidget({ onOpenPicker }: ToolsWidgetProps) {
                 </button>
                 <button
                     onClick={() => setActiveTool(activeTool === "traffic" ? null : "traffic")}
-                    className={`p-3 rounded-xl transition-all ${activeTool === "traffic" ? "bg-[hsl(var(--gold-strong))] text-white" : "text-stone-500 hover:text-foreground hover:bg-white/5"}`}
+                    className={`p-3 rounded-xl transition-all ${activeTool === "traffic" ? "bg-[hsl(var(--accent-primary))] text-white" : "text-stone-500 hover:text-foreground hover:bg-white/5"}`}
                     aria-label="الإشارة الضوئية"
                 >
                     <Signal size={20} />

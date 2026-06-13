@@ -70,7 +70,7 @@ export default function HealthAnalytics() {
                         { label: 'زيارات اليوم', value: stats.visitsToday, icon: Heart, color: 'text-rose-400', bg: 'bg-rose-400/10', border: 'border-rose-400/20' },
                         { label: 'إجمالي الشهر', value: stats.totalVisitsMonth, icon: Activity, color: 'text-sky-400', bg: 'bg-sky-400/10', border: 'border-sky-400/20' },
                         { label: 'مؤشر النظافة', value: `%${stats.hygieneScore}`, icon: Shield, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
-                        { label: 'المقصف المدرسي', value: stats.canteenStatus, icon: Droplets, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'المقصف المدرسي', value: stats.canteenStatus, icon: Droplets, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                     ].map((item, idx) => (
                         <motion.div
                             key={idx}

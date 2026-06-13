@@ -49,7 +49,7 @@ export function VisitEntryForm({ students, onSubmit }: Props) {
 
     return (
         <Card title="تسجيل زيارة (إداري)">
-            <div className="mb-4 bg-[hsla(var(--gold),.10)] border border-[hsla(var(--gold),.20)] p-2 rounded-lg text-xs text-[hsla(var(--gold),.65)]">
+            <div className="mb-4 bg-[hsla(var(--accent-primary),.10)] border border-[hsla(var(--accent-primary),.20)] p-2 rounded-lg text-xs text-[hsla(var(--accent-primary),.65)]">
                 ⚠️ تنبيه: هذا السجل إداري فقط لتوثيق حضور الطالب للموجّه الصحي. لا يعتبر تشخيصاً طبياً.
             </div>
 

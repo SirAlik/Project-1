@@ -85,8 +85,8 @@ export default function SciencePage() {
                                     <h3 className="text-sm font-bold opacity-40 uppercase tracking-widest mb-6">إحصائيات سريعة</h3>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="p-6 rounded-2xl glass-panel border border-stone-200 text-center flex flex-col items-center">
-                                            <div className="w-10 h-10 rounded-full bg-[hsla(var(--gold),.15)] flex items-center justify-center mb-4">
-                                                <TestTube2 className="w-5 h-5 text-[hsl(var(--gold))]" />
+                                            <div className="w-10 h-10 rounded-full bg-[hsla(var(--accent-primary),.15)] flex items-center justify-center mb-4">
+                                                <TestTube2 className="w-5 h-5 text-[hsl(var(--accent-primary))]" />
                                             </div>
                                             <div className="text-3xl font-bold">{state.bookings.filter(b => b.status === 'pending').length}</div>
                                             <div className="text-[10px] uppercase font-bold opacity-40 tracking-widest">قيد الانتظار</div>

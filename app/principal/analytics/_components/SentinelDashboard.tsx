@@ -83,8 +83,8 @@ export function SentinelDashboard() {
 
     const severityColors = {
         low: 'text-primary bg-primary/10 border-primary/20',
-        medium: 'text-[hsl(var(--gold-strong))] bg-[hsla(var(--gold),.10)] border-[hsla(var(--gold),.20)]',
-        high: 'text-[hsl(var(--gold-strong))] bg-[hsla(var(--gold),.15)] border-[hsla(var(--gold),.25)]',
+        medium: 'text-[hsl(var(--accent-primary))] bg-[hsla(var(--accent-primary),.10)] border-[hsla(var(--accent-primary),.20)]',
+        high: 'text-[hsl(var(--accent-primary))] bg-[hsla(var(--accent-primary),.15)] border-[hsla(var(--accent-primary),.25)]',
         critical: 'text-destructive bg-destructive/10 border-destructive/20 animate-pulse'
     };
 
@@ -138,10 +138,10 @@ export function SentinelDashboard() {
 
                     <div className="bg-background/50 p-4 rounded-2xl border border-border">
                         <div className="flex items-center gap-2 mb-1">
-                            <AlertTriangle size={14} className="text-[hsl(var(--gold))]" />
+                            <AlertTriangle size={14} className="text-[hsl(var(--accent-primary))]" />
                             <span className="text-[10px] font-black uppercase text-muted-foreground">High Risk</span>
                         </div>
-                        <span className="text-2xl font-black text-[hsl(var(--gold))]">{stats.high}</span>
+                        <span className="text-2xl font-black text-[hsl(var(--accent-primary))]">{stats.high}</span>
                     </div>
 
                     <div className="bg-background/50 p-4 rounded-2xl border border-border">

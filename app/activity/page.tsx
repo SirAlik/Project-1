@@ -34,7 +34,7 @@ export default function ActivityLeaderPage() {
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
                     <div className="space-y-4">
                         <h1 className="text-4xl font-bold tracking-tight">
-                            وحدة رائد <span className="text-[hsl(var(--gold))]">النشاط</span>
+                            وحدة رائد <span className="text-[hsl(var(--accent-primary))]">النشاط</span>
                         </h1>
                     </div>
 
@@ -50,7 +50,7 @@ export default function ActivityLeaderPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as ActivityTab)}
                                 className={`flex items-center gap-3 px-6 py-3.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap ${activeTab === tab.id
-                                    ? "bg-white text-[hsl(var(--gold))] shadow-xl"
+                                    ? "bg-white text-[hsl(var(--accent-primary))] shadow-xl"
                                     : "opacity-40 hover:opacity-100"
                                     }`}
                             >

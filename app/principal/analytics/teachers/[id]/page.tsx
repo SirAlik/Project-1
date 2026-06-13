@@ -91,7 +91,7 @@ export default function TeacherDeepDive() {
                                 <div className="text-5xl font-black text-foreground mb-2">{teacher.studentSatisfaction}</div>
                                 <div className="flex gap-1 mb-4">
                                     {[1, 2, 3, 4, 5].map(s => (
-                                        <Zap key={s} className={`w-4 h-4 ${s <= 4 ? 'text-[hsl(var(--gold))] fill-[hsl(var(--gold))]' : 'text-zinc-800'}`} />
+                                        <Zap key={s} className={`w-4 h-4 ${s <= 4 ? 'text-[hsl(var(--accent-primary))] fill-[hsl(var(--accent-primary))]' : 'text-zinc-800'}`} />
                                     ))}
                                 </div>
                                 <p className="text-[10px] text-stone-500 text-center uppercase font-black">تقييم ممتاز</p>

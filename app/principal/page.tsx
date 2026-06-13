@@ -31,7 +31,7 @@ export default function PrincipalPage() {
     }, []);
 
     return (
-        <main className="bg-bg-canvas text-text-inverse font-sans pb-20" dir="rtl">
+        <main className="bg-bg-canvas text-foreground font-sans pb-20" dir="rtl">
             <div className="relative z-10">
                 {/* Futuristic Header */}
                 <header className="mb-10 flex justify-between items-center">
@@ -209,7 +209,7 @@ export default function PrincipalPage() {
 
                 {/* Organization Hub */}
                 <section className="mb-10">
-                    <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-text-inverse">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-foreground">
                         <span className="w-2 h-8 bg-primary rounded-full"></span>
                         الهيكل التنظيمي والتشغيل الرقمي
                     </h2>

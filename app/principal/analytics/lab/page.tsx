@@ -19,7 +19,7 @@ export default function LabAnalytics() {
         return (
             <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-[hsla(var(--gold),.25)] border-t-[hsl(var(--gold))] rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-4 border-[hsla(var(--accent-primary),.25)] border-t-[hsl(var(--accent-primary))] rounded-full animate-spin" />
                     <p className="text-stone-500 font-medium animate-pulse">جاري جلب إحصائيات المختبر...</p>
                 </div>
             </div>
@@ -30,8 +30,8 @@ export default function LabAnalytics() {
         <main className="min-h-screen bg-[var(--bg)] text-[var(--text)] font-sans p-6" dir="rtl">
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[hsla(var(--gold),.05)] rounded-full blur-[120px]" />
-                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[hsla(var(--gold),.05)] rounded-full blur-[120px]" />
+                <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-[hsla(var(--accent-primary),.05)] rounded-full blur-[120px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-[hsla(var(--accent-primary),.05)] rounded-full blur-[120px]" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto pb-20">
@@ -56,7 +56,7 @@ export default function LabAnalytics() {
 
                     <div className="bg-white/80 border border-stone-200 px-4 py-2 rounded-2xl backdrop-blur-md">
                         <div className="flex items-center gap-2 text-xs text-stone-500">
-                            <div className="w-2 h-2 bg-[hsl(var(--gold))] rounded-full animate-pulse" />
+                            <div className="w-2 h-2 bg-[hsl(var(--accent-primary))] rounded-full animate-pulse" />
                             رصد حي للتجارب العملية
                         </div>
                     </div>
@@ -65,7 +65,7 @@ export default function LabAnalytics() {
                 {/* KPI Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
-                        { label: 'التجارب المنفذة', value: stats.totalExperiments, icon: Beaker, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'التجارب المنفذة', value: stats.totalExperiments, icon: Beaker, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                         { label: 'نسبة الإشغال', value: `%${stats.occupancyRate}`, icon: Clock, color: 'text-indigo-400', bg: 'bg-indigo-400/10', border: 'border-indigo-400/20' },
                         { label: 'سلامة المعدات', value: '٪٩٦', icon: ShieldCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
                         { label: 'إجمالي العهدة', value: '١٢٤', icon: Database, color: 'text-sky-400', bg: 'bg-sky-400/10', border: 'border-sky-400/20' },
@@ -103,7 +103,7 @@ export default function LabAnalytics() {
                                     />
                                     <circle
                                         cx="50" cy="50" r="40"
-                                        fill="none" stroke="hsl(var(--gold))" strokeWidth="10"
+                                        fill="none" stroke="hsl(var(--accent-primary))" strokeWidth="10"
                                         strokeDasharray="251.2"
                                         strokeDashoffset={251.2 - (251.2 * (stats.totalExperiments / stats.experimentTarget))}
                                         strokeLinecap="round"
@@ -117,7 +117,7 @@ export default function LabAnalytics() {
                             </div>
                             <p className="mt-4 text-xs text-stone-500 text-center leading-relaxed">
                                 معدل الإنجاز الحالي <br />
-                                <span className="text-[hsl(var(--gold))] font-bold">متوافق مع الخطة الزمنية</span>
+                                <span className="text-[hsl(var(--accent-primary))] font-bold">متوافق مع الخطة الزمنية</span>
                             </p>
                         </div>
                     </AnalyticsCard>
@@ -188,8 +188,8 @@ export default function LabAnalytics() {
                                                 key={period}
                                                 className="flex-1 h-12 rounded-lg transition-all hover:scale-105 cursor-pointer relative group/hex"
                                                 style={{
-                                                    backgroundColor: val > 0 ? `hsla(var(--gold), ${opacity})` : 'rgba(255, 255, 255, 0.05)',
-                                                    boxShadow: val > 3 ? `0 0 10px hsla(var(--gold), 0.2)` : 'none'
+                                                    backgroundColor: val > 0 ? `hsla(var(--accent-primary), ${opacity})` : 'rgba(255, 255, 255, 0.05)',
+                                                    boxShadow: val > 3 ? `0 0 10px hsla(var(--accent-primary), 0.2)` : 'none'
                                                 }}
                                             >
                                                 {val > 0 && (

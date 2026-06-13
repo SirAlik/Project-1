@@ -68,7 +68,7 @@ export default function AcademicAnalytics() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     {[
                         { label: 'استقرار الحصص', value: `%${stats.lessonStability}`, icon: Presentation, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-                        { label: 'خطط معلقة', value: stats.pendingPlans, icon: BookOpen, color: 'text-[hsl(var(--gold))]', bg: 'bg-[hsla(var(--gold),.15)]', border: 'border-[hsla(var(--gold),.25)]' },
+                        { label: 'خطط معلقة', value: stats.pendingPlans, icon: BookOpen, color: 'text-[hsl(var(--accent-primary))]', bg: 'bg-[hsla(var(--accent-primary),.15)]', border: 'border-[hsla(var(--accent-primary),.25)]' },
                         { label: 'متوسط الدرجات', value: `%${stats.gradeTrend[stats.gradeTrend.length - 1]?.average || 0}`, icon: TrendingUp, color: 'text-sky-500', bg: 'bg-sky-500/10', border: 'border-sky-500/20' },
                         { label: 'عدد المعلمين', value: stats.totalTeachers, icon: GraduationCap, color: 'text-indigo-500', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
                     ].map((item, idx) => (
@@ -168,8 +168,8 @@ export default function AcademicAnalytics() {
                             {stats.topClasses.map((cls, i) => (
                                 <div key={i} className="flex justify-between items-center p-4 rounded-2xl bg-muted/30 border border-border group hover:bg-muted/50 transition-colors">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-[hsla(var(--gold),.15)] flex items-center justify-center border border-[hsla(var(--gold),.25)]">
-                                            <Award className="w-5 h-5 text-[hsl(var(--gold))]" />
+                                        <div className="w-10 h-10 rounded-full bg-[hsla(var(--accent-primary),.15)] flex items-center justify-center border border-[hsla(var(--accent-primary),.25)]">
+                                            <Award className="w-5 h-5 text-[hsl(var(--accent-primary))]" />
                                         </div>
                                         <div>
                                             <p className="font-bold text-foreground">فصل {cls.name}</p>

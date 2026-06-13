@@ -281,7 +281,7 @@ export default function ClassDetailsPage() {
                                                                         {state.healthAlerts[s.id] && (
                                                                             <div className="flex gap-1.5 shrink-0">
                                                                                 {state.healthAlerts[s.id].diabetes && <HeartPulse className="w-3.5 h-3.5 text-rose-500 animate-pulse" />}
-                                                                                {state.healthAlerts[s.id].adhd && <AlertCircle className="w-3.5 h-3.5 text-[hsl(var(--gold))]" />}
+                                                                                {state.healthAlerts[s.id].adhd && <AlertCircle className="w-3.5 h-3.5 text-[hsl(var(--accent-primary))]" />}
                                                                                 {state.healthAlerts[s.id].vision && <Eye className="w-3.5 h-3.5 text-blue-500" />}
                                                                                 {state.healthAlerts[s.id].restroom && <Clock className="w-3.5 h-3.5 opacity-40" />}
                                                                             </div>

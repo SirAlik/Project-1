@@ -86,14 +86,14 @@ export default function VerifyPhase2Page() {
                     {report?.checks.map((check: VerifyReport["checks"][number], i: number) => (
                         <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-stone-200/70 border border-stone-200">
                             <div className="flex items-center gap-4">
-                                <div className={`w-2 h-2 rounded-full ${check.status === 'PASS' ? 'bg-emerald-500' : check.status === 'FAIL' ? 'bg-rose-500' : 'bg-[hsl(var(--gold))]'}`} />
+                                <div className={`w-2 h-2 rounded-full ${check.status === 'PASS' ? 'bg-emerald-500' : check.status === 'FAIL' ? 'bg-rose-500' : 'bg-[hsl(var(--accent-primary))]'}`} />
                                 <div>
                                     <div className="font-bold">{check.name}</div>
                                     <div className="text-xs text-stone-500">Expected: {String(check.expected ?? '')}</div>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <div className={`font-mono font-bold ${check.status === 'PASS' ? 'text-emerald-400' : check.status === 'FAIL' ? 'text-rose-400' : 'text-[hsl(var(--gold))]'}`}>
+                                <div className={`font-mono font-bold ${check.status === 'PASS' ? 'text-emerald-400' : check.status === 'FAIL' ? 'text-rose-400' : 'text-[hsl(var(--accent-primary))]'}`}>
                                     {String(check.actual ?? '')}
                                 </div>
                                 <div className="text-[10px] uppercase font-bold tracking-wider opacity-50">{check.status}</div>

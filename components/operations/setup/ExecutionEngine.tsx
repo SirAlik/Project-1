@@ -158,7 +158,7 @@ export function ExecutionEngine({ data, validation, onBack, schoolId }: Executio
                             <span className="text-[10px] font-bold text-muted uppercase">مستخدم جديد</span>
                         </div>
                         <div className="text-center border-x border-white/10">
-                            <span className="block text-2xl font-black text-[hsl(var(--gold))]">{resultCount.updated}</span>
+                            <span className="block text-2xl font-black text-[hsl(var(--accent-primary))]">{resultCount.updated}</span>
                             <span className="text-[10px] font-bold text-muted uppercase">تم تحديثهم</span>
                         </div>
                         <div className="text-center">
