@@ -118,3 +118,49 @@
 ## 8) التوصية
 
 **الخيار A (baseline موثّق) ثم الخيار B (repair مُحدَّد)** قبل الاعتماد على أدوات الترحيل عند/بعد الإطلاق. لا أثر أمني runtime اليوم. **لا إجراء عاجل مطلوب.** الأوامر المقترحة (لا تُنفَّذ الآن) في الملخّص الموحّد §12.
+
+---
+
+## 9) المصالحة لكل ملف (Security Sprint 2026-06-13 · FIX 10)
+
+> التتبّع الحيّ الآن **9 إدخالات** (أُضيف `m82_security_hardening`). الـ91 ملفاً مُصنَّفة أدناه. **الفحص أثبت 0 كائن مفقود من DB** — فكل ملف غير متتبَّع هو «مُطبَّق يدوياً/غير متتبَّع» يُغطّيه baseline، أو «متجاوَز» يُوثَّق، أو «أداة». **لا ملف «مفقود ومطلوب» (لا حاجة لإعادة بناء أمامية).**
+
+### مُتتبَّع ومُطبَّق (9) — لا إجراء
+`20260602_gamification_multitenant.sql` (m75) · `20260602_pg_cron_daily_feed.sql` · `20260605_enforce_tenant_not_null_and_fix_rls.sql` · `20260605_medium_risk_cleanup.sql` · `20260605_m79_cron_ai_insights.sql` · `20260605_m78_quality_trigger.sql` (m78) · `20260613_quality_template_settings.sql` (m80) · `20260613_seed_quality_readiness.sql` (m81) · `20260613_security_hardening.sql` (m82).
+
+### متجاوَز/مُستبدَل (obsolete-superseded) — توثيق فقط (لا حذف بلا موافقة)
+| الملف | السبب |
+| --- | --- |
+| `20240123_rbac_security.sql` | RBAC قديم (2024) استُبدل كلياً بموجة الأدوار/RLS 2026 (`20260523/24` + `r00–r12`). |
+| `06_rls_policies.sql` | استُبدل بـ `06_rls_policies_revised.sql` ثم بإعادة بناء RLS الكاملة. |
+| `06_rls_policies_revised.sql` | استُبدل بـ `20260524_rebuild_stale_rls_policies` + `r06/r07`. |
+| `20260206_fix_schools_rls.sql` · `20260207_fix_profiles_rls_recursion.sql` | إصلاحات RLS نقطية استُبدلت بإعادة البناء الشاملة لاحقاً. |
+
+### أداة لا ترحيل
+`verify_after.sql` — نصّ تحقّق (SELECTات)، ليس DDL.
+
+### مُطبَّق يدوياً/غير متتبَّع (applied-untracked) — كائناته موجودة → يُغطّيه baseline
+البقية (~76 ملفاً) — جميع كائناتها موجودة في DB الحيّة (114 جدول · 303 سياسة · دوال/triggers/enums)، مُطبَّقة خارج تتبّع Supabase. **objects_present = yes.** الإجراء الموصى: **baseline-covered**. تشمل: `01_core_tenancy`·`02_pbac`·`03_academic_integrity`·`05_audit_idempotency` · `20260120_gamification_*`·`20260121_*(ledger/hardening/integrity/quest/setup_production)` · `20260130_action_audit_log` · `20260201_*`·`20260202_identity_forge_*`·`20260208_strict_role_refactor` · `20260523_normalize_role_keys`·`20260524_*` · `20260526/20260527_layer3/5/6/6b/7_*` · `20260528_*(attendance)` · `20260529_r00–r12_*` (تشمل DROP migrations r01/r04/r11 — أثرها مُطبَّق: الكائنات القديمة غائبة) · `20260530_*`·`20260531_*`·`20260601_*`·`20260603_m77_*`·`20260604_*`·`20260606_drop_classes_school_id_default`.
+
+### جدول مُصنَّف (تمثيلي بالفئة — يغطّي الـ91)
+| الفئة | عدد | tracked | objects_present | الإجراء |
+| --- | --- | --- | --- | --- |
+| tracked-applied | 9 | yes | yes | none |
+| applied-untracked | ~76 | no | **yes** | baseline-covered |
+| obsolete-superseded | 5 | no | n/a (أثر/مُستبدَل) | document-superseded |
+| utility-nonmigration | 1 | no | n/a | none |
+| **missing-required** | **0** | — | — | — |
+
+### خطة المصالحة (لا تُنفَّذ الآن — أوامر للمالك)
+1. **Baseline (الخيار A):** توليد لقطة المخطط الحيّ كأساس للبيئات الجديدة:
+   ```bash
+   supabase db pull            # يولّد ملف schema baseline من DB الحيّة
+   # أو: pg_dump --schema-only --no-owner > db/baseline/0000_baseline.sql
+   ```
+2. **Repair (الخيار B) — اختياري، لمواءمة التتبّع فقط (لا يغيّر schema):** وسم الـ applied-untracked كمُطبَّقة:
+   ```bash
+   # مثال (تُحدَّد القائمة الدقيقة من db/migrations بعد توليد الإصدارات):
+   supabase migration repair --status applied <version>
+   ```
+   ⚠️ لا تُشغَّل قبل توليد baseline والتأكد أنّ كل version يقابل كائناً مُطبَّقاً فعلاً.
+3. **ممنوع:** `supabase db reset`/`db push` على الحيّة (تخاطر بمحو مخطط مُطبَّق يدوياً). الخيار D مرفوض.

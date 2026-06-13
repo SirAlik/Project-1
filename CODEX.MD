@@ -458,3 +458,14 @@ Do not wait until the end to report everything. After each stage, give the user 
 - **Layers (6) Auto-Fill Engine and (7) Quality Forms are mandatory cross-cutting layers** linking: operational action → structured data → auto-fill record → quality form → official PDF → analytics → AI. No fake AI/analytics/PDF/health.
 - Roadmap: **Phase 2 = Shell/Layout Unification + structural cleanup (6-agent audit plan); Phase 3 = Quality Forms & PDF layer.** Do NOT implement Phase 2/3 now — document only.
 - `/login` is NOT a blocker (it was a stale `.next` cache; resolved locally). Do not work on it.
+
+### Security invariants (binding — Security Hardening Sprint 2026-06-13)
+
+- **Never trust client `school_id`/`user_id`/`role`.** Derive from `getActivePersona()`/`ctx.user`. `createSafeAction` rejects mismatched `schoolId` AND `school_id` for non-owners.
+- **Ledger writes are RPC-only:** only `rpc_process_transaction` (SECURITY DEFINER) writes `transaction_logs`/`student_wallet`. No direct client writes (policies dropped, grants revoked, append-only).
+- **QMS PDFs are private:** bucket `qms-forms` is private; never `getPublicUrl`; `pdf_url` stays null; access via short-lived signed URLs from `lib/quality/qms-pdf.ts` after an RLS-enforced read.
+- **Security secrets fail-closed:** `generate-qms-pdf` and cron reject when `CRON_SECRET` is unset (no fail-open). `CRON_SECRET` (Vercel env) must equal `app_private.secrets.cron_secret`. Never commit real secrets; rotate server-side (`gen_random_bytes`).
+- **Public token flows** (e.g. trip consent) use token-scoped server actions, not the anon browser client; their paths live in `proxy.ts` `PUBLIC_PREFIXES`.
+- **Trigger/utility DB functions have no client EXECUTE** (PUBLIC/anon/authenticated revoked); every SECURITY DEFINER function sets `search_path`.
+- **Migrations:** Supabase tracking is partial (bookkeeping drift; schema fully materialized). Use baseline (`supabase db pull`) + targeted `migration repair`; never `db reset`/`db push` on live.
+- Full status: `docs/security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md`.

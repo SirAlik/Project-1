@@ -5,6 +5,44 @@
 
 ---
 
+## 0) نتائج Security Hardening Sprint (2026-06-13) ✅
+
+> §§1–14 أدناه تُوثّق **تدقيق 3E-5 (قراءة-فقط)**. هذا القسم يوثّق **سبرنت الإصلاح اللاحق** الذي عالج البنود من الجذر.
+
+| # | البند | الشدّة | الحالة |
+| --- | --- | --- | --- |
+| 1 | `generateInvite` عزل مستأجر | High | ✅ مُصلَح (اشتقاق `school_id` من السياق + حارس snake_case) |
+| 2 | `generate-qms-pdf` fail-open | High | ✅ مُصلَح (fail-closed 503/401) |
+| 3 | QMS PDF رابط عام | High | ✅ مُصلَح (bucket خاص + signed URL + `pdf_url=null`) |
+| 4 | نزاهة الـledger/المحفظة | High | ✅ مُصلَح (RPC-only + حذف سياسات + سحب منح الكتابة) |
+| 5a | `ledger_secret_salt` | High | ✅ مُدوّر (DB، عشوائي) |
+| 5b | `cron_secret`/`cron_site_url` | High | ⏳ **محجوب بإدخال المالك** (أوامر §12) |
+| 6 | موافقة الرحلة عبر anon | Medium | ✅ مُصلَح (server actions + مسار عام مُتحكَّم) |
+| 7 | PUBLIC EXECUTE (12 دالة) | Medium | ✅ مُصلَح (REVOKE) |
+| 8 | dedup `generated_forms` | Low | ✅ مُصلَح (فهرس فريد DB) |
+| 9 | RLS initplan + فهارس FK (3E-2) | Low | ✅ مُصلَح |
+| 10 | انحراف تتبّع الترحيلات | Low | ✅ مُوثَّق + جدول مصالحة + خطة baseline ([§9](../db/MIGRATION_TRACKING_AUDIT.md)) |
+| — | proxy logs (dev-gating) | Low | ✅ مُصلَح |
+| — | CSP كامل · validate-bulk-upload · overloads · z_archive · leaked-password | Low | ⏳ مؤجَّل بأسباب صريحة (لا «later» غامض — انظر تقارير الأقسام) |
+
+**المُطبَّق على DB:** `M82` (`20260613_security_hardening.sql`) + تدوير الملح. **app-code:** invite · safe-action · proxy · consent (page+actions) · generate-qms-pdf (Edge) · qms-pdf service · .env.example. **advisors بعد الإصلاح:** 0 ERROR · anon-secdef 3→0 · auth-secdef 13→10.
+
+### إجراء المالك المطلوب (الوحيد المتبقّي — High 5b)
+سرّ واحد قوي يُضبط في **مكانين** + رابط النشر:
+```bash
+# 1) ولّد سرّاً قوياً واحداً (مثال)
+openssl rand -hex 32
+# 2) اضبطه في Vercel (متغيّر بيئة المشروع):  CRON_SECRET=<القيمة>
+# 3) اضبط نفس القيمة + رابط النشر في DB (app_private.secrets):
+```
+```sql
+UPDATE app_private.secrets SET secret = '<نفس قيمة CRON_SECRET>' WHERE name = 'cron_secret';
+UPDATE app_private.secrets SET secret = 'https://<الرابط-الحقيقي>.vercel.app' WHERE name = 'cron_site_url';
+```
+حتى ذلك الحين تبقى cron + `generate-qms-pdf` **fail-closed** (آمنة، لا تعمل بسرّ ناقص).
+
+---
+
 ## 1) هل بقيت المرحلة قراءة-فقط؟
 ✅ **نعم.** لم يُطبَّق/يُنشأ/يُحذَف/يُعدَّل أي ترحيل · لا تغيير schema/RLS/trigger/function · لا تغيير كود runtime. فقط SQL للقراءة (SELECT) + قراءة ملفات + advisors + lint/build + **إنشاء ملفات تقارير markdown فقط**.
 

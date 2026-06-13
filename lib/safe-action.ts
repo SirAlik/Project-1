@@ -220,10 +220,16 @@ export function createSafeAction<TInput, TOutput>(
                     return { serverError: 'يتطلب هذا الإجراء سياق مدرسة محدد.' };
                 }
 
-                // Input Injection Check
-                // If the input has a 'schoolId' field, it MUST match the context
+                // Input Injection Check (defense-in-depth)
+                // If the input carries a school identifier — camelCase `schoolId` OR
+                // snake_case `school_id` — a non-owner's value MUST match their
+                // authenticated school context. (Catches snake_case fields that earlier
+                // only inspected camelCase and could slip a cross-tenant value through.)
                 const inputObj = validatedInput as Record<string, unknown>;
-                if (typeof inputObj.schoolId === 'string' && inputObj.schoolId !== persona.schoolId && !persona.isSystemOwner) {
+                const claimedSchoolId =
+                    (typeof inputObj.schoolId === 'string' ? inputObj.schoolId : undefined) ??
+                    (typeof inputObj.school_id === 'string' ? inputObj.school_id : undefined);
+                if (claimedSchoolId && !persona.isSystemOwner && claimedSchoolId !== persona.schoolId) {
                     return { serverError: 'محاولة اختراق السياق المدرسي.' };
                 }
             }

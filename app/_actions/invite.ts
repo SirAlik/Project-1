@@ -85,7 +85,9 @@ const generateInviteSchema = z.object({
         (val) => SCHOOL_ROLES.has(val as UserRole),
         { message: 'الدور المحدد غير صالح' }
     ),
-    school_id: z.string().uuid('معرف المدرسة غير صالح'),
+    // اختياري: لغير system_owner تُشتقّ المدرسة من سياق الخادم ويُتجاهَل أي قيمة من العميل
+    // (يحرسها أيضاً فحص الحقن المركزي في createSafeAction لكلٍّ من schoolId و school_id).
+    school_id: z.string().uuid('معرف المدرسة غير صالح').optional(),
 });
 
 // ============================================================
@@ -143,7 +145,18 @@ export const generateInvite = createSafeAction({
     },
 
     async handler(input: GenerateInviteInput, ctx): Promise<InviteResult> {
-        const { full_name, mobile_number, email, role, school_id } = input;
+        const { full_name, mobile_number, email, role } = input;
+
+        // 0. TENANT ISOLATION — derive target school from trusted server context only.
+        //    Non-owners are pinned to their authenticated school; only system_owner may
+        //    target a selected school. Client-provided school_id is never trusted here
+        //    (and the central guard rejects a non-owner mismatch before reaching this).
+        const targetSchoolId = ctx.user.isSystemOwner
+            ? (input.school_id ?? ctx.user.schoolId)
+            : ctx.user.schoolId;
+        if (!targetSchoolId) {
+            return { success: false, error: 'سياق المدرسة غير متوفر' };
+        }
 
         // 1. Normalize mobile number
         const normalizedMobile = normalizeMobile(mobile_number);
@@ -160,7 +173,7 @@ export const generateInvite = createSafeAction({
             .from('invites')
             .select('id')
             .eq('mobile_number', normalizedMobile)
-            .eq('target_school_id', school_id)
+            .eq('target_school_id', targetSchoolId)
             .is('used_at', null)
             .maybeSingle();
 
@@ -192,7 +205,7 @@ export const generateInvite = createSafeAction({
                 email: email || null,
                 full_name,
                 target_role: role,
-                target_school_id: school_id,
+                target_school_id: targetSchoolId,
                 expires_at: expiresAt,
                 created_by: ctx.user.userId,
             });

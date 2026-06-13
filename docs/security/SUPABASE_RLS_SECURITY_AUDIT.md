@@ -6,6 +6,24 @@
 
 ---
 
+## 0) تحديث الحالة — Security Hardening Sprint (2026-06-13) ✅
+
+> أُصلحت بنود هذا التقرير من الجذر عبر الترحيل `M82` (`20260613_security_hardening.sql`) المُطبَّق والمُتحقَّق منه. advisors بعد الإصلاح: **0 ERROR** · `anon_security_definer_function_executable` 3→**0** · `authenticated_security_definer_function_executable` 13→**10** (الباقي RPCs مشروعة).
+
+| البند | كان | الحالة |
+| --- | --- | --- |
+| نزاهة الـledger/المحفظة (High) | قابل للتجاوز | ✅ **مُصلَح** — حُذفت `tl_insert`+`sw_manage`؛ سُحبت منح INSERT/UPDATE/DELETE من `authenticated` على `transaction_logs`+`student_wallet`؛ الكتابة حصراً عبر `rpc_process_transaction` (SECURITY DEFINER). السجلّ append-only فعلياً. |
+| أسرار placeholder (High) | placeholder | ✅ **`ledger_secret_salt` مُدوّر** (عشوائي 64-hex، server-side، غير مُلتزَم). ⏳ `cron_secret`+`cron_site_url` **محجوبان بإدخال المالك** (Vercel env + رابط النشر) — أوامر دقيقة في الملخّص §12. |
+| دوال PUBLIC EXECUTE (Medium) | 12 دالة مكشوفة | ✅ **مُصلَح** — سُحب EXECUTE من PUBLIC/anon/authenticated عن 12 دالة trigger/أداة (postgres+service_role فقط). |
+| overloads دوال ميتة (Low) | موجودة | ⏳ مؤجَّل (DROP آمن، بلا أثر أمني — تنظيف). |
+| انحراف تتبّع الترحيلات (Low) | 8/91 | ✅ مُوثَّق + جدول مصالحة لكل ملف + خطة baseline/repair (انظر [MIGRATION_TRACKING_AUDIT](../db/MIGRATION_TRACKING_AUDIT.md) §9). |
+| z_archive + pg_net (Low) | موجود | ⏳ z_archive DROP اختياري · pg_net مُدار من Supabase (مقبول). |
+| leaked-password (Low) | معطّل | ⏳ يتطلّب Supabase Pro (مؤجَّل بقرار). |
+
+**فحوص جديدة (FIX 8/9):** فهرس فريد `uq_generated_forms_dedup` على `generated_forms (school_id, form_code, source_table, source_record_id)` · فهارس FK أمنية (sqs/sqto updated_by · qe academic_year/recorded_by) · تحسين initplan لسياسات جدولي 3E-2 · bucket `qms-forms` خاص.
+
+---
+
 ## 1) الحُكم العام
 
 قاعدة البيانات الحيّة في **حالة أمنية قوية** لـ SaaS متعدّد المستأجرين قبل الإطلاق، بتصميم RLS-first منضبط. تحقّق مستقلّ:

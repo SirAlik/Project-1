@@ -7,6 +7,21 @@
 
 ---
 
+## 0) تحديث الحالة — Security Hardening Sprint (2026-06-13) ✅
+
+> أُصلحت بنود هذا التقرير من الجذر بعد التدقيق. (هذا التقرير الآن **تاريخي + حالة الإصلاح**.)
+
+| البند | كان | الحالة |
+| --- | --- | --- |
+| `generateInvite` عزل مستأجر (High) | غير مُصلَح | ✅ **مُصلَح** — `targetSchoolId` يُشتقّ من `ctx.user` (غير system_owner مُثبَّت على مدرسته) + حارس `createSafeAction` المركزي صار يكشف `school_id` (snake_case) أيضاً. |
+| `generate-qms-pdf` fail-open (High) | غير مُصلَح | ✅ **مُصلَح** — fail-closed: 503 إن غاب `CRON_SECRET`، 401 إن لم يطابق. |
+| QMS PDF رابط عام (High) | غير مُصلَح | ✅ **مُصلَح** — `getPublicUrl` أُزيل · bucket خاص · `pdf_url=null` · signed URL server-side عند الطلب (`lib/quality/qms-pdf.ts`). |
+| موافقة الرحلة عبر anon (Medium) | غير مُصلَح | ✅ **مُصلَح** — server actions مُقيَّدة بالتوكن (`_actions.ts`) + مسار عام مُتحكَّم في `proxy.ts` + حقول دنيا. |
+| proxy logs + CSP (Low) | غير مُصلَح | ✅ logs محصورة بـ dev. CSP الكامل (nonce) يبقى عملاً منفصلاً (يتطلّب تكامل nonce في Next). |
+| `validate-bulk-upload` ربط مدرسة (Low) | غير مُصلَح | ⏳ دفاع متعمّق مؤجَّل (خطر منخفض — تحقّق فقط، مُستدعى خادمياً من route يفرض الدور). |
+
+---
+
 ## 1) الحُكم العام
 
 البنية الأمنية لكود التطبيق **قوية ومتّسقة** مع معمارية المشروع المُعلنة:

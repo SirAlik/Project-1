@@ -2,59 +2,47 @@
 
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/lib/db/supabase";
 import { Bus, MapPin, Calendar, CheckCircle, ShieldCheck } from "lucide-react";
-import type { ActivityTrip } from "@/lib/types/activity";
-
-interface ConsentRow {
-    id: string;
-    parent_consent: boolean;
-    consent_date: string | null;
-    student_profiles: { name: string } | null;
-    activity_trips: ActivityTrip | null;
-}
+import { getTripConsent, submitTripConsent, type PublicTripConsent } from "./_actions";
 
 export default function TripConsentPage() {
     const params = useParams();
     const uniqueLink = params.uniqueLink as string;
 
     const [loading, setLoading] = useState(true);
-    const [trip, setTrip] = useState<ActivityTrip | null>(null);
-    const [student, setStudent] = useState<{ name: string } | null>(null);
-    const [consent, setConsent] = useState<ConsentRow | null>(null);
+    const [data, setData] = useState<PublicTripConsent | null>(null);
     const [submitted, setSubmitted] = useState(false);
 
     useEffect(() => {
+        let active = true;
         async function loadConsentData() {
-            if (!uniqueLink) return;
-
-            const { data } = await supabase
-                .from("trip_consents")
-                .select("*, student_profiles(name), activity_trips(*)")
-                .eq("unique_link", uniqueLink)
-                .single();
-
-            if (data) {
-                setConsent(data);
-                setStudent(data.student_profiles);
-                setTrip(data.activity_trips);
+            if (!uniqueLink) {
+                if (active) setLoading(false);
+                return;
             }
-            setLoading(false);
+            // البيانات تُجلب server-side عبر إجراء مُقيَّد بالتوكن (لا عميل anon، حقول دنيا)
+            const result = await getTripConsent(uniqueLink);
+            if (active) {
+                setData(result);
+                setLoading(false);
+            }
         }
         loadConsentData();
+        return () => {
+            active = false;
+        };
     }, [uniqueLink]);
 
     const handleConsent = async () => {
-        const { error } = await supabase
-            .from("trip_consents")
-            .update({ parent_consent: true, consent_date: new Date().toISOString() })
-            .eq("unique_link", uniqueLink);
-
-        if (!error) setSubmitted(true);
+        const res = await submitTripConsent(uniqueLink);
+        if (res.ok) setSubmitted(true);
     };
 
     if (loading) return <div className="min-h-screen bg-white flex items-center justify-center text-stone-500">جاري التحميل...</div>;
-    if (!trip) return <div className="min-h-screen bg-white flex items-center justify-center text-rose-500">رابط غير صالح أو منتهي الصلاحية</div>;
+    if (!data?.trip) return <div className="min-h-screen bg-white flex items-center justify-center text-rose-500">رابط غير صالح أو منتهي الصلاحية</div>;
+
+    const trip = data.trip;
+    const consented = submitted || data.alreadyConsented;
 
     return (
         <main className="min-h-screen bg-white text-stone-800 font-sans p-6" dir="rtl">
@@ -79,11 +67,11 @@ export default function TripConsentPage() {
                     <div className="p-8 space-y-6">
                         <div className="p-6 bg-white border border-stone-200 rounded-3xl">
                             <p className="text-sm text-stone-500 leading-relaxed">
-                                أنا ولي أمر الطالب <span className="text-[hsl(var(--accent-primary))] font-black">({student?.name})</span>، أقر بموافقتي على مشاركة ابني في الرحلة المذكورة أعلاه، مع الالتزام بكافة التعليمات المنظمة للنشاط.
+                                أنا ولي أمر الطالب <span className="text-[hsl(var(--accent-primary))] font-black">({data.studentName ?? "—"})</span>، أقر بموافقتي على مشاركة ابني في الرحلة المذكورة أعلاه، مع الالتزام بكافة التعليمات المنظمة للنشاط.
                             </p>
                         </div>
 
-                        {submitted || consent?.parent_consent ? (
+                        {consented ? (
                             <div className="p-8 bg-emerald-500/10 border border-emerald-500/20 rounded-3xl text-center space-y-4 animate-in zoom-in">
                                 <CheckCircle className="w-12 h-12 text-emerald-400 mx-auto" />
                                 <h3 className="text-lg font-black text-foreground">تم استلام الموافقة بنجاح</h3>

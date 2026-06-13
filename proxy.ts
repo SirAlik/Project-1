@@ -20,6 +20,20 @@ import type { UserRole } from '@/lib/auth/roles';
 const PUBLIC_ROUTES = ['/', '/auth/callback', '/unauthorized', '/403'];
 
 /**
+ * Public route PREFIXES (token-scoped, no session required).
+ * `/activity/consent/<uniqueLink>` is a parent-facing consent link gated by an
+ * unguessable per-record token; data access is via server actions, not broad anon DB.
+ */
+const PUBLIC_PREFIXES = ['/activity/consent/'];
+
+/** Dev-only trace logger — silenced in production to avoid request-path/timing log noise. */
+const trace = (...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(...args);
+    }
+};
+
+/**
  * Helper: Creates a redirect response and copies all cookies from the source response.
  * This prevents session loss when auth tokens are refreshed before a redirect.
  */
@@ -38,7 +52,7 @@ export async function proxy(req: NextRequest) {
 
     // 0. EMERGENCY BYPASS FOR ROOT
     if (pathname === '/') {
-        console.log(`[Proxy] Path: / | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: root-bypass`);
+        trace(`[Proxy] Path: / | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: root-bypass`);
         return NextResponse.next();
     }
 
@@ -51,19 +65,23 @@ export async function proxy(req: NextRequest) {
 
     // 1. Static Asset Bypass (BEFORE any auth)
     if (pathname.includes('.') || pathname.startsWith('/_next') || pathname === '/favicon.ico') {
-        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: static-bypass`);
+        trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: static-bypass`);
         return NextResponse.next();
     }
 
     // 2. ZERO-WORK POLICY: /portal and /api/persona/select bypass active_persona checks
     if (pathname === '/portal' || pathname.startsWith('/api/persona/select')) {
-        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: portal-zero-work`);
+        trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: portal-zero-work`);
         return response;
     }
 
     // 3. Public Route Bypass (BEFORE auth call)
-    if (PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/auth/')) {
-        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: public-route`);
+    if (
+        PUBLIC_ROUTES.includes(pathname) ||
+        pathname.startsWith('/auth/') ||
+        PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+    ) {
+        trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: public-route`);
         return response;
     }
 
@@ -89,22 +107,22 @@ export async function proxy(req: NextRequest) {
     // 5. Auth Session Refresh & Verification
     const authStart = performance.now();
     const { data: { user } } = await supabase.auth.getUser();
-    console.log(`[Proxy] Auth check took: ${(performance.now() - authStart).toFixed(2)}ms`);
+    trace(`[Proxy] Auth check took: ${(performance.now() - authStart).toFixed(2)}ms`);
 
     // 6. SPECIAL /login HANDLING
     if (pathname === '/login') {
         if (user) {
-            console.log(`[Proxy] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-to-portal`);
+            trace(`[Proxy] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-to-portal`);
             return redirectWithCookies(response, new URL('/portal', req.url));
         } else {
-            console.log(`[Proxy] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-allowed`);
+            trace(`[Proxy] Path: /login | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: login-allowed`);
             return response;
         }
     }
 
     // 7. Protected Route Guard (Authentication)
     if (!user) {
-        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: no-auth-redirect`);
+        trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: no-auth-redirect`);
         const redirectUrl = new URL('/login', req.url);
         redirectUrl.searchParams.set('redirect', pathname);
         return redirectWithCookies(response, redirectUrl);
@@ -117,7 +135,7 @@ export async function proxy(req: NextRequest) {
         if (pathname === '/portal') {
             return response;
         }
-        console.log('[Proxy] No active persona found. Redirecting to Portal.');
+        trace('[Proxy] No active persona found. Redirecting to Portal.');
         return redirectWithCookies(response, new URL('/portal', req.url));
     }
 
@@ -126,7 +144,7 @@ export async function proxy(req: NextRequest) {
     try {
         const jwtSecret = process.env.JWT_SECRET;
         if (!jwtSecret) {
-            console.log('[Proxy] JWT_SECRET غير مضبوط. إعادة توجيه للبوابة.');
+            trace('[Proxy] JWT_SECRET غير مضبوط. إعادة توجيه للبوابة.');
             return redirectWithCookies(response, new URL('/portal', req.url));
         }
 
@@ -138,20 +156,20 @@ export async function proxy(req: NextRequest) {
             ALL_ROLES.has(rawRole as UserRole) ? (rawRole as UserRole) : undefined;
 
         if (!resolved) {
-            console.log(`[Proxy] دور غير معروف "${rawRole}". إعادة توجيه للبوابة.`);
+            trace(`[Proxy] دور غير معروف "${rawRole}". إعادة توجيه للبوابة.`);
             return redirectWithCookies(response, new URL('/portal', req.url));
         }
 
         canonicalRole = resolved;
     } catch (e) {
-        console.log('[Proxy] فشل التحقق من JWT:', e);
+        trace('[Proxy] فشل التحقق من JWT:', e);
         return redirectWithCookies(response, new URL('/portal', req.url));
     }
 
     // 10. RBAC Check
     // الأدوار العالمية (system_owner) تملك صلاحية وصول كاملة
     if (GLOBAL_ROLES.has(canonicalRole)) {
-        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: global-role-allow`);
+        trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: global-role-allow`);
         return response;
     }
 
@@ -159,11 +177,11 @@ export async function proxy(req: NextRequest) {
     const isAllowed = allowedPrefixes.includes('*') || allowedPrefixes.some((prefix: string) => pathname.startsWith(prefix));
 
     if (!isAllowed) {
-        console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-denied`);
+        trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-denied`);
         return NextResponse.rewrite(new URL('/403', req.url));
     }
 
-    console.log(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-allowed`);
+    trace(`[Proxy] Path: ${pathname} | Time: ${(performance.now() - startTime).toFixed(2)}ms | Branch: rbac-allowed`);
     return response;
 }
 

@@ -1,6 +1,7 @@
 // Supabase Edge Function — generate-qms-pdf
 // يُولِّد ملفات PDF لسجلات generated_forms المعلَّقة (is_ready = false)
-// يرفعها إلى Supabase Storage ثم يُحدِّث السجل بـ pdf_url وis_ready = true
+// يرفعها إلى Supabase Storage (bucket خاص) ثم يُحدِّث السجل بـ storage_path وis_ready = true
+// (pdf_url=null؛ الوصول لاحقاً عبر signed URL قصير الأجل يُولَّد server-side عند الطلب)
 //
 // دعم العربية (Phase 3C):
 //   - الخط: Amiri (Naskh رسمي) مُضمَّن محلياً من ./assets — يغطّي كامل Arabic Presentation Forms-B
@@ -74,7 +75,6 @@ interface GeneratedFormRow {
 interface PdfResult {
   form_id:      string;
   storage_path: string;
-  pdf_url:      string;
 }
 
 // ── مساعدات الرسم (RTL) ──
@@ -165,9 +165,16 @@ Deno.serve(async (req: Request): Promise<Response> => {
     });
   }
 
-  // التحقق من الـ CRON_SECRET
+  // التحقق من الـ CRON_SECRET — **fail-closed**:
+  // إن غاب السرّ من البيئة → الخدمة غير مُهيّأة، نرفض ولا نُولّد شيئاً (لا fail-open).
+  if (!CRON_SECRET) {
+    console.error('[generate-qms-pdf] CRON_SECRET غير مضبوط — رفض fail-closed.');
+    return new Response(JSON.stringify({ error: 'الخدمة غير مُهيّأة' }), {
+      status: 503, headers: { ...cors, 'Content-Type': 'application/json' },
+    });
+  }
   const auth = req.headers.get('Authorization') ?? '';
-  if (CRON_SECRET && auth !== `Bearer ${CRON_SECRET}`) {
+  if (auth !== `Bearer ${CRON_SECRET}`) {
     return new Response(JSON.stringify({ error: 'غير مصرح' }), {
       status: 401, headers: { ...cors, 'Content-Type': 'application/json' },
     });
@@ -224,7 +231,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
       // توليد PDF
       const pdfBytes = await buildPdf(form, schoolName);
 
-      // رفع إلى Supabase Storage
+      // رفع إلى Supabase Storage (bucket **خاص** qms-forms)
       const storagePath = `${school_id}/${form.form_code}/${form.id}.pdf`;
       const { error: uploadErr } = await supabase.storage
         .from(STORAGE_BUCKET)
@@ -238,19 +245,14 @@ Deno.serve(async (req: Request): Promise<Response> => {
         continue;
       }
 
-      // الحصول على الرابط العام
-      const { data: urlData } = supabase.storage
-        .from(STORAGE_BUCKET)
-        .getPublicUrl(storagePath);
-
-      const pdfUrl = urlData?.publicUrl ?? '';
-
-      // تحديث السجل
+      // **لا رابط عام**: المصدر المعتمد هو storage_path؛ pdf_url يبقى null.
+      // الوصول يكون عبر signed URL قصير الأجل يُولَّد server-side عند الطلب (lib/quality/qms-pdf.ts)
+      // بعد التحقق من صلاحية المستخدم للسجل عبر RLS. ملف الجودة قد يحوي بيانات حسّاسة → لا يُكشف للعموم.
       const { error: updateErr } = await supabase
         .from('generated_forms')
         .update({
           is_ready:     true,
-          pdf_url:      pdfUrl,
+          pdf_url:      null,
           storage_path: storagePath,
           generated_at: new Date().toISOString(),
         })
@@ -262,7 +264,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
         continue;
       }
 
-      processed.push({ form_id: form.id, storage_path: storagePath, pdf_url: pdfUrl });
+      processed.push({ form_id: form.id, storage_path: storagePath });
     } catch (err) {
       errors.push(`form ${form.id}: ${String(err)}`);
     }
