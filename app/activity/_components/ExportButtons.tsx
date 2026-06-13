@@ -5,6 +5,8 @@ import { FileDown, Printer, FileText, ClipboardList, Loader2 } from "lucide-reac
 import type { ActivityFinancial, ActivityClub, ClubAssignment, StudentWish, ActivityEvent, StudentHonor } from "@/lib/types/activity";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useAuth } from "@/app/_context/AuthContext";
+import { isQualityModuleEnabled } from "@/lib/quality/tenant-templates";
+import { QualityDisabledNotice } from "@/components/quality/QualityDisabledNotice";
 import {
     BudgetReport,
     ExpensesReport,
@@ -39,9 +41,15 @@ interface ExportButtonsProps {
 
 export function ExportButtons({ data }: ExportButtonsProps) {
     const { financials, assignments, wishes, events, honors, stats, clubs } = data;
-    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
-    const { schoolName } = useAuth();
+    // اسم المدرسة + المعرّف من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+    const { schoolName, schoolId, isLoading } = useAuth();
     const tenant = schoolName ?? undefined;
+
+    // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+    if (isLoading) return null;
+    if (!isQualityModuleEnabled(schoolId, 'activity')) {
+        return <QualityDisabledNotice moduleLabel="النشاط الطلابي" />;
+    }
 
     const reports = [
         {

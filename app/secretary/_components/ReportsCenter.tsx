@@ -3,6 +3,8 @@
 import React from "react";
 import { PDFDownloadLink, type DocumentProps } from "@react-pdf/renderer";
 import { useAuth } from "@/app/_context/AuthContext";
+import { isQualityModuleEnabled } from "@/lib/quality/tenant-templates";
+import { QualityDisabledNotice } from "@/components/quality/QualityDisabledNotice";
 import {
     Download,
     Printer,
@@ -54,8 +56,14 @@ interface Props {
 }
 
 export function ReportsCenter({ state }: Props) {
-    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
-    const { schoolName } = useAuth();
+    // اسم المدرسة + المعرّف من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+    const { schoolName, schoolId, isLoading } = useAuth();
+
+    // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+    if (isLoading) return null;
+    if (!isQualityModuleEnabled(schoolId, 'secretary')) {
+        return <QualityDisabledNotice moduleLabel="السكرتارية" />;
+    }
 
     const reportCategories = [
         {

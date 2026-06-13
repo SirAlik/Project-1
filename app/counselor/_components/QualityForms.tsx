@@ -1,4 +1,9 @@
+"use client";
+
 import React, { useState } from "react";
+import { useAuth } from "@/app/_context/AuthContext";
+import { isQualityModuleEnabled } from "@/lib/quality/tenant-templates";
+import { QualityDisabledNotice } from "@/components/quality/QualityDisabledNotice";
 import { Form42_IndividualSession } from "@/app/counselor/_components/Form42_IndividualSession";
 import { Form43_FollowUp } from "@/app/counselor/_components/Form43_FollowUp";
 import { Form82_AbsenceFollowUp } from "@/app/counselor/_components/Form82_AbsenceFollowUp";
@@ -15,7 +20,14 @@ interface QualityFormsProps {
 }
 
 export function QualityForms({ studentsList, classesList, cases, getAbsenceCount, user, userName }: QualityFormsProps) {
+    const { schoolId, isLoading } = useAuth();
     const [activeForm, setActiveForm] = useState<string>("4-2");
+
+    // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+    if (isLoading) return null;
+    if (!isQualityModuleEnabled(schoolId, 'counseling')) {
+        return <QualityDisabledNotice moduleLabel="الإرشاد الطلابي" />;
+    }
 
     // أكواد QF أدناه خاصّة بمستأجر «الفلاح» ومُمرآة في `lib/quality/tenant-templates.ts` (module 'counseling').
     // TODO (3D wiring): اشتقاق الأكواد/الإتاحة من getQualityTemplates(schoolId, 'counseling') بعد تسجيل برنامج المدرسة.

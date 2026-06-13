@@ -213,7 +213,19 @@ export const GLOBAL_QUALITY_TEMPLATES: QualityTemplate[] = [
  *
  * لا تُسجّل قوالب الفلاح لمعرّف مجهول. طبقة تفعيل/تعطيل لكل مدرسة مدعومة بقاعدة البيانات = Phase 3F.
  */
-const TENANT_QUALITY_REGISTRY: Record<string, TenantQualityConfig> = {};
+/**
+ * معرّف مدرسة الفلاح من سجلّ المدارس الحقيقي في Supabase (المشروع الحيّ · `schools.name` =
+ * «مدارس الفلاح الأهلية» · أُنشئ 2026-01-24). معرّف ثابت موثوق server-side — ليس مُختلَقاً.
+ */
+const AL_FALAH_SCHOOL_ID = 'bfe99c43-fa5c-46f4-8ad0-05e12184b55e';
+
+const TENANT_QUALITY_REGISTRY: Record<string, TenantQualityConfig> = {
+    [AL_FALAH_SCHOOL_ID]: {
+        qualityEnabled: true,
+        program: 'al-falah',
+        templates: [...AL_FALAH_QUALITY_TEMPLATES, ...GLOBAL_QUALITY_TEMPLATES],
+    },
+};
 
 // ============================================================================
 // الوصول الآمن (fail-closed)

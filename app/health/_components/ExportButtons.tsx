@@ -5,6 +5,8 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FileDown, Loader2 } from "lucide-react";
 import type { HealthVisit, HealthSupply, HygieneLog, CanteenCheck } from "@/lib/types/health";
 import { useAuth } from "@/app/_context/AuthContext";
+import { isQualityModuleEnabled } from "@/lib/quality/tenant-templates";
+import { QualityDisabledNotice } from "@/components/quality/QualityDisabledNotice";
 import {
     VisitLogReport,
     SupplyLogReport,
@@ -24,8 +26,14 @@ interface ExportButtonsProps {
 }
 
 export function ExportButtons({ state }: ExportButtonsProps) {
-    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
-    const { schoolName } = useAuth();
+    // اسم المدرسة + المعرّف من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+    const { schoolName, schoolId, isLoading } = useAuth();
+
+    // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+    if (isLoading) return null;
+    if (!isQualityModuleEnabled(schoolId, 'health')) {
+        return <QualityDisabledNotice moduleLabel="الصحة المدرسية" />;
+    }
 
     const reports = [
         {
