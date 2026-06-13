@@ -2,6 +2,13 @@
 // يُولِّد ملفات PDF لسجلات generated_forms المعلَّقة (is_ready = false)
 // يرفعها إلى Supabase Storage ثم يُحدِّث السجل بـ pdf_url وis_ready = true
 //
+// دعم العربية (Phase 3C):
+//   - الخط: Amiri (Naskh رسمي) مُضمَّن محلياً من ./assets — يغطّي كامل Arabic Presentation Forms-B
+//     (مُتحقَّق منه: 0 محارف ناقصة) فيُعرَض التشكيل عبر drawText دون نقص.
+//   - التشكيل: arabic-persian-reshaper (أشكال الحروف السياقية) + bidi-js (إعادة ترتيب RTL) — استيراد
+//     Edge عبر esm.sh فقط، لا يمسّ package.json. pdf-lib لا يملك محرّك تشكيل، فالنصّ يُشكَّل ويُرتَّب
+//     قبل الرسم. الترويسة تحمل اسم المدرسة ديناميكياً من schools.name (مصدر موثوق server-side).
+//
 // متغيرات البيئة المطلوبة:
 //   SUPABASE_URL                — رابط مشروع Supabase
 //   SUPABASE_SERVICE_ROLE_KEY   — مفتاح service role
@@ -14,13 +21,46 @@
 //   form_id اختياري — إذا غاب تُعالَج كل السجلات المعلَّقة للمدرسة
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { PDFDocument, StandardFonts, rgb } from 'npm:pdf-lib';
+import { PDFDocument, PDFFont, PDFPage, rgb } from 'npm:pdf-lib@1.17.1';
+import fontkit from 'npm:@pdf-lib/fontkit@1.1.1';
+import reshaperModule from 'https://esm.sh/arabic-persian-reshaper@1.0.1';
+import bidiFactory from 'https://esm.sh/bidi-js@1.0.3';
 
 const SUPABASE_URL              = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const CRON_SECRET               = Deno.env.get('CRON_SECRET');
 
 const STORAGE_BUCKET = 'qms-forms';
+const PAGE_W = 595, PAGE_H = 842, MARGIN = 50; // A4
+
+// ── طبقة التشكيل العربي (CJS interop آمن عبر esm.sh) ──
+const ArabicShaper = (
+  reshaperModule as { ArabicShaper?: { convertArabic(s: string): string }; default?: { ArabicShaper: { convertArabic(s: string): string } } }
+).ArabicShaper ?? (reshaperModule as { default?: { ArabicShaper: { convertArabic(s: string): string } } }).default!.ArabicShaper;
+
+const bidi = bidiFactory();
+
+/** يُحوِّل نصاً منطقياً إلى نصّ بصري جاهز للرسم: أشكال الحروف السياقية + ترتيب RTL.
+ *  pdf-lib يرسم يساراً-ليميناً، فبعد التشكيل وإعادة الترتيب يظهر النص العربي صحيحاً. */
+function ar(text: string | number | null | undefined): string {
+  const s = text === null || text === undefined ? '' : String(text);
+  if (!s) return '';
+  const shaped = ArabicShaper.convertArabic(s);
+  const embeddingLevels = bidi.getEmbeddingLevels(shaped, 'rtl');
+  return bidi.getReorderedString(shaped, embeddingLevels);
+}
+
+// ── تحميل الخط مرّة واحدة (cache عبر الاستدعاءات) ──
+let fontCache: { regular: Uint8Array; bold: Uint8Array } | null = null;
+async function loadFontBytes(): Promise<{ regular: Uint8Array; bold: Uint8Array }> {
+  if (!fontCache) {
+    fontCache = {
+      regular: await Deno.readFile(new URL('./assets/Amiri-Regular.ttf', import.meta.url)),
+      bold:    await Deno.readFile(new URL('./assets/Amiri-Bold.ttf',    import.meta.url)),
+    };
+  }
+  return fontCache;
+}
 
 interface GeneratedFormRow {
   id:           string;
@@ -37,76 +77,77 @@ interface PdfResult {
   pdf_url:      string;
 }
 
-async function buildPdf(form: GeneratedFormRow): Promise<Uint8Array> {
-  const doc      = await PDFDocument.create();
-  const page     = doc.addPage([595, 842]); // A4
-  const font     = await doc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
-  const { width, height } = page.getSize();
+// ── مساعدات الرسم (RTL) ──
+function rightAligned(page: PDFPage, text: string, y: number, size: number, font: PDFFont, color = rgb(0.15, 0.15, 0.15)) {
+  const visual = ar(text);
+  if (!visual) return;
+  const w = font.widthOfTextAtSize(visual, size);
+  page.drawText(visual, { x: PAGE_W - MARGIN - w, y, size, font, color });
+}
+function leftAligned(page: PDFPage, text: string, y: number, size: number, font: PDFFont, color = rgb(0.4, 0.4, 0.4)) {
+  const visual = ar(text);
+  if (!visual) return;
+  page.drawText(visual, { x: MARGIN, y, size, font, color });
+}
+function centered(page: PDFPage, text: string, y: number, size: number, font: PDFFont, color = rgb(0.1, 0.1, 0.1)) {
+  const visual = ar(text);
+  if (!visual) return;
+  const w = font.widthOfTextAtSize(visual, size);
+  page.drawText(visual, { x: (PAGE_W - w) / 2, y, size, font, color });
+}
 
-  let y = height - 60;
+async function buildPdf(form: GeneratedFormRow, schoolName: string): Promise<Uint8Array> {
+  const { regular, bold } = await loadFontBytes();
+  const doc = await PDFDocument.create();
+  doc.registerFontkit(fontkit);
+  const font     = await doc.embedFont(regular, { subset: true });
+  const boldFont = await doc.embedFont(bold,    { subset: true });
 
-  // عنوان النموذج
-  page.drawText(form.form_code, {
-    x: 50, y,
-    size: 18, font: boldFont,
-    color: rgb(0.1, 0.2, 0.5),
-  });
-  y -= 10;
+  let page = doc.addPage([PAGE_W, PAGE_H]);
+  let y = PAGE_H - 60;
 
-  // خط فاصل
-  page.drawLine({
-    start: { x: 50, y }, end: { x: width - 50, y },
-    thickness: 1, color: rgb(0.7, 0.7, 0.7),
-  });
-  y -= 25;
+  // ── ترويسة رسمية ديناميكية ──
+  centered(page, schoolName || 'المدرسة', y, 18, boldFont, rgb(0.05, 0.27, 0.42)); y -= 22;
+  centered(page, 'نظام إدارة الجودة', y, 12, font, rgb(0.2, 0.2, 0.2)); y -= 15;
+  centered(page, 'منصة سِدرة', y, 9, font, rgb(0.45, 0.45, 0.45)); y -= 18;
 
-  // معلومات المصدر
-  page.drawText(`Source: ${form.source_table} / ${form.source_record_id}`, {
-    x: 50, y, size: 9, font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  y -= 8;
-  page.drawText(`Generated: ${new Date().toISOString().split('T')[0]}`, {
-    x: 50, y, size: 9, font,
-    color: rgb(0.5, 0.5, 0.5),
-  });
-  y -= 30;
+  page.drawLine({ start: { x: MARGIN, y }, end: { x: PAGE_W - MARGIN, y }, thickness: 1, color: rgb(0.7, 0.7, 0.7) });
+  y -= 22;
 
-  // بيانات النموذج — key: value
+  // ── بيانات وصفية: رمز النموذج (يمين) + تاريخ التوليد (يسار) ──
+  const generatedDate = new Date().toISOString().split('T')[0];
+  rightAligned(page, `رمز النموذج: ${form.form_code}`, y, 11, boldFont, rgb(0.1, 0.2, 0.5));
+  leftAligned(page, `تاريخ التوليد: ${generatedDate}`, y, 10, font, rgb(0.4, 0.4, 0.4));
+  y -= 16;
+  leftAligned(page, `المصدر: ${form.source_table}`, y, 8, font, rgb(0.55, 0.55, 0.55));
+  y -= 26;
+
+  // ── جسم النموذج: تسمية: قيمة (RTL) ──
   const data = form.form_data ?? {};
-  for (const [key, value] of Object.entries(data)) {
-    if (y < 80) {
-      // صفحة جديدة إذا نفد المكان
-      const newPage = doc.addPage([595, 842]);
-      y = newPage.getSize().height - 60;
+  const entries = Object.entries(data);
+  if (entries.length === 0) {
+    rightAligned(page, 'لا توجد بيانات مسجَّلة لهذا النموذج.', y, 10, font, rgb(0.5, 0.5, 0.5));
+    y -= 18;
+  }
+  for (const [key, value] of entries) {
+    if (y < 70) {
+      page = doc.addPage([PAGE_W, PAGE_H]);
+      y = PAGE_H - 60;
     }
-
-    const label     = String(key).replace(/_/g, ' ');
-    const rawValue  = value === null || value === undefined ? '—' : String(value);
-    const displayVal = rawValue.length > 90 ? rawValue.slice(0, 90) + '...' : rawValue;
-
-    page.drawText(`${label}:`, {
-      x: 50, y, size: 10, font: boldFont,
-      color: rgb(0.2, 0.2, 0.2),
-    });
-    page.drawText(displayVal, {
-      x: 200, y, size: 10, font,
-      color: rgb(0.3, 0.3, 0.3),
-    });
-    y -= 20;
+    const label    = String(key).replace(/_/g, ' ');
+    const rawValue = value === null || value === undefined ? '—' : String(value);
+    const display  = rawValue.length > 80 ? rawValue.slice(0, 80) + '…' : rawValue;
+    rightAligned(page, `${label}: ${display}`, y, 10, font, rgb(0.15, 0.15, 0.15));
+    y -= 18;
   }
 
-  // تذييل الصفحة
+  // ── تذييل كل الصفحات ──
   const pages = doc.getPages();
   pages.forEach((p, i) => {
-    p.drawText(`Sidra — ${form.form_code}  |  Page ${i + 1} of ${pages.length}`, {
-      x: 50, y: 30, size: 8, font,
-      color: rgb(0.6, 0.6, 0.6),
-    });
+    centered(p, `منصة سِدرة — ${form.form_code} — صفحة ${i + 1} من ${pages.length}`, 30, 8, font, rgb(0.6, 0.6, 0.6));
   });
 
-  return doc.save();
+  return await doc.save();
 }
 
 Deno.serve(async (req: Request): Promise<Response> => {
@@ -150,6 +191,15 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
+  // اسم المدرسة من مصدر موثوق server-side عبر school_id (لا يُقبَل اسم من العميل)
+  let schoolName = 'المدرسة';
+  const { data: schoolRow } = await supabase
+    .from('schools')
+    .select('name')
+    .eq('id', school_id)
+    .maybeSingle();
+  if (schoolRow?.name) schoolName = String(schoolRow.name);
+
   // جلب السجلات المعلَّقة
   let query = supabase
     .from('generated_forms')
@@ -172,7 +222,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
   for (const form of (forms ?? []) as GeneratedFormRow[]) {
     try {
       // توليد PDF
-      const pdfBytes = await buildPdf(form);
+      const pdfBytes = await buildPdf(form, schoolName);
 
       // رفع إلى Supabase Storage
       const storagePath = `${school_id}/${form.form_code}/${form.id}.pdf`;
