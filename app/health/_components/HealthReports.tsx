@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
  * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
  * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (المصدر: سياق المستأجر
  * المصادَق server-side عبر useAuth في المُستدعي) ولا يُثبَّت في القالب. سجلّ القوالب/الأكواد لكل
- * مدرسة (tenant template registry) = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ * مدرسة (tenant template registry) = مُمرآة الآن في سجلّ المستأجرين `lib/quality/tenant-templates.ts` (module 'health'، المصدر المعتمد للأكواد). TODO: ربط الإتاحة المدرسية بالسجلّ على مستوى المُستدعي (بعد تسجيل برنامج المدرسة).
  */
 const ReportHeader = ({ title, code, schoolName }: { title: string; code: string; schoolName?: string }) => (
     <View style={styles.header}>

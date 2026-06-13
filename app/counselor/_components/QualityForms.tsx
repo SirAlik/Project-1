@@ -17,6 +17,8 @@ interface QualityFormsProps {
 export function QualityForms({ studentsList, classesList, cases, getAbsenceCount, user, userName }: QualityFormsProps) {
     const [activeForm, setActiveForm] = useState<string>("4-2");
 
+    // أكواد QF أدناه خاصّة بمستأجر «الفلاح» ومُمرآة في `lib/quality/tenant-templates.ts` (module 'counseling').
+    // TODO (3D wiring): اشتقاق الأكواد/الإتاحة من getQualityTemplates(schoolId, 'counseling') بعد تسجيل برنامج المدرسة.
     const tabs = [
         { id: "2-2", name: "دراسة حالة (2-2)", code: "QF-71-C-2-2" },
         { id: "4-2", name: "مقابلة فردية (4-2)", code: "QF-71-F-4-2" },

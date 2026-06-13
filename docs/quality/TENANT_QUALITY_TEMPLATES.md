@@ -62,3 +62,18 @@
 2. **لا تفترض** أن أكواد/نماذج الفلاح متاحة لكل المدارس.
 3. عند بناء طبقة قوالب الجودة (المرحلة 3): اجعل **القالب كياناً مرتبطاً بـ `school_id`**، والإتاحة قراراً لكل مدرسة.
 4. اقرأ [SIDRA_SYSTEM_DOCTRINE](../architecture/SIDRA_SYSTEM_DOCTRINE.md) §2 قبل لمس أي قالب أو ترويسة PDF.
+
+---
+
+## 6) السجلّ البرمجي (Phase 3D) — `lib/quality/tenant-templates.ts`
+
+نُفِّذ سجلّ app-code يُنمذج هذه القواعد (بلا قاعدة بيانات):
+
+- **`AL_FALAH_QUALITY_TEMPLATES`** — أكواد QF الخاصة بمستأجر الفلاح (health/secretary/student_affairs/counseling/activity) موسومة `tenantSpecific: true`. **مصدر الحقيقة للأكواد**.
+- **`GLOBAL_QUALITY_TEMPLATES`** — كتالوج عالمي بلا أكواد QF خاصة (LRC من `quality-forms.ts` + شهادة الانضباط العامة) موسوم `tenantSpecific: false`.
+- **`TENANT_QUALITY_REGISTRY`** (`school_id → TenantQualityConfig`) — **فارغ افتراضياً (fail-closed)**؛ PRE-LAUNCH لا مدارس حقيقية. تسجيل برنامج مدرسة يضيف إدخالاً — **لا تُسجَّل قوالب الفلاح لمعرّف مجهول**.
+- **الوصول الآمن:** `getTenantQualityConfig` · `isQualityEnabled` · `getQualityTemplates(schoolId, module?)` · `isQualityModuleEnabled` · `getTemplateByCode` — كلها fail-closed (`schoolId` غائب/غير مُسجَّل → معطّل/قائمة فارغة).
+- **الإتاحة لكل مدرسة app-code فقط** (لا feature flags في DB بعد — طبقة DB لكل مدرسة = Phase 3F).
+
+### حالة الربط (wiring)
+الأكواد **مُمرآة** في السجلّ ومُشار إليها بتعليقات داخل المكوّنات. لم تُحوَّل المكوّنات بعد لقراءة الإتاحة المدرسية من السجلّ **وقت التشغيل**، لأن السجلّ فارغ في PRE-LAUNCH وتحويلها الآن **يُخفي كل النماذج لكل المدارس** (تغيير سلوك). التحويل لبوّابة `getQualityTemplates(schoolId)` على مستوى المُستدعي = خطوة لاحقة (بعد تسجيل برنامج مدرسة)، معلَّمة `TODO` في كل مكوّن QF.

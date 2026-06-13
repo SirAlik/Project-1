@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
  * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
  * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (من سياق المستأجر
  * المصادَق عبر useAuth في ExportButtons) ولا يُثبَّت في القالب. العلامة المرئية «سِدرة» فقط.
- * سجلّ القوالب/الأكواد لكل مدرسة (tenant template registry) = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ * سجلّ القوالب/الأكواد لكل مدرسة (tenant template registry) = مُمرآة الآن في سجلّ المستأجرين `lib/quality/tenant-templates.ts` (module 'activity'، المصدر المعتمد للأكواد). TODO: ربط الإتاحة المدرسية بالسجلّ على مستوى المُستدعي (بعد تسجيل برنامج المدرسة).
  */
 const ReportHeader = ({ code, schoolName }: { code: string; title?: string; schoolName?: string }) => (
     <View style={styles.header}>

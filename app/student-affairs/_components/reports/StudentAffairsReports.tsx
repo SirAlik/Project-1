@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
  * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
  * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (من سياق المستأجر
  * المصادَق) ولا يُثبَّت في القالب. هذه المُصدَّرات غير مربوطة بصفحة حالياً؛ عند ربطها (Phase 3E) يُمرَّر
- * `schoolName` من المُستدعي. سجلّ القوالب/الأكواد لكل مدرسة = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ * `schoolName` من المُستدعي. سجلّ القوالب/الأكواد لكل مدرسة = مُمرآة الآن في سجلّ المستأجرين `lib/quality/tenant-templates.ts` (module 'student_affairs'، المصدر المعتمد للأكواد). TODO: ربط الإتاحة المدرسية بالسجلّ على مستوى المُستدعي (بعد تسجيل برنامج المدرسة).
  */
 // Shared Layout Components
 const QFHeader = ({ qf, schoolName }: { title?: string; qf: string; schoolName?: string }) => (
