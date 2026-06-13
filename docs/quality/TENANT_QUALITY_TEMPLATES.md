@@ -78,5 +78,5 @@
 ### حالة الربط (wiring) — مُحدَّثة 3D-2/3D-3
 - **3D-2:** سُجِّلت مدرسة الفلاح (`bfe99c43-…` من سجلّ Supabase الحقيقي) في `TENANT_QUALITY_REGISTRY`، ورُبطت مُستهلِكات: health/activity ExportButtons · secretary ReportsCenter · counselor QualityForms عبر `isQualityModuleEnabled`.
 - **3D-3:** رُبطت بقية أسطح QF المالكة: LRC (`LrcQualityForms`) · QA corrective-action (`/qa/corrective-action` + `/new`، server-side عبر `getActivePersona().schoolId`، وحدة `qa` جديدة + قالب QF03-1) · student-affairs quality forms (تحصين مستقبلي — غير مرسومة بالصفحة بعد).
-- **بلا لوحة QF بعد (مخطّط، لا تزييف):** lab_technician (`/science`) · school_principal · school_admin · academic_vp — تقارير مخطّطة عبر الوحدات، لا واجهة QF مخصّصة.
+- **لوحات مخطّطة مُضافة (3D-4):** lab_technician (`/science`) · school_principal (`/principal`) · school_admin (`/school/[id]/dashboard`) · academic_vp (`/educational`) — لها الآن لوحات حالة مُبوّبة بالسجلّ (`QualityOwnerPanel`) تعرض قوالبها كـ«قيد الاعتماد» (planned · `implemented:false` · بلا رمز QF) حتى تُعتمد القوالب الرسمية من مالك المنتج. **بلا أزرار تصدير ولا PDF للمخطّط.**
 - **الأكواد الحرفية داخل مستندات React-PDF تبقى** (مُمرآة في السجلّ)؛ تُعرَض فقط عبر مُستهلِكات مُبوّبة بالسجلّ (للفلاح المُسجَّلة)، وحالة فارغة صادقة (`QualityDisabledNotice`) لأي مدرسة غير مُسجَّلة. `school_affairs_vp` مُستثنى (لا يُربَط).

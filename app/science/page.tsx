@@ -5,6 +5,7 @@ import { useScience } from "./_hooks/useScience";
 import { InventoryList } from "./_components/InventoryList";
 import { BookingList } from "./_components/BookingList";
 import { RequestModal } from "./_components/RequestModal";
+import { QualityOwnerPanel } from "@/components/quality/QualityOwnerPanel";
 import {
     TestTube2,
     Calendar,
@@ -141,6 +142,11 @@ export default function SciencePage() {
                             </div>
                         </div>
                     )}
+                </div>
+
+                {/* نماذج الجودة (مالك: محضر المختبر) — مُبوّبة بسجلّ المستأجر */}
+                <div className="mt-8">
+                    <QualityOwnerPanel module="science" moduleLabel="المختبر العلمي" />
                 </div>
             </div>
 

@@ -12,6 +12,7 @@ import { Trophy, Microscope, BookOpen, Shield, TrendingUp, Bell } from "lucide-r
 import { supabase } from "@/lib/db/supabase";
 import { usePrincipalKPIs } from "./_hooks/usePrincipalKPIs";
 import { AIInsightCard } from "@/components/ai/AIInsightCard";
+import { QualityOwnerPanel } from "@/components/quality/QualityOwnerPanel";
 
 export default function PrincipalPage() {
     const [isKnightsOpen, setIsKnightsOpen] = React.useState(false);
@@ -127,6 +128,11 @@ export default function PrincipalPage() {
                         contextType="school_overview"
                         title="الرؤية الذكية — نظرة عامة على المدرسة"
                     />
+                </div>
+
+                {/* نماذج الجودة (مالك: مدير المدرسة) — مُبوّبة بسجلّ المستأجر */}
+                <div className="mb-10">
+                    <QualityOwnerPanel module="principal" moduleLabel="القيادة المدرسية" />
                 </div>
 
                 {/* Operational Command Grid */}

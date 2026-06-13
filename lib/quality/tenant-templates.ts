@@ -30,12 +30,15 @@ import { LRC_QUALITY_FORMS } from '@/lib/quality/quality-forms';
  *   counseling       → app/counselor/_components/{QualityForms,Form22,Form42,Form43,Form82}.tsx
  *   activity         → app/activity/_components/ActivityReports.tsx
  *   lrc              → lib/quality/quality-forms.ts (LRC_QUALITY_FORMS) + app/lrc/_components/*
- *   qa               → app/qa/corrective-action/* (QF03-1 عدم المطابقة/إجراء تصحيحي)
- *   science          → مخطّط (تقارير المختبر · lab_technician) — لا واجهة/قالب بعد
+ *   qa               → app/qa/corrective-action/* (QF03-1 عدم المطابقة/إجراء تصحيحي — متوفّر)
+ *   science          → app/science (لوحة مخطّطة — lab_technician، قوالب قيد الاعتماد)
+ *   principal        → app/principal (لوحة مخطّطة — school_principal، قوالب قيد الاعتماد)
+ *   school_admin     → app/school/[id]/dashboard (لوحة مخطّطة — قوالب قيد الاعتماد)
+ *   academic         → app/educational (لوحة مخطّطة — academic_vp، قوالب قيد الاعتماد)
  *   operations       → components/operations/DisciplineKnightsModal.tsx (شهادة عامة، لا رمز QF)
  *
- * أدوار إشرافية (school_principal · school_admin · academic_vp): تقارير قيادية/أكاديمية مخطّطة عبر
- * الوحدات — لا لوحة QF مخصّصة بعد. school_affairs_vp مُستثنى من ملكية نماذج الجودة (لا يُربَط).
+ * الأدوار الأربعة (principal · school_admin · academic_vp · lab_technician) تملك نماذج جودة لكن
+ * قوالبها تُعتمد لاحقاً (planned: implemented:false، بلا رمز QF). school_affairs_vp مُستثنى (لا يُربَط).
  *
  * ملاحظة wiring (Phase 3D): الأكواد مُمرآة هنا (مصدر حقيقة)، لكن المكوّنات لم تُحوَّل بعد لقراءة الإتاحة
  * المدرسية من هذا السجلّ، لأن السجلّ فارغ في PRE-LAUNCH وتحويلها الآن يُخفي كل النماذج لكل المدارس
@@ -53,6 +56,9 @@ export type QualityModule =
     | 'lrc'
     | 'qa'
     | 'science'
+    | 'principal'
+    | 'school_admin'
+    | 'academic'
     | 'operations';
 
 /** الدور المالك — يجب أن يكون ضمن QUALITY_FORM_OWNER_ROLES في quality-forms.ts (المصدر المعتمد). */
@@ -157,7 +163,14 @@ const AL_FALAH_QA: QualityTemplate[] = [
     { key: 'qa:corrective_action', code: 'QF03-1', title: 'تقرير عدم المطابقة والإجراء التصحيحي', ownerRole: 'quality_coordinator', module: 'qa', enabled: true, implemented: true, tenantSpecific: true },
 ];
 
-// ملاحظة: وحدة 'science' (محضر المختبر) مخطّطة بلا قالب/واجهة بعد — لا قوالب تُسجَّل لها (تظهر فارغة بصدق).
+// قوالب مخطّطة (placeholder) لأدوار مالكة تُعتمد قوالبها الرسمية لاحقاً من مالك المنتج.
+// implemented:false · بلا رمز QF مُختلَق · enabled للفلاح فقط (عبر التسجيل) · تُعرض «قيد الاعتماد» بصدق.
+const AL_FALAH_PLANNED: QualityTemplate[] = [
+    { key: 'principal:leadership_reports', title: 'نماذج الجودة القيادية (قيد الاعتماد)',   ownerRole: 'school_principal', module: 'principal',    enabled: true, implemented: false, tenantSpecific: true, note: 'بانتظار اعتماد القوالب الرسمية من مالك المنتج.' },
+    { key: 'school_admin:coordination',    title: 'نماذج التنسيق المدرسي (قيد الاعتماد)',   ownerRole: 'school_admin',    module: 'school_admin', enabled: true, implemented: false, tenantSpecific: true, note: 'بانتظار اعتماد القوالب الرسمية من مالك المنتج.' },
+    { key: 'academic:academic_forms',      title: 'نماذج الشؤون التعليمية (قيد الاعتماد)',  ownerRole: 'academic_vp',     module: 'academic',     enabled: true, implemented: false, tenantSpecific: true, note: 'بانتظار اعتماد القوالب الرسمية من مالك المنتج.' },
+    { key: 'science:lab_forms',            title: 'نماذج/سجلات المختبر (قيد الاعتماد)',     ownerRole: 'lab_technician',  module: 'science',      enabled: true, implemented: false, tenantSpecific: true, note: 'بانتظار اعتماد القوالب الرسمية من مالك المنتج.' },
+];
 
 /**
  * مجموعة قوالب الفلاح الخاصة بالمستأجر (أكواد QF). مُصدَّرة كمصدر حقيقة لأكواد الفلاح.
@@ -170,6 +183,7 @@ export const AL_FALAH_QUALITY_TEMPLATES: QualityTemplate[] = [
     ...AL_FALAH_COUNSELING,
     ...AL_FALAH_ACTIVITY,
     ...AL_FALAH_QA,
+    ...AL_FALAH_PLANNED,
 ];
 
 // ============================================================================

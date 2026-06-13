@@ -174,7 +174,7 @@ export default function StudentAffairsPage() {
               <h1 className="text-2xl font-bold tracking-tight text-[var(--primary)]">
                 شؤون الطلاب
               </h1>
-              <p className="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-0.5">SMART SCHOOL OS • VISION 2030</p>
+              <p className="text-[10px] opacity-40 font-bold uppercase tracking-widest mt-0.5">سِدرة</p>
             </div>
           </div>
 

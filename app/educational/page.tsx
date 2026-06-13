@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpenCheck, FlaskConical, HeartPulse, Library, ShieldAlert } from "lucide-react";
+import { QualityOwnerPanel } from "@/components/quality/QualityOwnerPanel";
 
 const MODULES = [
     {
@@ -65,6 +66,9 @@ export default function EducationalAffairsPage() {
                         );
                     })}
                 </section>
+
+                {/* نماذج الجودة (مالك: وكيل الشؤون التعليمية) — مُبوّبة بسجلّ المستأجر */}
+                <QualityOwnerPanel module="academic" moduleLabel="الشؤون التعليمية" />
             </div>
         </main>
     );

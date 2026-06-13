@@ -61,7 +61,8 @@
 - ✅ **3D** — سجلّ قوالب المستأجر `lib/quality/tenant-templates.ts` (أكواد QF كـ tenant-specific + بوّابة إتاحة fail-closed).
 - ✅ **3D-2** — تسجيل مدرسة الفلاح (معرّف Supabase حقيقي) + ربط مُستهلِكات health/activity/secretary/counseling بالبوّابة.
 - ✅ **3D-3** — تبويب كل أسطح QF المالكة بالسجلّ: + lrc + qa (corrective-action، وحدة `qa` + QF03-1) + student-affairs. أدوار إشرافية + lab_technician مخطّطة بلا لوحة بعد. `school_affairs_vp` مُستثنى.
-- ▶️ **متبقٍّ:** بناء قوالب LRC الثمانية · واجهات QF للأدوار المخطّطة (principal/academic_vp/lab_technician) عند الحاجة · خط عربي لمولّدات jsPDF المتبقية إن لزم.
+- ✅ **3D-4** — لوحات جودة مخطّطة مُبوّبة (`QualityOwnerPanel`) لـ principal · school_admin · academic_vp · lab_technician (placeholder «قيد الاعتماد» · بلا رمز QF · بلا تصدير) + تنظيف تسريب `SMART SCHOOL OS`.
+- ▶️ **متبقٍّ:** اعتماد القوالب الرسمية للأدوار الأربعة (من مالك المنتج) ثم بناء مولّداتها · بناء قوالب LRC الثمانية · خط عربي لمولّدات jsPDF المتبقية إن لزم.
 
 **النطاق:**
 - تمرير **اسم المدرسة ديناميكياً** لكل قالب PDF (إزالة الأسماء المُثبَّتة — يبدأ بـ `HealthReports.tsx:103`). app-code، بلا schema.

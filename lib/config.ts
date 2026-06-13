@@ -1,6 +1,6 @@
 /**
  * Global Configuration & Feature Flags
- * SMART SCHOOL OS
+ * سِدرة
  */
 
 export const CONFIG = {

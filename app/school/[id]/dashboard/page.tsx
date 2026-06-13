@@ -30,6 +30,7 @@ import {
 import { getActivePersona } from "@/lib/auth/context-service";
 import { getRoleInfo, normalizeRole, type UserRole } from "@/lib/auth/roles";
 import { SchoolDashboardShell } from "@/components/layout/SchoolDashboardShell";
+import { QualityOwnerPanel } from "@/components/quality/QualityOwnerPanel";
 import { toSafeNumber } from "@/lib/utils";
 
 export const metadata = { title: "لوحة المدرسة" };
@@ -249,6 +250,9 @@ export default async function SchoolCoordinatorDashboard({ params }: PageProps) 
                                 </p>
                             </div>
                         </SectionCard>
+
+                        {/* نماذج الجودة (مالك: منسق المدرسة) — مُبوّبة بسجلّ المستأجر */}
+                        <QualityOwnerPanel module="school_admin" moduleLabel="تنسيق المدرسة" />
                     </div>
                 </div>
 
