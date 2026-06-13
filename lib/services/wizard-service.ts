@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
 import { startWorkflow, advanceWorkflow, createApprovalGate } from '../workflow-service';
 import type { WorkflowResult }        from '../workflow-service';
+import { createGeneratedForm }        from '../quality/generated-forms';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -251,24 +252,25 @@ export async function submitCorrectiveActionWizard(
     escalation_role: 'school_principal',
   });
 
-  // ── تسجيل النموذج المُولَّد (QF03-1)
-  await supabase.from('generated_forms').insert({
-    school_id:           persona.schoolId,
-    form_code:           'QF03-1',
-    source_table:        'nonconformance_reports',
-    source_record_id:    ncr.id,
-    workflow_instance_id: instanceId,
-    form_data: {
-      ncr_number:            ncrNumber,
-      target_name:           targetName,
-      target_role:           targetRow.role,
-      description:           input.description,
-      reason_code:           input.reason_code,
-      due_date:              input.due_date,
-      detected_by:           actorName,
-      detected_at:           new Date().toISOString(),
+  // ── تسجيل النموذج المُولَّد (QF03-1) عبر خدمة السجلّ المُبوّبة بسجلّ المستأجر (+ منع تكرار)
+  // best-effort: school_id يُشتق داخل الخدمة من سياق مصادَق؛ فشل التسجيل (قالب غير مُنفَّذ/مدرسة
+  // غير مُسجَّلة) لا يُفشِل الإجراء التصحيحي. QF03-1 مُنفَّذ في السجلّ لمستأجر الفلاح.
+  await createGeneratedForm({
+    formCode:           'QF03-1',
+    sourceTable:        'nonconformance_reports',
+    sourceRecordId:     ncr.id,
+    workflowInstanceId: instanceId,
+    formData: {
+      ncr_number:  ncrNumber,
+      target_name: targetName,
+      target_role: targetRow.role,
+      description: input.description,
+      reason_code: input.reason_code,
+      due_date:    input.due_date,
+      detected_by: actorName,
+      detected_at: new Date().toISOString(),
     },
-    is_ready: false,
+    isReady: false,
   });
 
   // ── تسجيل جلسة المعالج

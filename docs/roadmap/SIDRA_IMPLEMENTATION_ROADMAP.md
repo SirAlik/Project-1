@@ -62,7 +62,8 @@
 - ✅ **3D-2** — تسجيل مدرسة الفلاح (معرّف Supabase حقيقي) + ربط مُستهلِكات health/activity/secretary/counseling بالبوّابة.
 - ✅ **3D-3** — تبويب كل أسطح QF المالكة بالسجلّ: + lrc + qa (corrective-action، وحدة `qa` + QF03-1) + student-affairs. أدوار إشرافية + lab_technician مخطّطة بلا لوحة بعد. `school_affairs_vp` مُستثنى.
 - ✅ **3D-4** — لوحات جودة مخطّطة مُبوّبة (`QualityOwnerPanel`) لـ principal · school_admin · academic_vp · lab_technician (placeholder «قيد الاعتماد» · بلا رمز QF · بلا تصدير) + تنظيف تسريب `SMART SCHOOL OS`.
-- ▶️ **متبقٍّ:** اعتماد القوالب الرسمية للأدوار الأربعة (من مالك المنتج) ثم بناء مولّداتها · بناء قوالب LRC الثمانية · خط عربي لمولّدات jsPDF المتبقية إن لزم.
+- ✅ **3E** — أساس التعبئة والأدلة: `lib/quality/generated-forms.ts` · `quality-evidence.ts` · `autofill.ts` (مُبوّبة بسجلّ المستأجر · `school_id` من سياق مصادَق · قالب مُنفَّذ فقط · منع تكرار · fail-closed) + ربط qa (`QF03-1`) عبر الخدمة. **توليد `quality_evidence` خامل** حتى زرع `quality_indicators`+`academic_years` (DB الحية = 0/0).
+- ▶️ **متبقٍّ:** زرع مؤشرات الجودة + السنوات الدراسية (DB، بموافقة) لتفعيل الأدلة · توحيد أكواد الاجتماعات (`QF-19-*`↔`QF19-*`) · اعتماد القوالب الرسمية للأدوار الأربعة ثم بناء مولّداتها · بناء قوالب LRC الثمانية · خط عربي لمولّدات jsPDF المتبقية إن لزم.
 
 **النطاق:**
 - تمرير **اسم المدرسة ديناميكياً** لكل قالب PDF (إزالة الأسماء المُثبَّتة — يبدأ بـ `HealthReports.tsx:103`). app-code، بلا schema.

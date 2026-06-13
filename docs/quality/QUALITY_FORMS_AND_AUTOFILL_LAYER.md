@@ -82,3 +82,23 @@
 - **3 سياقات ذكاء فارغة** (`class_report` · `behavior_pattern` · `quality_summary`).
 
 > **لا يُعالَج أيٌّ من هذا في المرحلة 1 (التوثيق).** التوثيق يثبّت المعيار؛ التنفيذ في المراحل 3–5.
+
+---
+
+## 7) طبقة خدمة التعبئة والأدلة (Phase 3E) — app-code
+
+نُفِّذت طبقة خدمة **خادمية** تُجسّد السلسلة (إجراء تشغيلي → سجل نموذج → دليل):
+
+- **`lib/quality/generated-forms.ts`** — `createGeneratedForm()`: يُنشئ سجل `generated_forms` **لقالب مُنفَّذ فقط**. `school_id` من `getActivePersona` (**لا من العميل**) · بوّابة سجلّ المستأجر (planned/مجهول → fail-closed) · منع تكرار (`school_id` · `form_code` · `source_record_id`). لا يُولّد PDF (التوليد عبر Edge عند `is_ready`).
+- **`lib/quality/quality-evidence.ts`** — `createQualityEvidence()`: يُنشئ `quality_evidence` **لمؤشر مزروع حقيقي فقط**. fail-closed: مؤشر غير مزروع → `indicator_not_seeded` · لا سنة نشطة → `no_active_academic_year` · جودة غير مفعّلة → `quality_disabled`. `source_module` مقيّد بـ CHECK. RLS: الإدراج عبر العميل لـ `quality_coordinator`/`school_admin` فقط؛ الأدلة الآلية من وحدات أخرى عبر triggers `SECURITY DEFINER` (M78).
+- **`lib/quality/autofill.ts`** — حارس `isImplementedTemplate()` + نوع `AutoFillPayload` (**نقي**، بلا DB — يصحّ للعميل والخادم).
+
+### المُفعَّل فعلياً (flow مربوط)
+- **qa — الإجراء التصحيحي (`QF03-1`):** `wizard-service` يُنشئ سجل `generated_forms` الآن عبر `createGeneratedForm` (مُبوّب بسجلّ المستأجر + منع تكرار). best-effort — لا يُفشِل الإجراء التصحيحي.
+
+### غير مُفعَّل بعد (بصدق — ولماذا)
+- **توليد الأدلة (`quality_evidence`) خامل:** `quality_indicators`=0 و`academic_years`=0 في DB الحية → أي إدراج دليل يفشل بالضرورة. **الزرع خطوة DB منفصلة تتطلب موافقة** (لم تُنفَّذ في 3E). الخدمة جاهزة fail-closed لحين الزرع — **بلا أدلة وهمية**.
+- **الاجتماعات (`meeting-service`: `QF-19-1`/`QF-19-2`):** أكوادها لا تطابق أكواد السجلّ (`QF19-1`/`QF19-2`) → تبويبها عبر الخدمة سيحجبها؛ يلزم توحيد الأكواد أولاً (مؤجَّل).
+- **تصديرات React-PDF التجميعية (health/secretary/activity/student-affairs):** تجميعية بلا `source_record_id` مفرد (`NOT NULL`)، وعميلية؛ ربطها بـ `generated_forms` يتطلب server action + نموذج سجل-واحد (مؤجَّل).
+
+> **القاعدة:** لا سجل/دليل رسمي إلا لقالب **مُنفَّذ** ومدرسة **مُسجَّلة**؛ planned/مجهول → fail-closed. **لا دليل بلا بيانات مصدر حقيقية.**
