@@ -65,10 +65,20 @@ export type QualityModule =
 export type QualityOwnerRole = UserRole;
 
 export interface QualityTemplate {
-    /** مفتاح داخلي ثابت (module:slug) */
+    /** مفتاح داخلي ثابت (module:slug) — هوية القالب الثابتة عبر تغيّر الأكواد. */
     key: string;
-    /** رمز QF — **خاص بالمستأجر**. غائب للنماذج بلا رمز رسمي (LRC/شهادات). */
+    /** الرمز **المعتمد** (canonical) — خاص بالمستأجر. غائب للنماذج بلا رمز رسمي (LRC/شهادات). */
     code?: string;
+    /**
+     * أكواد بديلة تاريخية تشير لنفس النموذج (لتوحيد التعارضات مثل QF19-1 ↔ QF-19-1).
+     * تُستخدم في الـ resolution فقط (getTemplateByCode) — لا تُغيّر الرمز المعتمد المُخزَّن.
+     */
+    aliases?: string[];
+    /**
+     * الرمز المعروض على الوثيقة الرسمية (PDF). افتراضي = code. هذا الافتراض app-code؛
+     * يُتجاوز لكل مستأجر عبر DB (school_quality_template_overrides.display_code) وقت التوليد.
+     */
+    displayCode?: string;
     /** العنوان العربي المرئي */
     title: string;
     /** الدور المالك لتصدير النموذج الرسمي */
@@ -125,8 +135,8 @@ const AL_FALAH_SECRETARY: QualityTemplate[] = [
     { key: 'secretary:commencement_letter', code: 'QF71-A-2-5', title: 'خطاب مباشرة عمل',           ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
     { key: 'secretary:clearance_form',      code: 'QF71-A-2-6', title: 'نموذج إخلاء طرف',           ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
     { key: 'secretary:procurement_request', code: 'QF71-A-4-1', title: 'نموذج طلب احتياج / شراء',    ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
-    { key: 'secretary:meeting_invitation',  code: 'QF19-1',     title: 'دعوة لحضور اجتماع',         ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
-    { key: 'secretary:meeting_minutes',     code: 'QF19-2',     title: 'محضر اجتماع رسمي',          ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
+    { key: 'secretary:meeting_invitation',  code: 'QF19-1', aliases: ['QF-19-1'], title: 'دعوة لحضور اجتماع', ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
+    { key: 'secretary:meeting_minutes',     code: 'QF19-2', aliases: ['QF-19-2'], title: 'محضر اجتماع رسمي',  ownerRole: 'school_secretary', module: 'secretary', enabled: true, implemented: true, tenantSpecific: true },
 ];
 
 const STUDENT_AFFAIRS_NOTE = 'مولّد React-PDF متوفّر؛ غير مربوط بصفحة بعد (يُربط في مرحلة لاحقة).';
@@ -284,7 +294,23 @@ export function isQualityModuleEnabled(schoolId: string | null | undefined, modu
     return getQualityTemplates(schoolId, module).length > 0;
 }
 
-/** قالب بعينه عبر رمز QF لمدرسة (fail-closed: null لمدرسة غير مُسجَّلة أو رمز غير متاح). */
+/**
+ * قالب بعينه عبر رمز QF لمدرسة (fail-closed: null لمدرسة غير مُسجَّلة أو رمز غير متاح).
+ * يُطابق الرمز المعتمد (code) **أو** الرمز المعروض (displayCode) **أو** أيّ alias تاريخي —
+ * فيُحَلّ QF19-1 وQF-19-1 إلى نفس القالب (توحيد التعارض دون كسر المسارات القائمة).
+ */
 export function getTemplateByCode(schoolId: string | null | undefined, code: string): QualityTemplate | null {
-    return getQualityTemplates(schoolId).find((t) => t.code === code) ?? null;
+    return (
+        getQualityTemplates(schoolId).find(
+            (t) => t.code === code || t.displayCode === code || (t.aliases?.includes(code) ?? false),
+        ) ?? null
+    );
+}
+
+/**
+ * الرمز المعروض (canonical app-code fallback) لقالب: displayCode إن وُجد، وإلا code، وإلا key.
+ * هذا الافتراض app-code فقط؛ تجاوز المستأجر من DB يُطبَّق في طبقة الخدمة (template-settings).
+ */
+export function resolveTemplateDisplayCode(template: QualityTemplate): string {
+    return template.displayCode ?? template.code ?? template.key;
 }

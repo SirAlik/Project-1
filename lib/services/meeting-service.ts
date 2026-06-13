@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
 import { startWorkflow, advanceWorkflow } from '../workflow-service';
 import type { WorkflowResult }        from '../workflow-service';
+import { createGeneratedForm }        from '../quality/generated-forms';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -323,14 +324,15 @@ export async function createMeeting(
       .eq('id', meeting.id);
   }
 
-  // نموذج QF-19-1 (دعوة)
-  await supabase.from('generated_forms').insert({
-    school_id:            persona.schoolId,
-    form_code:            'QF-19-1',
-    source_table:         'meeting_sessions',
-    source_record_id:     meeting.id,
-    workflow_instance_id: wfResult.ok ? wfResult.data.instance_id : null,
-    form_data: {
+  // نموذج دعوة الاجتماع — الرمز المعتمد QF19-1 (alias تاريخي: QF-19-1).
+  // عبر خدمة السجلّ المُبوّبة بسجلّ المستأجر (+ منع تكرار · school_id من سياق مصادَق).
+  // best-effort: مدرسة غير مُسجَّلة ببرنامج جودة → لا سجل (fail-closed) دون إفشال إنشاء الاجتماع.
+  await createGeneratedForm({
+    formCode:           'QF19-1',
+    sourceTable:        'meeting_sessions',
+    sourceRecordId:     meeting.id,
+    workflowInstanceId: wfResult.ok ? wfResult.data.instance_id : undefined,
+    formData: {
       session_number:  sessionNumber,
       title:           input.title,
       meeting_type:    input.meeting_type,
@@ -341,7 +343,7 @@ export async function createMeeting(
       agenda_items:    input.agenda_items ?? [],
       generated_at:    new Date().toISOString(),
     },
-    is_ready: false,
+    isReady: false,
   });
 
   // إشعارات للمدعوِّين
@@ -520,14 +522,14 @@ export async function endMeeting(
     );
   }
 
-  // نموذج QF-19-2 (محضر)
-  await supabase.from('generated_forms').insert({
-    school_id:            persona.schoolId,
-    form_code:            'QF-19-2',
-    source_table:         'meeting_sessions',
-    source_record_id:     meetingId,
-    workflow_instance_id: meeting.workflow_instance_id,
-    form_data: {
+  // نموذج محضر الاجتماع — الرمز المعتمد QF19-2 (alias تاريخي: QF-19-2).
+  // عبر خدمة السجلّ المُبوّبة (+ منع تكرار · school_id من سياق مصادَق · fail-closed).
+  await createGeneratedForm({
+    formCode:           'QF19-2',
+    sourceTable:        'meeting_sessions',
+    sourceRecordId:     meetingId,
+    workflowInstanceId: meeting.workflow_instance_id ?? undefined,
+    formData: {
       session_number:  meeting.session_number,
       title:           meeting.title,
       minutes:         input.minutes,
@@ -535,7 +537,7 @@ export async function endMeeting(
       recommendations: input.recommendations ?? [],
       ended_at:        endedAt,
     },
-    is_ready: false,
+    isReady: false,
   });
 
   // إشعارات لجميع المدعوِّين بأن المحضر جاهز للتوقيع

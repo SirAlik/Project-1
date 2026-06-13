@@ -57,20 +57,25 @@ export async function createGeneratedForm(
     if (!persona.schoolId) return { ok: false, reason: 'no_school_context' };
     const schoolId = persona.schoolId;
 
-    // بوّابة المستأجر: قالب مُنفَّذ فقط (planned/مجهول → fail-closed)
+    // بوّابة المستأجر: قالب مُنفَّذ فقط (planned/مجهول → fail-closed).
+    // يُطابق الرمز المعتمد أو البديل/المعروض (getTemplateByCode).
     const template = getTemplateByCode(schoolId, input.formCode);
     if (!template || !template.implemented) {
         return { ok: false, reason: 'template_not_registered_or_planned' };
     }
 
+    // تخزين **الرمز المعتمد** دائماً (لا alias) — يضمن أنّ alias ورمزه المعتمد لا يُنشئان
+    // سجلَّين، ويوحّد form_code المُخزَّن. (template.code قد يغيب لقوالب بلا رمز رسمي.)
+    const canonicalCode = template.code ?? input.formCode;
+
     const supabase = await createSupabaseServerClient();
 
-    // منع التكرار — نفس النموذج لنفس السجل المصدر في نفس المدرسة
+    // منع التكرار — نفس النموذج (بالرمز المعتمد) لنفس السجل المصدر في نفس المدرسة
     const { data: existing } = await supabase
         .from('generated_forms')
         .select('id')
         .eq('school_id', schoolId)
-        .eq('form_code', input.formCode)
+        .eq('form_code', canonicalCode)
         .eq('source_record_id', input.sourceRecordId)
         .limit(1)
         .maybeSingle();
@@ -81,7 +86,7 @@ export async function createGeneratedForm(
         .from('generated_forms')
         .insert({
             school_id: schoolId,
-            form_code: input.formCode,
+            form_code: canonicalCode,
             source_table: input.sourceTable,
             source_record_id: input.sourceRecordId,
             workflow_instance_id: input.workflowInstanceId ?? null,

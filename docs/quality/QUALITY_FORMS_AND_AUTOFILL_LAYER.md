@@ -93,12 +93,30 @@
 - **`lib/quality/quality-evidence.ts`** — `createQualityEvidence()`: يُنشئ `quality_evidence` **لمؤشر مزروع حقيقي فقط**. fail-closed: مؤشر غير مزروع → `indicator_not_seeded` · لا سنة نشطة → `no_active_academic_year` · جودة غير مفعّلة → `quality_disabled`. `source_module` مقيّد بـ CHECK. RLS: الإدراج عبر العميل لـ `quality_coordinator`/`school_admin` فقط؛ الأدلة الآلية من وحدات أخرى عبر triggers `SECURITY DEFINER` (M78).
 - **`lib/quality/autofill.ts`** — حارس `isImplementedTemplate()` + نوع `AutoFillPayload` (**نقي**، بلا DB — يصحّ للعميل والخادم).
 
-### المُفعَّل فعلياً (flow مربوط)
-- **qa — الإجراء التصحيحي (`QF03-1`):** `wizard-service` يُنشئ سجل `generated_forms` الآن عبر `createGeneratedForm` (مُبوّب بسجلّ المستأجر + منع تكرار). best-effort — لا يُفشِل الإجراء التصحيحي.
+### المُفعَّل فعلياً (flows مربوطة — مُحدَّث 3E-2)
+- **qa — الإجراء التصحيحي (`QF03-1`):** `wizard-service` يُنشئ `generated_forms` عبر `createGeneratedForm` (مُبوّب + منع تكرار). best-effort.
+- **الاجتماعات — دعوة (`QF19-1`) + محضر (`QF19-2`):** `meeting-service` رُبط في 3E-2 عبر `createGeneratedForm` بالرمز المعتمد (بعد توحيد التعارض `QF-19-*`↔`QF19-*`). best-effort · fail-closed لمدرسة غير مُسجَّلة.
+- **الحضور → دليل جودة (`ATT-001`):** **سلسلة أدلة حيّة الآن.** `period_attendance` (INSERT) → trigger M78 → `quality_evidence` (`source_module='attendance'`، غياب=1.0 · تأخر=0.5). فُعِّلت في 3E-2 بزرع `ATT-001` + سنة نشطة (M81) **وتطبيق trigger M78 على DB الحية** (كان غير مُطبَّق رغم وصفه السابق كمُنجز). **لا أدلة وهمية** — تُنشأ فقط من غياب/تأخر حقيقي.
 
 ### غير مُفعَّل بعد (بصدق — ولماذا)
-- **توليد الأدلة (`quality_evidence`) خامل:** `quality_indicators`=0 و`academic_years`=0 في DB الحية → أي إدراج دليل يفشل بالضرورة. **الزرع خطوة DB منفصلة تتطلب موافقة** (لم تُنفَّذ في 3E). الخدمة جاهزة fail-closed لحين الزرع — **بلا أدلة وهمية**.
-- **الاجتماعات (`meeting-service`: `QF-19-1`/`QF-19-2`):** أكوادها لا تطابق أكواد السجلّ (`QF19-1`/`QF19-2`) → تبويبها عبر الخدمة سيحجبها؛ يلزم توحيد الأكواد أولاً (مؤجَّل).
+- **أدلة لوحدات أخرى (qa/secretary/lrc/health/activity/counseling):** لا triggers/تدفّقات أدلة مربوطة بعد + `quality_evidence.source_module` CHECK لا يغطّي `qa`/`secretary`/… (يُوسَّع عند ربط تدفّق حقيقي — لم يُوسَّع في 3E-2 إذ لا تدفّق لها). مؤشراتها تُزرع عند ربطها — **لا مؤشرات/أدلة وهمية الآن**.
 - **تصديرات React-PDF التجميعية (health/secretary/activity/student-affairs):** تجميعية بلا `source_record_id` مفرد (`NOT NULL`)، وعميلية؛ ربطها بـ `generated_forms` يتطلب server action + نموذج سجل-واحد (مؤجَّل).
 
 > **القاعدة:** لا سجل/دليل رسمي إلا لقالب **مُنفَّذ** ومدرسة **مُسجَّلة**؛ planned/مجهول → fail-closed. **لا دليل بلا بيانات مصدر حقيقية.**
+
+---
+
+## 8) جاهزية الأدلة + إعدادات قوالب قابلة للتحرير لكل مستأجر (Phase 3E-2)
+
+### أ) توحيد أكواد QF (canonical/alias/displayCode)
+`QualityTemplate` اكتسب `aliases?` و`displayCode?`. التعارض `QF19-1`↔`QF-19-1` و`QF19-2`↔`QF-19-2` = **نفس النموذجين** (دعوة/محضر اجتماع) — وُحِّد بـ alias لا باستبدال أعمى. `getTemplateByCode` يطابق **code أو displayCode أو alias** (متوافق خلفياً). `createGeneratedForm` يُخزّن **الرمز المعتمد دائماً** (alias ورمزه لا يُنشئان سجلَّين). `meeting-service` رُبط عبر الخدمة بالرمز المعتمد.
+
+### ب) جاهزية السنة الدراسية + المؤشرات (DB seed)
+`academic_years` و`quality_indicators` **كافيان بنيوياً** (بلا تغيير مخطط). seed (M81): سنة نشطة `2025-2026` + مؤشر `ATT-001` (auto_fillable+active) للفلاح فقط (slug، idempotent). **trigger M78 طُبِّق على DB الحية** (كان مفقوداً) → سلسلة الحضور→الدليل حيّة. خدمات خادمية: `lib/quality/academic-years.ts` (السنة النشطة) · `lib/quality/quality-indicators.ts` (المؤشرات) — fail-closed، `school_id` من سياق مصادَق.
+
+### ج) إعدادات قوالب الجودة القابلة للتحرير (M80 + خدمة)
+جدولان جديدان (RLS): `school_quality_settings` (افتراضات المدرسة: شعار/ترويسة/تذييل/هوية) · `school_quality_template_overrides` (تجاوزات `scope='module'` أو `'form'`: displayCode/title/شعار/ترويسة/تذييل/تفعيل). `lib/quality/template-settings.ts` يَحُلّ بأسبقية **form → module → school → registry**. **`school_id` من سياق مصادَق فقط · لا يمسّ `generated_forms` (السجلات التاريخية ثابتة؛ الإعدادات للتوليد المستقبلي) · الكتابة لـ `school_admin` (مدرسته) أو `system_owner` فقط (مُدعَّم بـ RLS) · fail-closed للمجهول.**
+
+> **مستويات التحرير المدعومة:** كامل المدرسة (school) · وحدة/دور (module — مثل نماذج المرشد فقط) · نموذج واحد (form — رمز معروض/عنوان/تفعيل). **«نمط رمز» عام لم يُنفَّذ** (يتطلّب دلالة تحويل ملتبسة عبر أكواد غير متجانسة) — تغيير الرمز المعروض يتم بدقّة عبر تجاوز مستوى-النموذج.
+
+> **UI:** لا واجهة إدارة بعد (foundation فقط). الواجهة المستقبلية لـ `school_admin` يجب أن تُتيح: تحرير افتراضات المدرسة · اختيار وحدة/نموذج · تحرير الرمز المعروض/العنوان/الشعار/الترويسة/التذييل · تفعيل/تعطيل — كلها لمدرسته فقط.

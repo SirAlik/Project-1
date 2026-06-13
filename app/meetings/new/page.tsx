@@ -43,7 +43,7 @@ export default async function NewMeetingPage() {
             إنشاء <span className="text-sky-400">اجتماع جديد</span>
           </h1>
           <p className="text-sm opacity-50 mt-2">
-            نماذج QF-19-1 / QF-19-2 — دعوة ومحضر الاجتماع
+            نماذج QF19-1 / QF19-2 — دعوة ومحضر الاجتماع
           </p>
         </header>
 
