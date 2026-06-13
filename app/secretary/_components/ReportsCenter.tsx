@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import { PDFDownloadLink, type DocumentProps } from "@react-pdf/renderer";
+import { useAuth } from "@/app/_context/AuthContext";
 import {
     Download,
     Printer,
@@ -51,6 +54,9 @@ interface Props {
 }
 
 export function ReportsCenter({ state }: Props) {
+    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+    const { schoolName } = useAuth();
+
     const reportCategories = [
         {
             title: "الموارد البشرية والحضور",
@@ -114,6 +120,9 @@ export function ReportsCenter({ state }: Props) {
         if (typeof data.employee_id === 'string' || data.employee) {
             props.employee = state.employees.find((e: Employee) => e.id === data.employee_id) ?? data.employee;
         }
+
+        // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+        props.schoolName = schoolName ?? undefined;
 
         return React.createElement(report.component, props) as unknown as React.ReactElement<DocumentProps>;
     };

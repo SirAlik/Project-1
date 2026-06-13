@@ -137,11 +137,18 @@ const styles = StyleSheet.create({
     }
 });
 
+/**
+ * نماذج شؤون الطلاب الرسمية (سلسلة QF71-C-*).
+ * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
+ * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (من سياق المستأجر
+ * المصادَق) ولا يُثبَّت في القالب. هذه المُصدَّرات غير مربوطة بصفحة حالياً؛ عند ربطها (Phase 3E) يُمرَّر
+ * `schoolName` من المُستدعي. سجلّ القوالب/الأكواد لكل مدرسة = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ */
 // Shared Layout Components
-const QFHeader = ({ qf }: { title?: string; qf: string }) => (
+const QFHeader = ({ qf, schoolName }: { title?: string; qf: string; schoolName?: string }) => (
     <View style={styles.header}>
         <View style={styles.schoolInfo}>
-            <Text style={{ fontSize: 12, fontWeight: "bold" }}>مدارس الفلاح الأهلية</Text>
+            <Text style={{ fontSize: 12, fontWeight: "bold" }}>{schoolName || 'المدرسة'}</Text>
             <Text>وحدة شؤون الطلاب</Text>
             <Text style={styles.qfCode}>{qf}</Text>
         </View>
@@ -158,10 +165,10 @@ const QFFooter = () => (
 );
 
 // 1. QF71-C-2-2: Student Personal Data
-export const QF71_C_2_2 = ({ student }: { student: StudentProfile }) => (
+export const QF71_C_2_2 = ({ student, schoolName }: { student: StudentProfile; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="بيانات الطالب الشخصية" qf="QF71-C-2-2" />
+            <QFHeader title="بيانات الطالب الشخصية" qf="QF71-C-2-2" schoolName={schoolName} />
             <Text style={styles.title}>بيانات الطالب الشخصية</Text>
 
             <View style={styles.section}>
@@ -194,10 +201,10 @@ export const QF71_C_2_2 = ({ student }: { student: StudentProfile }) => (
 );
 
 // 2. QF71-C-5-1: Morning Lateness Log
-export const QF71_C_5_1 = ({ records, date }: { records: StudentAttendance[], date: string }) => (
+export const QF71_C_5_1 = ({ records, date, schoolName }: { records: StudentAttendance[], date: string; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="سجل التأخر الصباحي" qf="QF71-C-5-1" />
+            <QFHeader title="سجل التأخر الصباحي" qf="QF71-C-5-1" schoolName={schoolName} />
             <Text style={styles.title}>سجل التأخر الصباحي ليوم {date}</Text>
 
             <View style={styles.table}>
@@ -224,10 +231,10 @@ export const QF71_C_5_1 = ({ records, date }: { records: StudentAttendance[], da
 );
 
 // 3. QF71-C-4-1: Student Exit Log
-export const QF71_C_4_1 = ({ records, date }: { records: StudentAttendance[], date: string }) => (
+export const QF71_C_4_1 = ({ records, date, schoolName }: { records: StudentAttendance[], date: string; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="سجل استئذان الطلاب" qf="QF71-C-4-1" />
+            <QFHeader title="سجل استئذان الطلاب" qf="QF71-C-4-1" schoolName={schoolName} />
             <Text style={styles.title}>سجل استئذان الطلاب ليوم {date}</Text>
 
             <View style={styles.table}>
@@ -254,10 +261,10 @@ export const QF71_C_4_1 = ({ records, date }: { records: StudentAttendance[], da
 );
 
 // 4. QF71-C-5-3: Referral Form (Student Affairs -> Counselor)
-export const QF71_C_5_3 = ({ referral }: { referral: BehavioralReferral }) => (
+export const QF71_C_5_3 = ({ referral, schoolName }: { referral: BehavioralReferral; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="إحالة طالب للمرشد الطلابي" qf="QF71-C-5-3" />
+            <QFHeader title="إحالة طالب للمرشد الطلابي" qf="QF71-C-5-3" schoolName={schoolName} />
             <Text style={styles.title}>إحالة طالب للمرشد الطلابي</Text>
 
             <View style={styles.section}>
@@ -288,10 +295,10 @@ export const QF71_C_5_3 = ({ referral }: { referral: BehavioralReferral }) => (
 );
 
 // 5. QF71-C-5-2: Daily Absence Log
-export const QF71_C_5_2 = ({ records, date }: { records: StudentAttendance[], date: string }) => (
+export const QF71_C_5_2 = ({ records, date, schoolName }: { records: StudentAttendance[], date: string; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="سجل الغياب اليومي" qf="QF71-C-5-2" />
+            <QFHeader title="سجل الغياب اليومي" qf="QF71-C-5-2" schoolName={schoolName} />
             <Text style={styles.title}>سجل الغياب اليومي ليوم {date}</Text>
 
             <View style={styles.table}>
@@ -318,10 +325,10 @@ export const QF71_C_5_2 = ({ records, date }: { records: StudentAttendance[], da
 );
 
 // 6. QF71-C-3-1: Book Handover/Return (Asset Management)
-export const QF71_C_3_1 = ({ records }: { records: StudentAsset[] }) => (
+export const QF71_C_3_1 = ({ records, schoolName }: { records: StudentAsset[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="سجل استلام وتسليم العهد" qf="QF71-C-3-1" />
+            <QFHeader title="سجل استلام وتسليم العهد" qf="QF71-C-3-1" schoolName={schoolName} />
             <Text style={styles.title}>سجل استلام وتسليم الكتب والعهد المدرسيّة</Text>
 
             <View style={styles.table}>
@@ -348,10 +355,10 @@ export const QF71_C_3_1 = ({ records }: { records: StudentAsset[] }) => (
 );
 
 // 7. QF71-C-2-3: Student Roster
-export const QF71_C_2_3 = ({ students, grade }: { students: StudentProfile[], grade: string }) => (
+export const QF71_C_2_3 = ({ students, grade, schoolName }: { students: StudentProfile[], grade: string; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="كشف بأسماء الطلاب" qf="QF71-C-2-3" />
+            <QFHeader title="كشف بأسماء الطلاب" qf="QF71-C-2-3" schoolName={schoolName} />
             <Text style={styles.title}>كشف بأسماء الطلاب - {grade}</Text>
 
             <View style={styles.table}>
@@ -378,10 +385,10 @@ export const QF71_C_2_3 = ({ students, grade }: { students: StudentProfile[], gr
 );
 
 // 8. QF71-C-6-1: Behavioral Contract (التعهد السلوكي)
-export const QF71_C_6_1 = ({ student }: { contract?: BehavioralContract, student: StudentProfile }) => (
+export const QF71_C_6_1 = ({ student, schoolName }: { contract?: BehavioralContract, student: StudentProfile; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader title="نموذج التعهد السلوكي" qf="QF71-C-6-1" />
+            <QFHeader title="نموذج التعهد السلوكي" qf="QF71-C-6-1" schoolName={schoolName} />
             <Text style={styles.title}>نموذج التعهد بعدم تكرار المخالفة</Text>
 
             <View style={styles.section}>

@@ -4,6 +4,7 @@ import React from "react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { FileDown, Loader2 } from "lucide-react";
 import type { HealthVisit, HealthSupply, HygieneLog, CanteenCheck } from "@/lib/types/health";
+import { useAuth } from "@/app/_context/AuthContext";
 import {
     VisitLogReport,
     SupplyLogReport,
@@ -23,25 +24,28 @@ interface ExportButtonsProps {
 }
 
 export function ExportButtons({ state }: ExportButtonsProps) {
+    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+    const { schoolName } = useAuth();
+
     const reports = [
         {
             label: "سجل الزيارات (QF-70-j-4-1)",
-            document: <VisitLogReport visits={state.visits} />,
+            document: <VisitLogReport visits={state.visits} schoolName={schoolName ?? undefined} />,
             fileName: "سجل_الزيارات.pdf",
         },
         {
             label: "سجل العهدة (QF-70-j-3-1)",
-            document: <SupplyLogReport supplies={state.supplies} />,
+            document: <SupplyLogReport supplies={state.supplies} schoolName={schoolName ?? undefined} />,
             fileName: "سجل_العهدة.pdf",
         },
         {
             label: "فحص النظافة (QF-70-j-6-1)",
-            document: <HygieneReport logs={state.hygieneLogs} />,
+            document: <HygieneReport logs={state.hygieneLogs} schoolName={schoolName ?? undefined} />,
             fileName: "فحص_النظافة.pdf",
         },
         {
             label: "متابعة المقصف (QF-70-j-8-1)",
-            document: <CanteenReport checks={state.canteenChecks} />,
+            document: <CanteenReport checks={state.canteenChecks} schoolName={schoolName ?? undefined} />,
             fileName: "متابعة_المقصف.pdf",
         },
     ];

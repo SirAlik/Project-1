@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, Image as PdfImage } from '@react-pdf/renderer';
 import qualityLogo from '../_assets/quality-logo.png';
 import type { ActivityFinancial, ClubAssignment, StudentWish, ActivityClub, ActivityEvent, StudentHonor } from '@/lib/types/activity';
@@ -108,15 +108,22 @@ const styles = StyleSheet.create({
     },
 });
 
-const ReportHeader = ({ code }: { code: string; title?: string }) => (
+/**
+ * نماذج تقارير النشاط الطلابي (سلسلة QF71-G-*).
+ * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
+ * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (من سياق المستأجر
+ * المصادَق عبر useAuth في ExportButtons) ولا يُثبَّت في القالب. العلامة المرئية «سِدرة» فقط.
+ * سجلّ القوالب/الأكواد لكل مدرسة (tenant template registry) = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ */
+const ReportHeader = ({ code, schoolName }: { code: string; title?: string; schoolName?: string }) => (
     <View style={styles.header}>
         <View style={styles.schoolInfo}>
-            <Text style={{ fontSize: 13, fontFamily: 'TajawalBold', marginBottom: 2 }}>ظ…ط¯ط§ط±ط³ ط§ظ„ظپظ„ط§ط­ ط§ظ„ط£ظ‡ظ„ظٹط©</Text>
-            <Text style={{ fontSize: 9, marginBottom: 2 }}>ظˆط²ط§ط±ط© ط§ظ„طھط¹ظ„ظٹظ… - ط§ظ„ط¥ط¯ط§ط±ط© ط§ظ„ط¹ط§ظ…ط© ظ„ظ„طھط¹ظ„ظٹظ…</Text>
-            <Text style={{ fontSize: 9 }}>ظ‚ط³ظ… ط§ظ„ظ†ط´ط§ط· ط§ظ„ط·ظ„ط§ط¨ظٹ</Text>
+            <Text style={{ fontSize: 13, fontFamily: 'TajawalBold', marginBottom: 2 }}>{schoolName || 'المدرسة'}</Text>
+            <Text style={{ fontSize: 9, marginBottom: 2 }}>وزارة التعليم - الإدارة العامة للتعليم</Text>
+            <Text style={{ fontSize: 9 }}>قسم النشاط الطلابي</Text>
         </View>
 
-        {/* âœ… Quality Forms Logo (PNG, imported safely for react-pdf) */}
+        {/* شعار نظام الجودة (PNG، مستورد بأمان لـ react-pdf) */}
         <PdfImage src={qualityLogo.src} style={styles.logo} />
 
         <View style={styles.qualityInfo}>
@@ -135,23 +142,23 @@ const ReportFooter = ({ code }: { code: string }) => (
 );
 
 // 1. Budget Report (QF71-G-1-2)
-export const BudgetReport = ({ items }: { items: ActivityFinancial[] }) => (
+export const BudgetReport = ({ items, schoolName }: { items: ActivityFinancial[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="ط®ط·ط© ظ…ظٹط²ط§ظ†ظٹط© ط§ظ„ظ†ط´ط§ط· ط§ظ„ط·ظ„ط§ط¨ظٹ" code="QF71-G-1-2" />
+            <ReportHeader title="خطة ميزانية النشاط الطلابي" code="QF71-G-1-2" schoolName={schoolName} />
             <View style={styles.titleContainer}>
-                <Text style={styles.title}>طھظ‚ط¯ظٹط±ط§طھ ط§ظ„ظ…ظٹط²ط§ظ†ظٹط© ظ„ظ„ظپطµظ„ ط§ظ„ط¯ط±ط§ط³ظٹ ط§ظ„ط­ط§ظ„ظٹ</Text>
+                <Text style={styles.title}>تقديرات الميزانية للفصل الدراسي الحالي</Text>
             </View>
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '40%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ط¨ظ†ط¯</Text>
+                        <Text style={styles.tableCell}>البند</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '30%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ظپط¦ط©</Text>
+                        <Text style={styles.tableCell}>الفئة</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '30%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ظ…ط¨ظ„ط؛ ط§ظ„طھظ‚ط¯ظٹط±ظٹ</Text>
+                        <Text style={styles.tableCell}>المبلغ التقديري</Text>
                     </View>
                 </View>
                 {items.map((item, i) => (
@@ -163,14 +170,14 @@ export const BudgetReport = ({ items }: { items: ActivityFinancial[] }) => (
                             <Text style={styles.tableCell}>{item.category}</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '30%' }]}>
-                            <Text style={styles.tableCell}>{item.amount} ط±ظٹط§ظ„</Text>
+                            <Text style={styles.tableCell}>{item.amount} ريال</Text>
                         </View>
                     </View>
                 ))}
             </View>
             <View style={{ marginTop: 20, textAlign: 'left' }}>
                 <Text style={{ fontSize: 12, fontFamily: 'TajawalBold' }}>
-                    ط¥ط¬ظ…ط§ظ„ظٹ ط§ظ„ظ…ظٹط²ط§ظ†ظٹط© ط§ظ„ظ…ظ‚طھط±ط­ط©: {items.reduce((acc, curr) => acc + Number(curr.amount), 0)} ط±ظٹط§ظ„
+                    إجمالي الميزانية المقترحة: {items.reduce((acc, curr) => acc + Number(curr.amount), 0)} ريال
                 </Text>
             </View>
             <ReportFooter code="QF71-G-1-2" />
@@ -179,23 +186,23 @@ export const BudgetReport = ({ items }: { items: ActivityFinancial[] }) => (
 );
 
 // 2. Expenses Log (QF71-G-7-1)
-export const ExpensesReport = ({ expenses }: { expenses: ActivityFinancial[] }) => (
+export const ExpensesReport = ({ expenses, schoolName }: { expenses: ActivityFinancial[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="ط³ط¬ظ„ ط§ظ„طµط±ظپ ط§ظ„ظ…ط§ظ„ظٹ ط§ظ„ظپط¹ظ„ظٹ" code="QF71-G-7-1" />
+            <ReportHeader title="سجل الصرف المالي الفعلي" code="QF71-G-7-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '20%' }]}>
-                        <Text style={styles.tableCell}>ط±ظ‚ظ… ط§ظ„ظپط§طھظˆط±ط©</Text>
+                        <Text style={styles.tableCell}>رقم الفاتورة</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '40%' }]}>
-                        <Text style={styles.tableCell}>ط¨ظٹط§ظ† ط§ظ„طµط±ظپ</Text>
+                        <Text style={styles.tableCell}>بيان الصرف</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '20%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„طھط§ط±ظٹط®</Text>
+                        <Text style={styles.tableCell}>التاريخ</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '20%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ظ…ط¨ظ„ط؛</Text>
+                        <Text style={styles.tableCell}>المبلغ</Text>
                     </View>
                 </View>
                 {expenses.map((exp, i) => (
@@ -210,7 +217,7 @@ export const ExpensesReport = ({ expenses }: { expenses: ActivityFinancial[] }) 
                             <Text style={styles.tableCell}>{exp.date}</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '20%' }]}>
-                            <Text style={styles.tableCell}>{exp.amount} ط±ظٹط§ظ„</Text>
+                            <Text style={styles.tableCell}>{exp.amount} ريال</Text>
                         </View>
                     </View>
                 ))}
@@ -221,20 +228,20 @@ export const ExpensesReport = ({ expenses }: { expenses: ActivityFinancial[] }) 
 );
 
 // 3. Supervisors Distribution (QF71-G-1-1)
-export const SupervisorsReport = ({ assignments }: { assignments: ClubAssignment[] }) => (
+export const SupervisorsReport = ({ assignments, schoolName }: { assignments: ClubAssignment[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="ط¨ظٹط§ظ† طھظˆط²ظٹط¹ ط§ظ„ظ…ط´ط±ظپظٹظ† ط¹ظ„ظ‰ ط§ظ„ط£ظ†ط¯ظٹط©" code="QF71-G-1-1" />
+            <ReportHeader title="بيان توزيع المشرفين على الأندية" code="QF71-G-1-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '35%' }]}>
-                        <Text style={styles.tableCell}>ط§ط³ظ… ط§ظ„ظ…ط¹ظ„ظ…</Text>
+                        <Text style={styles.tableCell}>اسم المعلم</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '35%' }]}>
-                        <Text style={styles.tableCell}>ط§ط³ظ… ط§ظ„ظ†ط§ط¯ظٹ</Text>
+                        <Text style={styles.tableCell}>اسم النادي</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '30%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ط¯ظˆط±</Text>
+                        <Text style={styles.tableCell}>الدور</Text>
                     </View>
                 </View>
                 {assignments.map((a, i) => (
@@ -246,7 +253,7 @@ export const SupervisorsReport = ({ assignments }: { assignments: ClubAssignment
                             <Text style={styles.tableCell}>{a.club_name}</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '30%' }]}>
-                            <Text style={styles.tableCell}>{a.role === 'supervisor' ? 'ظ…ط´ط±ظپ ط£ط³ط§ط³ظٹ' : 'ظ…ط³ط§ط¹ط¯'}</Text>
+                            <Text style={styles.tableCell}>{a.role === 'supervisor' ? 'مشرف أساسي' : 'مساعد'}</Text>
                         </View>
                     </View>
                 ))}
@@ -257,25 +264,25 @@ export const SupervisorsReport = ({ assignments }: { assignments: ClubAssignment
 );
 
 // 4. Student Desires (QF71-G-3-1)
-export const StudentWishesReport = ({ wishes, clubs }: { wishes: StudentWish[]; clubs: ActivityClub[] }) => {
+export const StudentWishesReport = ({ wishes, clubs, schoolName }: { wishes: StudentWish[]; clubs: ActivityClub[]; schoolName?: string }) => {
     const getClubName = (id: string | null) => id ? (clubs.find((c) => c.id === id)?.name || id) : '—';
     return (
         <Document>
             <Page size="A4" style={styles.page}>
-                <ReportHeader title="ط¨ظٹط§ظ† ط±ط؛ط¨ط§طھ ط§ظ„ط·ظ„ط§ط¨ ظپظٹ ط§ظ„ظ†ط´ط§ط·" code="QF71-G-3-1" />
+                <ReportHeader title="بيان رغبات الطلاب في النشاط" code="QF71-G-3-1" schoolName={schoolName} />
                 <View style={styles.table}>
                     <View style={[styles.tableRow, styles.tableHeader]}>
                         <View style={[styles.tableCol, { width: '25%' }]}>
-                            <Text style={styles.tableCell}>ط§ط³ظ… ط§ظ„ط·ط§ظ„ط¨</Text>
+                            <Text style={styles.tableCell}>اسم الطالب</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '25%' }]}>
-                            <Text style={styles.tableCell}>ط§ظ„ط±ط؛ط¨ط© ط§ظ„ط£ظˆظ„ظ‰</Text>
+                            <Text style={styles.tableCell}>الرغبة الأولى</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '25%' }]}>
-                            <Text style={styles.tableCell}>ط§ظ„ط±ط؛ط¨ط© ط§ظ„ط«ط§ظ†ظٹط©</Text>
+                            <Text style={styles.tableCell}>الرغبة الثانية</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '25%' }]}>
-                            <Text style={styles.tableCell}>ط§ظ„ط±ط؛ط¨ط© ط§ظ„ط«ط§ظ„ط«ط©</Text>
+                            <Text style={styles.tableCell}>الرغبة الثالثة</Text>
                         </View>
                     </View>
                     {wishes.map((w, i) => (
@@ -302,23 +309,23 @@ export const StudentWishesReport = ({ wishes, clubs }: { wishes: StudentWish[]; 
 };
 
 // 5. Events Log (QF71-G-4-1)
-export const EventsReport = ({ events }: { events: ActivityEvent[] }) => (
+export const EventsReport = ({ events, schoolName }: { events: ActivityEvent[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="ط³ط¬ظ„ طھظ†ظپظٹط° ط§ظ„ظپط¹ط§ظ„ظٹط§طھ ظˆط§ظ„ط¨ط±ط§ظ…ط¬" code="QF71-G-4-1" />
+            <ReportHeader title="سجل تنفيذ الفعاليات والبرامج" code="QF71-G-4-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '15%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„طھط§ط±ظٹط®</Text>
+                        <Text style={styles.tableCell}>التاريخ</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '30%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ط¨ط±ظ†ط§ظ…ط¬</Text>
+                        <Text style={styles.tableCell}>البرنامج</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '20%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ظ…ظ‚ط±</Text>
+                        <Text style={styles.tableCell}>المقر</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '35%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ظ…ط®ط±ط¬ط§طھ/ط§ظ„ظ†طھط§ط¦ط¬</Text>
+                        <Text style={styles.tableCell}>المخرجات/النتائج</Text>
                     </View>
                 </View>
                 {events.map((e, i) => (
@@ -333,7 +340,7 @@ export const EventsReport = ({ events }: { events: ActivityEvent[] }) => (
                             <Text style={styles.tableCell}>{e.location}</Text>
                         </View>
                         <View style={[styles.tableCol, { width: '35%' }]}>
-                            <Text style={styles.tableCell}>{e.outcome || 'ظ‚ظٹط¯ ط§ظ„طھظ†ظپظٹط°'}</Text>
+                            <Text style={styles.tableCell}>{e.outcome || 'قيد التنفيذ'}</Text>
                         </View>
                     </View>
                 ))}
@@ -344,20 +351,20 @@ export const EventsReport = ({ events }: { events: ActivityEvent[] }) => (
 );
 
 // 6. Honored Students (QF71-G-5-3)
-export const HonorsReport = ({ honors }: { honors: StudentHonor[] }) => (
+export const HonorsReport = ({ honors, schoolName }: { honors: StudentHonor[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="ط³ط¬ظ„ طھظƒط±ظٹظ… ط§ظ„ط·ظ„ط§ط¨ ط§ظ„ظ…طھظ…ظٹط²ظٹظ†" code="QF71-G-5-3" />
+            <ReportHeader title="سجل تكريم الطلاب المتميزين" code="QF71-G-5-3" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '30%' }]}>
-                        <Text style={styles.tableCell}>ط§ط³ظ… ط§ظ„ط·ط§ظ„ط¨</Text>
+                        <Text style={styles.tableCell}>اسم الطالب</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '40%' }]}>
-                        <Text style={styles.tableCell}>ط³ط¨ط¨ ط§ظ„طھظƒط±ظٹظ…</Text>
+                        <Text style={styles.tableCell}>سبب التكريم</Text>
                     </View>
                     <View style={[styles.tableCol, { width: '30%' }]}>
-                        <Text style={styles.tableCell}>ط§ظ„ط¬ط§ط¦ط²ط© ط§ظ„ظ…ط³طھظ„ظ…ط©</Text>
+                        <Text style={styles.tableCell}>الجائزة المستلمة</Text>
                     </View>
                 </View>
                 {honors.map((h, i) => (
@@ -384,27 +391,29 @@ export const FullActivityRecord = ({
     events,
     honors,
     stats,
+    schoolName,
 }: {
     events: ActivityEvent[];
     honors: StudentHonor[];
     stats: ActivityReportStats;
+    schoolName?: string;
 }) => (
     <Document>
         {/* Page 1: Summary & Stats */}
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="ط§ظ„ط³ط¬ظ„ ط§ظ„طھط±ط§ظƒظ…ظٹ ط§ظ„ط´ط§ظ…ظ„ ظ„ظ„ظ†ط´ط§ط·" code="QF71-G-3-2" />
+            <ReportHeader title="السجل التراكمي الشامل للنشاط" code="QF71-G-3-2" schoolName={schoolName} />
             <View style={styles.titleContainer}>
-                <Text style={styles.title}>ظ…ظ„ط®طµ ط§ظ„ط¥ظ†ط¬ط§ط²ط§طھ ظˆط§ظ„ظ†ط´ط§ط·ط§طھ</Text>
+                <Text style={styles.title}>ملخص الإنجازات والنشاطات</Text>
             </View>
             <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 11, marginBottom: 8 }}>ط¹ط¯ط¯ ط§ظ„ط£ظ†ط¯ظٹط© ط§ظ„ظ…ظپطھظˆط­ط©: {stats.activeClubs}</Text>
-                <Text style={{ fontSize: 11, marginBottom: 8 }}>ط¥ط¬ظ…ط§ظ„ظٹ ط§ظ„ظپط¹ط§ظ„ظٹط§طھ ظˆط§ظ„ط¨ط±ط§ظ…ط¬: {events.length}</Text>
-                <Text style={{ fontSize: 11, marginBottom: 8 }}>ط¹ط¯ط¯ ط§ظ„ط·ظ„ط§ط¨ ط§ظ„ظ…ظƒط±ظ…ظٹظ†: {honors.length}</Text>
+                <Text style={{ fontSize: 11, marginBottom: 8 }}>عدد الأندية المفتوحة: {stats.activeClubs}</Text>
+                <Text style={{ fontSize: 11, marginBottom: 8 }}>إجمالي الفعاليات والبرامج: {events.length}</Text>
+                <Text style={{ fontSize: 11, marginBottom: 8 }}>عدد الطلاب المكرمين: {honors.length}</Text>
                 <Text style={{ fontSize: 11, marginBottom: 8 }}>
-                    ظ†ط³ط¨ط© ط§ط³طھظ‡ظ„ط§ظƒ ط§ظ„ظ…ظٹط²ط§ظ†ظٹط©: {stats.expenseRatio.toFixed(1)}%
+                    نسبة استهلاك الميزانية: {stats.expenseRatio.toFixed(1)}%
                 </Text>
             </View>
-            <Text style={{ fontSize: 12, fontFamily: 'TajawalBold', marginBottom: 10 }}>ط£ط¨ط±ط² ط§ظ„ظپط¹ط§ظ„ظٹط§طھ ط§ظ„ظ…ظ†ظپط°ط©:</Text>
+            <Text style={{ fontSize: 12, fontFamily: 'TajawalBold', marginBottom: 10 }}>أبرز الفعاليات المنفذة:</Text>
             <View style={styles.table}>
                 {events.slice(0, 10).map((e, i) => (
                     <View key={i} style={styles.tableRow}>
@@ -421,4 +430,3 @@ export const FullActivityRecord = ({
         </Page>
     </Document>
 );
-

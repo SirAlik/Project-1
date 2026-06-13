@@ -6,6 +6,7 @@ import { X, Trophy, Download, ShieldCheck, User, Calendar, Loader2 } from "lucid
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { supabase } from "@/lib/db/supabase";
+import { useAuth } from "@/app/_context/AuthContext";
 
 interface Student {
     id: string;
@@ -31,6 +32,8 @@ const HIJRI_MONTHS = [
 // Mock data removed - now using Supabase
 
 export function DisciplineKnightsModal({ isOpen, onClose, userRole }: DisciplineKnightsModalProps) {
+    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في الشهادة)
+    const { schoolName } = useAuth();
     const [selectedMonth, setSelectedMonth] = useState(4); // Jumada al-Ula as default
     const [, setIsGenerating] = useState(false);
     const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
@@ -246,7 +249,7 @@ export function DisciplineKnightsModal({ isOpen, onClose, userRole }: Discipline
                             <div className="text-center">
                                 <h3 className="text-xl font-bold">المملكة العربية السعودية</h3>
                                 <h3 className="text-xl font-bold">وزارة التعليم</h3>
-                                <h3 className="text-lg">مدرسة ذكية متطورة</h3>
+                                <h3 className="text-lg">{schoolName || 'المدرسة'}</h3>
                             </div>
                             <div className="w-32 h-32 bg-zinc-100 rounded-full flex items-center justify-center border-2 border-[hsl(var(--accent-primary))]">
                                 <ShieldCheck className="w-16 h-16 text-[hsl(var(--accent-primary))]" />

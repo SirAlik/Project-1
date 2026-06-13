@@ -144,12 +144,19 @@ const styles = StyleSheet.create({
     },
 });
 
-const QFHeader = ({ qfCode, title }: { qfCode: string; title: string }) => (
+/**
+ * نماذج السكرتارية الرسمية (سلسلة QF71-A-* و QF19-*).
+ * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
+ * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (المصدر: سياق المستأجر
+ * المصادَق عبر useAuth في ReportsCenter) ولا يُثبَّت في القالب. العلامة المرئية «سِدرة» فقط.
+ * سجلّ القوالب/الأكواد لكل مدرسة (tenant template registry) = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ */
+const QFHeader = ({ qfCode, title, schoolName }: { qfCode: string; title: string; schoolName?: string }) => (
     <View style={styles.header}>
         <View style={styles.schoolInfo}>
             <Text style={{ fontSize: 12, fontWeight: "bold" }}>المملكة العربية السعودية</Text>
             <Text>وزارة التعليم</Text>
-            <Text>مدارس الفلاح الأهلية</Text>
+            <Text>{schoolName || 'المدرسة'}</Text>
             <Text style={styles.qfCode}>رمز النموذج: {qfCode}</Text>
         </View>
         <View style={{ alignItems: "center" }}>
@@ -169,7 +176,7 @@ const QFHeader = ({ qfCode, title }: { qfCode: string; title: string }) => (
 
 const QFFooter = () => (
     <View style={styles.footer}>
-        <Text>نظام مدارس الفلاح الذكي • السكرتارية الموحدة</Text>
+        <Text>سِدرة • السكرتارية الموحدة</Text>
         <Text>طُبع بواسطة النظام آلياً</Text>
     </View>
 );
@@ -192,10 +199,10 @@ const SignatureSection = ({ role1 = "سكرتير المدرسة", name1 = "....
 // --- 1. HR & Attendance Forms ---
 
 // QF71-A-3-1: Late Arrival Inquiry
-export const LateInquiryPDF = ({ inquiry, employee }: { inquiry: HRInquiry; employee: Employee }) => (
+export const LateInquiryPDF = ({ inquiry, employee, schoolName }: { inquiry: HRInquiry; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-3-1" title="استفسار عن تأخر موظف" />
+            <QFHeader qfCode="QF71-A-3-1" title="استفسار عن تأخر موظف" schoolName={schoolName} />
 
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>بيانات الموظف</Text>
@@ -237,10 +244,10 @@ export const LateInquiryPDF = ({ inquiry, employee }: { inquiry: HRInquiry; empl
 );
 
 // QF71-A-3-2: Absence Inquiry
-export const AbsenceInquiryPDF = ({ inquiry, employee }: { inquiry: HRInquiry; employee: Employee }) => (
+export const AbsenceInquiryPDF = ({ inquiry, employee, schoolName }: { inquiry: HRInquiry; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-3-2" title="استفسار عن غياب موظف" />
+            <QFHeader qfCode="QF71-A-3-2" title="استفسار عن غياب موظف" schoolName={schoolName} />
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>بيانات الموظف</Text>
                 <View style={styles.row}><Text style={styles.label}>الاسم:</Text><Text style={styles.value}>{employee.name}</Text></View>
@@ -257,10 +264,10 @@ export const AbsenceInquiryPDF = ({ inquiry, employee }: { inquiry: HRInquiry; e
 );
 
 // QF19-2: Meeting Minutes
-export const MeetingMinutesPDF = ({ meeting }: { meeting: Meeting }) => (
+export const MeetingMinutesPDF = ({ meeting, schoolName }: { meeting: Meeting; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF19-2" title="محضر اجتماع رسمي" />
+            <QFHeader qfCode="QF19-2" title="محضر اجتماع رسمي" schoolName={schoolName} />
             <View style={styles.section}>
                 <View style={styles.row}>
                     <Text style={styles.label}>عنوان الاجتماع:</Text>
@@ -312,10 +319,10 @@ export const MeetingMinutesPDF = ({ meeting }: { meeting: Meeting }) => (
 );
 
 // QF71-A-4-1: Procurement Request
-export const ProcurementRequestPDF = ({ request }: { request: ProcurementRequest }) => (
+export const ProcurementRequestPDF = ({ request, schoolName }: { request: ProcurementRequest; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-4-1" title="نموذج طلب احتياج / شراء" />
+            <QFHeader qfCode="QF71-A-4-1" title="نموذج طلب احتياج / شراء" schoolName={schoolName} />
             <View style={styles.section}>
                 <View style={styles.row}>
                     <Text style={styles.label}>رقم الطلب:</Text>
@@ -356,10 +363,10 @@ export const ProcurementRequestPDF = ({ request }: { request: ProcurementRequest
 );
 
 // QF71-A-2-1: Incoming Mail Log
-export const IncomingLogPDF = ({ letters }: { letters: CorrespondenceRow[] }) => (
+export const IncomingLogPDF = ({ letters, schoolName }: { letters: CorrespondenceRow[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" orientation="landscape" style={styles.page}>
-            <QFHeader qfCode="QF71-A-2-1" title="سجل الوارد العام" />
+            <QFHeader qfCode="QF71-A-2-1" title="سجل الوارد العام" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={styles.tableHeader}>
                     <Text style={styles.tableCell}>الرقم التسلسلي</Text>
@@ -384,10 +391,10 @@ export const IncomingLogPDF = ({ letters }: { letters: CorrespondenceRow[] }) =>
 );
 
 // QF71-A-3-3: Salary Deduction Decision
-export const DeductionDecisionPDF = ({ inquiry, employee }: { inquiry: HRInquiry; employee: Employee }) => (
+export const DeductionDecisionPDF = ({ inquiry, employee, schoolName }: { inquiry: HRInquiry; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-3-3" title="قرار حسم من الراتب" />
+            <QFHeader qfCode="QF71-A-3-3" title="قرار حسم من الراتب" schoolName={schoolName} />
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>بيانات الموظف</Text>
                 <View style={styles.row}><Text style={styles.label}>الاسم:</Text><Text style={styles.value}>{employee.name}</Text></View>
@@ -407,10 +414,10 @@ export const DeductionDecisionPDF = ({ inquiry, employee }: { inquiry: HRInquiry
 );
 
 // QF71-A-3-4: Daily Exit Log (Permissions)
-export const AttendanceExitLogPDF = ({ logs }: { logs: AttendanceLog[] }) => (
+export const AttendanceExitLogPDF = ({ logs, schoolName }: { logs: AttendanceLog[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-3-4" title="سجل الاستئذان اليومي" />
+            <QFHeader qfCode="QF71-A-3-4" title="سجل الاستئذان اليومي" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={styles.tableHeader}>
                     <Text style={styles.tableCell}>الموظف</Text>
@@ -433,10 +440,10 @@ export const AttendanceExitLogPDF = ({ logs }: { logs: AttendanceLog[] }) => (
 );
 
 // QF71-A-3-5: Emergency Leave Request
-export const EmergencyLeavePDF = ({ leave, employee }: { leave: LeaveRow; employee: Employee }) => (
+export const EmergencyLeavePDF = ({ leave, employee, schoolName }: { leave: LeaveRow; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-3-5" title="طلب إجازة اضطرارية" />
+            <QFHeader qfCode="QF71-A-3-5" title="طلب إجازة اضطرارية" schoolName={schoolName} />
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>بيانات مقدم الطلب</Text>
                 <View style={styles.row}><Text style={styles.label}>الاسم:</Text><Text style={styles.value}>{employee.name}</Text></View>
@@ -455,10 +462,10 @@ export const EmergencyLeavePDF = ({ leave, employee }: { leave: LeaveRow; employ
 );
 
 // QF71-A-2-2: Outgoing Mail Log
-export const OutgoingLogPDF = ({ letters }: { letters: CorrespondenceRow[] }) => (
+export const OutgoingLogPDF = ({ letters, schoolName }: { letters: CorrespondenceRow[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" orientation="landscape" style={styles.page}>
-            <QFHeader qfCode="QF71-A-2-2" title="سجل الصادر العام" />
+            <QFHeader qfCode="QF71-A-2-2" title="سجل الصادر العام" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={styles.tableHeader}>
                     <Text style={styles.tableCell}>الرقم</Text>
@@ -483,10 +490,10 @@ export const OutgoingLogPDF = ({ letters }: { letters: CorrespondenceRow[] }) =>
 );
 
 // QF71-A-2-3: Assignment Letter
-export const AssignmentLetterPDF = ({ letter, employee }: { letter: AssignmentLetter; employee: Employee }) => (
+export const AssignmentLetterPDF = ({ letter, employee, schoolName }: { letter: AssignmentLetter; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-2-3" title="قرار تكليف بمهمة" />
+            <QFHeader qfCode="QF71-A-2-3" title="قرار تكليف بمهمة" schoolName={schoolName} />
             <View style={styles.section}>
                 <Text style={{ textAlign: "right", marginVertical: 20, lineHeight: 1.6 }}>
                     بناءً على ما تقتضيه مصلحة العمل، فقد تقرر تكليف الأستاذ/ {employee.name} بمهمة ({letter.purpose}) في جهة ({letter.destination})
@@ -500,10 +507,10 @@ export const AssignmentLetterPDF = ({ letter, employee }: { letter: AssignmentLe
 );
 
 // QF71-A-2-4: Official Letter Template
-export const OfficialLetterPDF = ({ correspondence }: { correspondence: CorrespondenceRow }) => (
+export const OfficialLetterPDF = ({ correspondence, schoolName }: { correspondence: CorrespondenceRow; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-2-4" title="خطاب رسمي" />
+            <QFHeader qfCode="QF71-A-2-4" title="خطاب رسمي" schoolName={schoolName} />
             <View style={{ marginTop: 40, textAlign: "right" }}>
                 <Text style={{ fontSize: 12, fontWeight: "bold" }}>سعادة/ {correspondence.sender || '...............'} المحترم</Text>
                 <Text style={{ marginTop: 10 }}>السلام عليكم ورحمة الله وبركاته،،،</Text>
@@ -518,10 +525,10 @@ export const OfficialLetterPDF = ({ correspondence }: { correspondence: Correspo
 );
 
 // QF71-A-2-5: Commencement Letter
-export const CommencementLetterPDF = ({ letter, employee }: { letter: AssignmentLetter; employee: Employee }) => (
+export const CommencementLetterPDF = ({ letter, employee, schoolName }: { letter: AssignmentLetter; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-2-5" title="خطاب مباشرة عمل" />
+            <QFHeader qfCode="QF71-A-2-5" title="خطاب مباشرة عمل" schoolName={schoolName} />
             <View style={styles.section}>
                 <Text style={{ textAlign: "right", lineHeight: 1.6 }}>
                     نفيدكم بأن الموظف/ {employee.name} قد باشر مهام عمله في وظيفة ({letter.position_title}) بقسم ({letter.department})
@@ -535,10 +542,10 @@ export const CommencementLetterPDF = ({ letter, employee }: { letter: Assignment
 );
 
 // QF71-A-2-6: Clearance Form
-export const ClearanceFormPDF = ({ letter, employee }: { letter: AssignmentLetter; employee: Employee }) => (
+export const ClearanceFormPDF = ({ letter, employee, schoolName }: { letter: AssignmentLetter; employee: Employee; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF71-A-2-6" title="نموذج إخلاء طرف" />
+            <QFHeader qfCode="QF71-A-2-6" title="نموذج إخلاء طرف" schoolName={schoolName} />
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>بيانات الموظف</Text>
                 <View style={styles.row}><Text style={styles.label}>الاسم:</Text><Text style={styles.value}>{employee.name}</Text></View>
@@ -565,10 +572,10 @@ export const ClearanceFormPDF = ({ letter, employee }: { letter: AssignmentLette
 );
 
 // QF19-1: Meeting Invitation
-export const MeetingInvitationPDF = ({ meeting }: { meeting: Meeting }) => (
+export const MeetingInvitationPDF = ({ meeting, schoolName }: { meeting: Meeting; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <QFHeader qfCode="QF19-1" title="دعوة لحضور اجتماع" />
+            <QFHeader qfCode="QF19-1" title="دعوة لحضور اجتماع" schoolName={schoolName} />
             <View style={{ marginTop: 20, textAlign: "right" }}>
                 <Text>السادة الموظفين الموقرين،،،</Text>
                 <Text style={{ marginTop: 10 }}>السلام عليكم ورحمة الله وبركاته،،،</Text>

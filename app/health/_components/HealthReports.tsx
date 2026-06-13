@@ -97,10 +97,17 @@ const styles = StyleSheet.create({
     }
 });
 
-const ReportHeader = ({ title, code }: { title: string; code: string }) => (
+/**
+ * نماذج تقارير الصحة المدرسية (سلسلة QF-70-j-*).
+ * ملاحظة معمارية: أكواد QF والبنية الحالية قوالب خاصة بمستأجر «الفلاح» (tenant-specific) — وليست
+ * افتراضات سِدرة العالمية. اسم المدرسة يُمرَّر ديناميكياً عبر prop `schoolName` (المصدر: سياق المستأجر
+ * المصادَق server-side عبر useAuth في المُستدعي) ولا يُثبَّت في القالب. سجلّ القوالب/الأكواد لكل
+ * مدرسة (tenant template registry) = طبقة لاحقة (Phase 3D) ولا يُنفَّذ هنا.
+ */
+const ReportHeader = ({ title, code, schoolName }: { title: string; code: string; schoolName?: string }) => (
     <View style={styles.header}>
         <View style={styles.schoolInfo}>
-            <Text style={{ fontSize: 12, fontFamily: 'TajawalBold' }}>مدارس الفلاح الأهلية</Text>
+            <Text style={{ fontSize: 12, fontFamily: 'TajawalBold' }}>{schoolName || 'المدرسة'}</Text>
             <Text style={{ fontSize: 8 }}>تحت إشراف وزارة التعليم</Text>
         </View>
         <View style={styles.titleContainer}>
@@ -121,10 +128,10 @@ const ReportFooter = ({ code }: { code: string }) => (
 );
 
 // 1. Visit Log Report (QF-70-j-4-1)
-export const VisitLogReport = ({ visits }: { visits: VisitReportRow[] }) => (
+export const VisitLogReport = ({ visits, schoolName }: { visits: VisitReportRow[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="سجل الزيارات اليومي" code="QF-70-j-4-1" />
+            <ReportHeader title="سجل الزيارات اليومي" code="QF-70-j-4-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '15%' }]}><Text style={styles.tableCell}>التاريخ/الوقت</Text></View>
@@ -149,10 +156,10 @@ export const VisitLogReport = ({ visits }: { visits: VisitReportRow[] }) => (
 );
 
 // 2. Supply Log Report (QF-70-j-3-1)
-export const SupplyLogReport = ({ supplies }: { supplies: SupplyReportRow[] }) => (
+export const SupplyLogReport = ({ supplies, schoolName }: { supplies: SupplyReportRow[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="سجل عهدة العيادة المدرسية" code="QF-70-j-3-1" />
+            <ReportHeader title="سجل عهدة العيادة المدرسية" code="QF-70-j-3-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '40%' }]}><Text style={styles.tableCell}>البيان (المادة)</Text></View>
@@ -175,10 +182,10 @@ export const SupplyLogReport = ({ supplies }: { supplies: SupplyReportRow[] }) =
 );
 
 // 3. Hygiene Log Report (QF-70-j-6-1)
-export const HygieneReport = ({ logs }: { logs: HygieneReportRow[] }) => (
+export const HygieneReport = ({ logs, schoolName }: { logs: HygieneReportRow[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="سجل فحص النظافة الشخصية" code="QF-70-j-6-1" />
+            <ReportHeader title="سجل فحص النظافة الشخصية" code="QF-70-j-6-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '20%' }]}><Text style={styles.tableCell}>التاريخ</Text></View>
@@ -201,10 +208,10 @@ export const HygieneReport = ({ logs }: { logs: HygieneReportRow[] }) => (
 );
 
 // 4. Canteen Check Report (QF-70-j-8-1)
-export const CanteenReport = ({ checks }: { checks: CanteenReportRow[] }) => (
+export const CanteenReport = ({ checks, schoolName }: { checks: CanteenReportRow[]; schoolName?: string }) => (
     <Document>
         <Page size="A4" style={styles.page}>
-            <ReportHeader title="سجل متابعة المقصف المدرسي" code="QF-70-j-8-1" />
+            <ReportHeader title="سجل متابعة المقصف المدرسي" code="QF-70-j-8-1" schoolName={schoolName} />
             <View style={styles.table}>
                 <View style={[styles.tableRow, styles.tableHeader]}>
                     <View style={[styles.tableCol, { width: '20%' }]}><Text style={styles.tableCell}>التاريخ</Text></View>

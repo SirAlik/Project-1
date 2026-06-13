@@ -1,7 +1,10 @@
+"use client";
+
 import React from "react";
 import { FileDown, Printer, FileText, ClipboardList, Loader2 } from "lucide-react";
 import type { ActivityFinancial, ActivityClub, ClubAssignment, StudentWish, ActivityEvent, StudentHonor } from "@/lib/types/activity";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { useAuth } from "@/app/_context/AuthContext";
 import {
     BudgetReport,
     ExpensesReport,
@@ -36,49 +39,52 @@ interface ExportButtonsProps {
 
 export function ExportButtons({ data }: ExportButtonsProps) {
     const { financials, assignments, wishes, events, honors, stats, clubs } = data;
+    // اسم المدرسة ديناميكي من سياق المستأجر المصادَق (لا يُثبَّت في القالب)
+    const { schoolName } = useAuth();
+    const tenant = schoolName ?? undefined;
 
     const reports = [
         {
             id: "QF71-G-1-1",
             label: "توزيع المشرفين",
             code: "QF71-G-1-1",
-            document: <SupervisorsReport assignments={assignments} />
+            document: <SupervisorsReport assignments={assignments} schoolName={tenant} />
         },
         {
             id: "QF71-G-1-2",
             label: "ميزانية النشاط",
             code: "QF71-G-1-2",
-            document: <BudgetReport items={financials.filter(f => f.type === 'budget')} />
+            document: <BudgetReport items={financials.filter(f => f.type === 'budget')} schoolName={tenant} />
         },
         {
             id: "QF71-G-3-1",
             label: "رغبات الطلاب",
             code: "QF71-G-3-1",
-            document: <StudentWishesReport wishes={wishes} clubs={clubs} />
+            document: <StudentWishesReport wishes={wishes} clubs={clubs} schoolName={tenant} />
         },
         {
             id: "QF71-G-4-1",
             label: "سجل الفعاليات",
             code: "QF71-G-4-1",
-            document: <EventsReport events={events} />
+            document: <EventsReport events={events} schoolName={tenant} />
         },
         {
             id: "QF71-G-5-1",
             label: "سجل المسابقات",
             code: "QF71-G-5-1",
-            document: <EventsReport events={events.filter(e => e.type === 'competition')} />
+            document: <EventsReport events={events.filter(e => e.type === 'competition')} schoolName={tenant} />
         },
         {
             id: "QF71-G-5-3",
             label: "كشف التكريم",
             code: "QF71-G-5-3",
-            document: <HonorsReport honors={honors} />
+            document: <HonorsReport honors={honors} schoolName={tenant} />
         },
         {
             id: "QF71-G-7-1",
             label: "سجل المصروفات",
             code: "QF71-G-7-1",
-            document: <ExpensesReport expenses={financials.filter(f => f.type === 'expense')} />
+            document: <ExpensesReport expenses={financials.filter(f => f.type === 'expense')} schoolName={tenant} />
         },
     ];
 
@@ -133,7 +139,7 @@ export function ExportButtons({ data }: ExportButtonsProps) {
                 <p className="text-[10px] text-stone-500 font-bold mb-6">توليد ملف كامل يحتوي على كافة بيانات النشاط للفصل الدراسي</p>
 
                 <PDFDownloadLink
-                    document={<FullActivityRecord events={events} honors={honors} stats={stats} />}
+                    document={<FullActivityRecord events={events} honors={honors} stats={stats} schoolName={tenant} />}
                     fileName="Comprehensive_Activity_Record.pdf"
                     className="w-full"
                 >

@@ -1,7 +1,9 @@
+"use client";
+
 import React from "react";
-import Image from "next/image";
 import { Download } from "lucide-react";
 import { exportToOfficialPDF } from "@/lib/utils/pdfExport";
+import { useAuth } from "@/app/_context/AuthContext";
 
 interface QualityFormWrapperProps {
     children: React.ReactNode;
@@ -11,7 +13,14 @@ interface QualityFormWrapperProps {
     fileName: string;
 }
 
+/**
+ * غلاف نموذج الجودة الرسمي (مشترك بين نماذج المرشد الطلابي وشؤون الطلاب).
+ * اسم المدرسة ديناميكي من سياق المستأجر المصادَق (useAuth) — لا يُثبَّت. العلامة المرئية «سِدرة» فقط.
+ * شعار المدرسة لكل مستأجر (per-school logo) = طبقة لاحقة (Phase 3F) تتطلب تخزيناً + عموداً، لا يُنفَّذ هنا.
+ */
 export function QualityFormWrapper({ children, id, title, code, fileName }: QualityFormWrapperProps) {
+    const { schoolName } = useAuth();
+
     return (
         <div className="glass-panel p-6 md:p-10 rounded-[2.5rem] border border-stone-200 shadow-2xl relative overflow-hidden">
             {/* Decorative official elements */}
@@ -21,20 +30,11 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
 
             <header className="flex flex-col md:flex-row items-center justify-between mb-8 border-b border-stone-200 pb-8 gap-4">
                 <div className="text-center md:text-right">
-                    <h2 className="text-xl font-black text-foreground mb-1 italic tracking-tighter">مدارس الفلاح الأهلية</h2>
-                    <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Al-Falah Private Schools</p>
+                    <h2 className="text-xl font-black text-foreground mb-1 tracking-tight">{schoolName || 'المدرسة'}</h2>
+                    <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">نظام إدارة الجودة</p>
                 </div>
 
                 <div className="text-center">
-                    <div className="w-20 h-20 mb-4 mx-auto relative group">
-                        <Image
-                            src="/school_official_logo.png"
-                            alt="Al-Falah Schools Logo"
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-contain filter drop-shadow-[0_0_15px_rgba(124,58,237,0.3)] group-hover:scale-110 transition-transform duration-500"
-                        />
-                    </div>
                     <h1 className="text-xs font-black text-teal-400 bg-teal-500/10 px-8 py-2 rounded-full border border-teal-500/20 shadow-inner tracking-widest uppercase">
                         {title}
                     </h1>
@@ -64,4 +64,3 @@ export function QualityFormWrapper({ children, id, title, code, fileName }: Qual
         </div>
     );
 }
-

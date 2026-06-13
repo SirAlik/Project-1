@@ -100,7 +100,7 @@ export default function TripConsentPage() {
                     </div>
 
                     <footer className="p-6 bg-white/80 text-center">
-                        <p className="text-[10px] text-stone-500 font-black uppercase tracking-[0.2em]">نظام إدارة الأنشطة - مدارس الفلاح</p>
+                        <p className="text-[10px] text-stone-500 font-black uppercase tracking-[0.2em]">نموذج موافقة إلكتروني • منصة سِدرة</p>
                     </footer>
                 </div>
             </div>
