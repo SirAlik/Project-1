@@ -4,6 +4,8 @@ import { redirect }         from 'next/navigation';
 import { Plus, ShieldAlert, CheckCircle2, Clock, XCircle, FileSearch } from 'lucide-react';
 import { getActivePersona } from '@/lib/auth/context-service';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
+import { isQualityModuleEnabled } from '@/lib/quality/tenant-templates';
+import { QualityDisabledNotice } from '@/components/quality/QualityDisabledNotice';
 
 export const metadata: Metadata = { title: 'الإجراءات التصحيحية — سِدرة' };
 
@@ -49,6 +51,11 @@ function formatDateAr(iso: string): string {
 export default async function CorrectiveActionListPage() {
   const persona = await getActivePersona();
   if (!persona || !persona.schoolId) redirect('/portal');
+
+  // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+  if (!isQualityModuleEnabled(persona.schoolId, 'qa')) {
+    return <QualityDisabledNotice moduleLabel="ضمان الجودة" />;
+  }
 
   const supabase = await createSupabaseServerClient();
 

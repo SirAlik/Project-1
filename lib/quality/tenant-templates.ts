@@ -30,7 +30,12 @@ import { LRC_QUALITY_FORMS } from '@/lib/quality/quality-forms';
  *   counseling       → app/counselor/_components/{QualityForms,Form22,Form42,Form43,Form82}.tsx
  *   activity         → app/activity/_components/ActivityReports.tsx
  *   lrc              → lib/quality/quality-forms.ts (LRC_QUALITY_FORMS) + app/lrc/_components/*
+ *   qa               → app/qa/corrective-action/* (QF03-1 عدم المطابقة/إجراء تصحيحي)
+ *   science          → مخطّط (تقارير المختبر · lab_technician) — لا واجهة/قالب بعد
  *   operations       → components/operations/DisciplineKnightsModal.tsx (شهادة عامة، لا رمز QF)
+ *
+ * أدوار إشرافية (school_principal · school_admin · academic_vp): تقارير قيادية/أكاديمية مخطّطة عبر
+ * الوحدات — لا لوحة QF مخصّصة بعد. school_affairs_vp مُستثنى من ملكية نماذج الجودة (لا يُربَط).
  *
  * ملاحظة wiring (Phase 3D): الأكواد مُمرآة هنا (مصدر حقيقة)، لكن المكوّنات لم تُحوَّل بعد لقراءة الإتاحة
  * المدرسية من هذا السجلّ، لأن السجلّ فارغ في PRE-LAUNCH وتحويلها الآن يُخفي كل النماذج لكل المدارس
@@ -46,6 +51,8 @@ export type QualityModule =
     | 'counseling'
     | 'activity'
     | 'lrc'
+    | 'qa'
+    | 'science'
     | 'operations';
 
 /** الدور المالك — يجب أن يكون ضمن QUALITY_FORM_OWNER_ROLES في quality-forms.ts (المصدر المعتمد). */
@@ -146,6 +153,12 @@ const AL_FALAH_ACTIVITY: QualityTemplate[] = [
     { key: 'activity:full_record',      code: 'QF71-G-3-2', title: 'السجل التراكمي الشامل للنشاط', ownerRole: 'activity_leader', module: 'activity', enabled: true, implemented: true, tenantSpecific: true },
 ];
 
+const AL_FALAH_QA: QualityTemplate[] = [
+    { key: 'qa:corrective_action', code: 'QF03-1', title: 'تقرير عدم المطابقة والإجراء التصحيحي', ownerRole: 'quality_coordinator', module: 'qa', enabled: true, implemented: true, tenantSpecific: true },
+];
+
+// ملاحظة: وحدة 'science' (محضر المختبر) مخطّطة بلا قالب/واجهة بعد — لا قوالب تُسجَّل لها (تظهر فارغة بصدق).
+
 /**
  * مجموعة قوالب الفلاح الخاصة بالمستأجر (أكواد QF). مُصدَّرة كمصدر حقيقة لأكواد الفلاح.
  * **ليست** قوالب عالمية: لا تُربَط إلا بمدرسة مُسجَّلة صراحةً ببرنامج الفلاح.
@@ -156,6 +169,7 @@ export const AL_FALAH_QUALITY_TEMPLATES: QualityTemplate[] = [
     ...AL_FALAH_STUDENT_AFFAIRS,
     ...AL_FALAH_COUNSELING,
     ...AL_FALAH_ACTIVITY,
+    ...AL_FALAH_QA,
 ];
 
 // ============================================================================

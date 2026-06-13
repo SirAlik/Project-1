@@ -3,9 +3,19 @@
 import React, { useState } from "react";
 import { FormC51_MorningTardy } from "./FormC51_MorningTardy";
 import { FormC53_CounselorReferral } from "./FormC53_CounselorReferral";
+import { useAuth } from "@/app/_context/AuthContext";
+import { isQualityModuleEnabled } from "@/lib/quality/tenant-templates";
+import { QualityDisabledNotice } from "@/components/quality/QualityDisabledNotice";
 
 export function StudentAffairsQualityForms() {
+    // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+    const { schoolId, isLoading } = useAuth();
     const [activeForm, setActiveForm] = useState<string>("C-5-1");
+
+    if (isLoading) return null;
+    if (!isQualityModuleEnabled(schoolId, 'student_affairs')) {
+        return <QualityDisabledNotice moduleLabel="شؤون الطلاب" />;
+    }
 
     const tabs = [
         { id: "C-5-1", name: "سجل التأخر الصباحي (C-5-1)", code: "QF-71-C-5-1" },

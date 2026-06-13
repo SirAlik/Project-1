@@ -4,12 +4,19 @@ import { ChevronRight }       from 'lucide-react';
 import { getActivePersona }   from '@/lib/auth/context-service';
 import { getReasonCodes }     from '@/lib/services/wizard-service';
 import { CorrectiveActionWizard } from './CorrectiveActionWizard';
+import { isQualityModuleEnabled } from '@/lib/quality/tenant-templates';
+import { QualityDisabledNotice } from '@/components/quality/QualityDisabledNotice';
 
 export default async function CorrectiveActionNewPage() {
   const persona = await getActivePersona();
   if (!persona) redirect('/login');
   if (persona.role !== 'quality_coordinator' && !persona.isSystemOwner) {
     redirect('/qa');
+  }
+
+  // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+  if (!isQualityModuleEnabled(persona.schoolId, 'qa')) {
+    return <QualityDisabledNotice moduleLabel="ضمان الجودة" />;
   }
 
   const rcResult = await getReasonCodes('corrective_action');

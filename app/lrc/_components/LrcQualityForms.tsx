@@ -4,6 +4,9 @@ import React from 'react';
 import { FileText, Download, Workflow, FileCheck2 } from 'lucide-react';
 import { LRC_QUALITY_FORMS, type QualityFormDef } from '@/lib/quality/quality-forms';
 import { generateLRCCertificate } from './CertificateGenerator';
+import { useAuth } from '@/app/_context/AuthContext';
+import { isQualityModuleEnabled } from '@/lib/quality/tenant-templates';
+import { QualityDisabledNotice } from '@/components/quality/QualityDisabledNotice';
 
 interface LrcQualityFormsProps {
     /** اسم الطالب الأكثر استعارة (لتفعيل تصدير شهادة التميّز) — من بيانات حقيقية */
@@ -11,6 +14,12 @@ interface LrcQualityFormsProps {
 }
 
 export function LrcQualityForms({ topStudentName }: LrcQualityFormsProps) {
+    // بوّابة الإتاحة لكل مستأجر (fail-closed): مدرسة غير مُسجَّلة في سجلّ القوالب → حالة فارغة صادقة
+    const { schoolId, isLoading } = useAuth();
+    if (isLoading) return null;
+    if (!isQualityModuleEnabled(schoolId, 'lrc')) {
+        return <QualityDisabledNotice moduleLabel="مركز مصادر التعلم" />;
+    }
     return (
         <div className="space-y-6">
             {/* مفهوم محرّك التعبئة التلقائية — توضيح معماري صادق */}

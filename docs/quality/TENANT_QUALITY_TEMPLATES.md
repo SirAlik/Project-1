@@ -75,5 +75,8 @@
 - **الوصول الآمن:** `getTenantQualityConfig` · `isQualityEnabled` · `getQualityTemplates(schoolId, module?)` · `isQualityModuleEnabled` · `getTemplateByCode` — كلها fail-closed (`schoolId` غائب/غير مُسجَّل → معطّل/قائمة فارغة).
 - **الإتاحة لكل مدرسة app-code فقط** (لا feature flags في DB بعد — طبقة DB لكل مدرسة = Phase 3F).
 
-### حالة الربط (wiring)
-الأكواد **مُمرآة** في السجلّ ومُشار إليها بتعليقات داخل المكوّنات. لم تُحوَّل المكوّنات بعد لقراءة الإتاحة المدرسية من السجلّ **وقت التشغيل**، لأن السجلّ فارغ في PRE-LAUNCH وتحويلها الآن **يُخفي كل النماذج لكل المدارس** (تغيير سلوك). التحويل لبوّابة `getQualityTemplates(schoolId)` على مستوى المُستدعي = خطوة لاحقة (بعد تسجيل برنامج مدرسة)، معلَّمة `TODO` في كل مكوّن QF.
+### حالة الربط (wiring) — مُحدَّثة 3D-2/3D-3
+- **3D-2:** سُجِّلت مدرسة الفلاح (`bfe99c43-…` من سجلّ Supabase الحقيقي) في `TENANT_QUALITY_REGISTRY`، ورُبطت مُستهلِكات: health/activity ExportButtons · secretary ReportsCenter · counselor QualityForms عبر `isQualityModuleEnabled`.
+- **3D-3:** رُبطت بقية أسطح QF المالكة: LRC (`LrcQualityForms`) · QA corrective-action (`/qa/corrective-action` + `/new`، server-side عبر `getActivePersona().schoolId`، وحدة `qa` جديدة + قالب QF03-1) · student-affairs quality forms (تحصين مستقبلي — غير مرسومة بالصفحة بعد).
+- **بلا لوحة QF بعد (مخطّط، لا تزييف):** lab_technician (`/science`) · school_principal · school_admin · academic_vp — تقارير مخطّطة عبر الوحدات، لا واجهة QF مخصّصة.
+- **الأكواد الحرفية داخل مستندات React-PDF تبقى** (مُمرآة في السجلّ)؛ تُعرَض فقط عبر مُستهلِكات مُبوّبة بالسجلّ (للفلاح المُسجَّلة)، وحالة فارغة صادقة (`QualityDisabledNotice`) لأي مدرسة غير مُسجَّلة. `school_affairs_vp` مُستثنى (لا يُربَط).
