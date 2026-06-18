@@ -5,6 +5,9 @@ import {
     CalendarCheck,
     FileWarning,
     ClipboardCheck,
+    Sparkles,
+    Globe,
+    Settings,
     type LucideIcon,
 } from 'lucide-react';
 import type { UserRole } from '@/lib/auth/roles';
@@ -110,6 +113,21 @@ export function getRoleNav(role: UserRole): RoleNavGroup[] {
             return [home('/science')];
         case 'activity_leader':
             return [home('/activity')];
+        case 'school_librarian':
+            // العمليات (الفهرس · الإعارة · الحجوزات · الزيارات · التقارير · الجودة) تبويبات داخل الصفحة
+            // عبر SegmentedTabs (تشترك في حالة useLRC) — لا مسارات منفصلة. الشريط الجانبي يحمل الرئيسية
+            // + عناصر مخطّطة «قريباً» معطّلة (بلا روابط وهمية).
+            return [
+                home('/lrc'),
+                {
+                    title: 'قريباً',
+                    items: [
+                        { label: 'الفهرسة الذكية', href: null, icon: Sparkles, comingSoon: true },
+                        { label: 'الفهرس العام', href: null, icon: Globe, comingSoon: true },
+                        { label: 'الإعدادات', href: null, icon: Settings, comingSoon: true },
+                    ],
+                },
+            ];
         default:
             return [];
     }
