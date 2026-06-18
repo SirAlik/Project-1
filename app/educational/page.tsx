@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { BookOpenCheck, FlaskConical, HeartPulse, Library, ShieldAlert } from "lucide-react";
 import { QualityOwnerPanel } from "@/components/quality/QualityOwnerPanel";
+import { PageHeader, DashboardGrid, ActionCard } from "@/components/dashboard";
 
 const MODULES = [
     {
@@ -31,45 +31,29 @@ const MODULES = [
 
 export default function EducationalAffairsPage() {
     return (
-        <main dir="rtl">
-            <div className="space-y-8">
-                <header className="rounded-[2rem] border border-stone-200 bg-white/85 p-8 shadow-sm">
-                    <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                        <ShieldAlert className="h-7 w-7" />
-                    </div>
-                    <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                        الشؤون التعليمية
-                    </p>
-                    <h1 className="text-3xl font-black tracking-tight">
-                        لا توجد لوحة مؤشرات تعليمية جاهزة
-                    </h1>
-                    <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-                        تمت إزالة المؤشرات الثابتة من هذه الصفحة. ستعرض هذه المنطقة ملخصات الشؤون التعليمية فقط بعد اعتماد مصادر بيانات حقيقية لكل وحدة.
-                    </p>
-                </header>
+        <div className="space-y-8" dir="rtl">
+            {/* حالة فارغة صادقة: لا مؤشرات تعليمية ثابتة — تُعرض بعد ربط مصادر بيانات حقيقية */}
+            <PageHeader
+                icon={ShieldAlert}
+                kicker="الشؤون التعليمية"
+                title="لا توجد لوحة مؤشرات تعليمية جاهزة"
+                subtitle="تمت إزالة المؤشرات الثابتة من هذه الصفحة. ستعرض هذه المنطقة ملخصات الشؤون التعليمية فقط بعد اعتماد مصادر بيانات حقيقية لكل وحدة."
+            />
 
-                <section className="grid gap-4 md:grid-cols-2">
-                    {MODULES.map((module) => {
-                        const Icon = module.icon;
-                        return (
-                            <Link
-                                key={module.href}
-                                href={module.href}
-                                className="rounded-2xl border border-stone-200 bg-white/85 p-6 shadow-sm transition-colors hover:border-primary/30"
-                            >
-                                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                                    <Icon className="h-5 w-5" />
-                                </div>
-                                <h2 className="text-base font-black">{module.title}</h2>
-                                <p className="mt-2 text-sm leading-6 text-muted-foreground">{module.description}</p>
-                            </Link>
-                        );
-                    })}
-                </section>
+            <DashboardGrid cols={2}>
+                {MODULES.map((module) => (
+                    <ActionCard
+                        key={module.href}
+                        href={module.href}
+                        icon={module.icon}
+                        title={module.title}
+                        description={module.description}
+                    />
+                ))}
+            </DashboardGrid>
 
-                {/* نماذج الجودة (مالك: وكيل الشؤون التعليمية) — مُبوّبة بسجلّ المستأجر */}
-                <QualityOwnerPanel module="academic" moduleLabel="الشؤون التعليمية" />
-            </div>
-        </main>
+            {/* نماذج الجودة (مالك: وكيل الشؤون التعليمية) — مُبوّبة بسجلّ المستأجر */}
+            <QualityOwnerPanel module="academic" moduleLabel="الشؤون التعليمية" />
+        </div>
     );
 }

@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useQA } from "./_hooks/useQA";
-import { KPICard } from "@/components/ui/KPICard";
 import { ObservationList } from "./_components/ObservationList";
 import { DisciplineKnightsModal } from "@/components/operations/DisciplineKnightsModal";
-import { Trophy, ChevronLeft, BarChart3, ShieldCheck, Activity } from "lucide-react";
+import { Trophy, ArrowLeft, BarChart3, ShieldCheck, Activity, Plus } from "lucide-react";
 import { AIInsightCard } from "@/components/ai/AIInsightCard";
+import { PageHeader, DashboardGrid, MetricCard, DashboardSection, EmptyState } from "@/components/dashboard";
 
 export default function QADashboard() {
     const { state } = useQA();
@@ -26,93 +26,98 @@ export default function QADashboard() {
 
     return (
         <>
-            <main className="text-[var(--text)] font-sans pb-20" dir="rtl">
-                <div className="relative z-10">
-                    <header className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div>
-                            <h1 className="text-4xl font-bold tracking-tight">
-                                ضمان <span className="text-sky-500">الجودة</span>
-                            </h1>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
+            <div className="space-y-8" dir="rtl">
+                <PageHeader
+                    icon={ShieldCheck}
+                    title="ضمان الجودة"
+                    subtitle="الملاحظات الصفّية ومؤشّرات الأداء والإجراءات التصحيحية."
+                    actions={
+                        <>
                             <button
                                 onClick={() => setIsKnightsOpen(true)}
-                                className="glass-card px-5 py-2.5 rounded-2xl text-xs font-bold text-[hsl(var(--accent-primary))] hover:bg-[hsla(var(--accent-primary),.05)] transition-all border-[hsla(var(--accent-primary),.20)] flex items-center gap-2"
+                                className="flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition-colors hover:bg-muted"
                             >
-                                <Trophy className="w-4 h-4 shadow-pulse" /> فرسان الانضباط
+                                <Trophy className="h-4 w-4 text-primary" /> فرسان الانضباط
                             </button>
-
-                            <Link href="/qa/corrective-action" className="bg-emerald-700/80 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-2xl text-xs font-bold shadow-xl shadow-emerald-500/10 transition-all flex items-center gap-2">
-                                الإجراءات التصحيحية <ChevronLeft className="w-4 h-4" />
+                            <Link
+                                href="/qa/corrective-action"
+                                className="flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition-colors hover:bg-muted"
+                            >
+                                الإجراءات التصحيحية <ArrowLeft className="h-4 w-4" />
                             </Link>
-                            <Link href="/qa/corrective-action/new" className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-2xl text-xs font-bold shadow-xl shadow-emerald-500/20 transition-all flex items-center gap-2">
-                                إجراء تصحيحي جديد <ChevronLeft className="w-4 h-4" />
+                            <Link
+                                href="/qa/corrective-action/new"
+                                className="flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                            >
+                                <Plus className="h-4 w-4" /> إجراء تصحيحي جديد
                             </Link>
+                        </>
+                    }
+                />
 
-                        </div>
-                    </header>
-
-                    {state.msg && (
-                        <div className="mb-8 p-4 glass-panel border border-emerald-500/20 text-emerald-500 text-xs font-bold rounded-2xl animate-in fade-in slide-in-from-top-4">
-                            {state.msg}
-                        </div>
-                    )}
-
-                    {/* KPI Strip */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                        <KPICard title="متوسط الأداء التعليمي" value={`${avgScore}%`} trend="up" color="primary" icon={BarChart3} />
-                        <KPICard title="الزيارات الصفية" value={totalObs} color="primary" icon={Activity} />
-                        <KPICard title="مؤشر الخطر (طلاب)" value={highRiskStudents} trend="down" color="rose" icon={ShieldCheck} />
-                        <KPICard title="نسبة الحضور (اليوم)" value={attendanceValue} trend={typeof latestAttendanceRate === "number" ? "up" : undefined} color="accent" icon={Trophy} />
+                {state.msg && (
+                    <div className="rounded-2xl border border-success/20 bg-success/10 px-4 py-3 text-sm font-bold text-success">
+                        {state.msg}
                     </div>
+                )}
 
-                    {/* AI Insight */}
-                    <div className="mb-10">
-                        <AIInsightCard contextType="quality_summary" title="الرؤية الذكية — ضمان الجودة" />
-                    </div>
+                {/* KPI Strip */}
+                <DashboardGrid cols={4}>
+                    <MetricCard label="متوسط الأداء التعليمي" value={`${avgScore}%`} icon={BarChart3} tone="primary" />
+                    <MetricCard label="الزيارات الصفية" value={totalObs} icon={Activity} tone="info" />
+                    <MetricCard label="مؤشر الخطر (طلاب)" value={highRiskStudents} icon={ShieldCheck} tone="danger" />
+                    <MetricCard label="نسبة الحضور (اليوم)" value={attendanceValue} icon={Trophy} tone="success" />
+                </DashboardGrid>
 
-                    <div className="grid lg:grid-cols-12 gap-8">
-                        {/* Weekly Trends Chart Area */}
-                        <div className="lg:col-span-8">
-                            <section className="glass-card p-10 h-full flex flex-col">
-                                <div className="flex justify-between items-center mb-10">
-                                    <h3 className="text-lg font-bold">اتجاهات الحضور الأسبوعية</h3>
-                                    <div className="flex gap-2">
-                                        <div className="w-3 h-3 rounded-full bg-sky-500"></div>
-                                        <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest">معدل الحضور</span>
-                                    </div>
-                                </div>
-                                <div className="flex-1 flex items-end gap-3 px-4">
+                {/* AI Insight */}
+                <AIInsightCard contextType="quality_summary" title="الرؤية الذكية — ضمان الجودة" />
+
+                <div className="grid gap-6 lg:grid-cols-12">
+                    {/* Weekly Trends Chart Area */}
+                    <div className="lg:col-span-8">
+                        <DashboardSection
+                            title="اتجاهات الحضور الأسبوعية"
+                            icon={BarChart3}
+                            action={
+                                <span className="flex items-center gap-2">
+                                    <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">معدل الحضور</span>
+                                </span>
+                            }
+                            className="h-full"
+                        >
+                            {state.kpis.length === 0 ? (
+                                <EmptyState icon={BarChart3} title="لا توجد بيانات متاحة حالياً" hint="ستظهر اتجاهات الحضور بعد توفّر مؤشّرات يومية." />
+                            ) : (
+                                <div className="flex flex-1 items-end gap-3 px-2 pt-6">
                                     {state.kpis.slice(-7).map((k, i) => (
-                                        <div key={i} className="flex-1 flex flex-col items-center group">
-                                            <div className="w-full bg-gradient-to-t from-sky-600/20 to-sky-400/40 group-hover:from-sky-500/40 group-hover:to-sky-400 group-hover:scale-x-105 rounded-2xl relative transition-all duration-500 flex items-end justify-center pb-4 qa-bar"
-                                                data-h={k.metrics.attendance_rate}>
-                                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 glass-panel px-2.5 py-1.5 rounded-xl text-[10px] font-black opacity-0 group-hover:opacity-100 transition-all pointer-events-none border whitespace-nowrap shadow-xl">
+                                        <div key={i} className="group flex flex-1 flex-col items-center">
+                                            <div
+                                                className="qa-bar relative flex w-full items-end justify-center rounded-2xl bg-gradient-to-t from-primary/15 to-primary/40 pb-4 transition-all duration-500 group-hover:from-primary/30 group-hover:to-primary"
+                                                data-h={k.metrics.attendance_rate}
+                                            >
+                                                <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-xl border border-border bg-card px-2.5 py-1.5 text-[10px] font-black text-foreground opacity-0 shadow-sm transition-all group-hover:opacity-100">
                                                     {(k.metrics.attendance_rate as number).toFixed(1)}%
                                                 </div>
-                                                <span className="text-[10px] font-black text-stone-400 group-hover:text-foreground transition-colors rotate-90 origin-bottom mb-2">{k.date.split('-').slice(1).join('/')}</span>
+                                                <span className="mb-2 origin-bottom rotate-90 text-[10px] font-black text-muted-foreground transition-colors group-hover:text-foreground">
+                                                    {k.date.split('-').slice(1).join('/')}
+                                                </span>
                                             </div>
-                                            <div className="mt-4 text-[9px] font-bold opacity-20 uppercase tracking-widest">{new Date(k.date).toLocaleDateString('ar-EG', { weekday: 'short' })}</div>
+                                            <div className="mt-4 text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                                                {new Date(k.date).toLocaleDateString('ar-EG', { weekday: 'short' })}
+                                            </div>
                                         </div>
                                     ))}
-                                    {state.kpis.length === 0 && (
-                                        <div className="w-full flex flex-col items-center justify-center opacity-10">
-                                            <BarChart3 className="w-16 h-16 mb-4" />
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em]">لا توجد بيانات متاحة حالياً</p>
-                                        </div>
-                                    )}
                                 </div>
-                            </section>
-                        </div>
+                            )}
+                        </DashboardSection>
+                    </div>
 
-                        <div className="lg:col-span-4">
-                            <article className="h-full">
-                                <ObservationList observations={state.observations} />
-                            </article>
-                        </div>
+                    <div className="lg:col-span-4">
+                        <ObservationList observations={state.observations} />
                     </div>
                 </div>
-            </main>
+            </div>
             <DisciplineKnightsModal
                 isOpen={isKnightsOpen}
                 onClose={() => setIsKnightsOpen(false)}

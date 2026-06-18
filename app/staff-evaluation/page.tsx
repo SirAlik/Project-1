@@ -5,6 +5,10 @@ import { Plus, ClipboardCheck, Clock, CheckCircle2, FileText, XCircle } from 'lu
 import { getActivePersona } from '@/lib/auth/context-service';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 import { getRoleInfo, type UserRole } from '@/lib/auth/roles';
+import { PageHeader, DashboardGrid, MetricCard, EmptyState } from '@/components/dashboard';
+
+const CTA_CLASS =
+  'flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold shadow-sm transition-colors';
 
 export const metadata: Metadata = { title: 'تقييمات الأداء — سِدرة' };
 
@@ -77,70 +81,42 @@ export default async function StaffEvaluationListPage() {
     filed:        items.filter(r => r.status === 'filed').length,
   };
 
+  const createCta = canCreate ? (
+    <Link href="/staff-evaluation/new" className={CTA_CLASS}>
+      <Plus className="w-4 h-4" />
+      تقييم جديد
+    </Link>
+  ) : null;
+
   return (
     <div dir="rtl">
       <div className="mx-auto max-w-4xl space-y-6">
 
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <p className="text-sm text-muted-foreground mb-1">الموارد البشرية / تقييمات الأداء</p>
-            <h1 className="text-2xl font-black text-foreground flex items-center gap-2">
-              <ClipboardCheck className="w-6 h-6 text-blue-500" />
-              تقييمات الأداء الوظيفي
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              تقييم وتطوير الكفاءات — ISO 9001:2015 بند 9.1.3
-            </p>
-          </div>
-          {canCreate && (
-            <Link
-              href="/staff-evaluation/new"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-500/20 transition-all"
-            >
-              <Plus className="w-4 h-4" />
-              تقييم جديد
-            </Link>
-          )}
-        </div>
+        <PageHeader
+          icon={ClipboardCheck}
+          kicker="الموارد البشرية / تقييمات الأداء"
+          title="تقييمات الأداء الوظيفي"
+          subtitle="تقييم وتطوير الكفاءات — ISO 9001:2015 بند 9.1.3"
+          actions={createCta}
+        />
 
         {/* إحصائيات */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {[
-            { label: 'الإجمالي',          value: counts.total,        color: 'text-foreground'   },
-            { label: 'بانتظار الإقرار',   value: counts.pending,      color: 'text-amber-500'    },
-            { label: 'مُقرّ به',          value: counts.acknowledged, color: 'text-blue-500'     },
-            { label: 'محفوظ رسمياً',      value: counts.filed,        color: 'text-emerald-500'  },
-          ].map(s => (
-            <div key={s.label} className="border border-border rounded-2xl bg-card p-4 text-center">
-              <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
-            </div>
-          ))}
-        </div>
+        <DashboardGrid cols={4}>
+          <MetricCard label="الإجمالي"        value={counts.total}        icon={ClipboardCheck} tone="primary" />
+          <MetricCard label="بانتظار الإقرار" value={counts.pending}      icon={Clock}          tone="warning" />
+          <MetricCard label="مُقرّ به"         value={counts.acknowledged} icon={CheckCircle2}   tone="info" />
+          <MetricCard label="محفوظ رسمياً"     value={counts.filed}        icon={FileText}       tone="success" />
+        </DashboardGrid>
 
         {/* القائمة */}
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 space-y-4 text-center">
-            <div className="w-16 h-16 rounded-full bg-muted/60 flex items-center justify-center">
-              <ClipboardCheck className="w-8 h-8 text-muted-foreground/40" />
-            </div>
-            <div>
-              <p className="font-bold text-foreground">لا توجد تقييمات بعد</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                ابدأ بإنشاء تقييم أداء لأحد أعضاء الهيئة
-              </p>
-            </div>
-            {canCreate && (
-              <Link
-                href="/staff-evaluation/new"
-                className="flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-all"
-              >
-                <Plus className="w-4 h-4" />
-                تقييم جديد
-              </Link>
-            )}
-          </div>
+          <EmptyState
+            icon={ClipboardCheck}
+            title="لا توجد تقييمات بعد"
+            hint="ابدأ بإنشاء تقييم أداء لأحد أعضاء الهيئة"
+            action={createCta}
+          />
         ) : (
           <div className="space-y-3">
             {items.map(r => {
