@@ -1,4 +1,6 @@
-# School OS — Database Directory
+# سِدرة (Sidra) — Database Directory
+
+> **Visible product brand: «سِدرة».** "Sidra OS" / "School OS" appear in this internal developer doc as the **internal repo name only** — never user-facing branding.
 
 ## Project Status: PRE-LAUNCH — RADICAL RESTRUCTURING
 
@@ -8,7 +10,7 @@ There are **zero real users** and **zero live data**.
 Do NOT treat this codebase as a running system.
 All destructive operations (DROP, TRUNCATE, ALTER, DELETE) are **fully permitted and expected**.
 
-**Code Quality:** `npm run build` → 77/77 pages, zero TypeScript errors. `npm run lint` → **zero errors, zero warnings**. All lint phases (1–5) complete: `no-unused-vars`, `no-explicit-any`, `no-unescaped-entities`, `set-state-in-effect`, and `exhaustive-deps` fully resolved. **Middleware:** `proxy.ts` (Next.js 16 convention) runs as `/_middleware` with `jose.jwtVerify` — verifies every `active_persona` cookie cryptographically; `?demo` bypass and `DEMO_MODE` bypass removed. Demo mode removed entirely: `lib/mock-data/` deleted, `NEXT_PUBLIC_DEMO_MODE` variable gone. **Tests:** `npm test` runs Vitest (config: `vitest.config.ts`). **Env bootstrap:** copy `.env.example` → `.env.local` and fill in the 8 required variables.
+**Code Quality:** `npm run build` → 63/63 pages, zero TypeScript errors. `npm run lint` → **zero errors, zero warnings**. All lint phases (1–5) complete: `no-unused-vars`, `no-explicit-any`, `no-unescaped-entities`, `set-state-in-effect`, and `exhaustive-deps` fully resolved. **Middleware:** `proxy.ts` (Next.js 16 convention) runs as `/_middleware` with `jose.jwtVerify` — verifies every `active_persona` cookie cryptographically; `?demo` bypass and `DEMO_MODE` bypass removed. Demo mode removed entirely: `lib/mock-data/` deleted, `NEXT_PUBLIC_DEMO_MODE` variable gone. **Tests:** `npm test` runs Vitest (config: `vitest.config.ts`). **Env bootstrap:** copy `.env.example` → `.env.local` and fill in the 8 required variables.
 
 ---
 
@@ -86,14 +88,24 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260603_m77_student_national_id_school_scoped` | M77: student_profiles — حُذف `national_id_key` unique عالمي، أُضيف `UNIQUE(school_id, national_id)` scoped per tenant + performance index. يمنع تعارض الأرقام الوطنية عبر المدارس. |
 | `20260604_harden_legacy_rpc_and_roles` | Security Audit Phase 3: REVOKE anon من dangerous RPCs · DROP `get_my_role()` · DROP legacy `"Assigned Role Update Cases"` policy · CREATE `cases_update_assigned` (JWT-based RLS) · ALTER `invites.target_role` + `cases.assigned_to_role` → `school_role_type` (CASE كامل: 11 قيمة user_role + idempotency — super_admin → system_owner) · DROP TYPE `user_role` · CREATE `rate_limit_tracker` (school-scoped, RLS) + `increment_rate_limit` SECURITY DEFINER (service_role). |
 | `20260604_rebuild_gamification_ledger_infrastructure` | Security Audit Phase 4 (v2): CREATE `app_private` schema (locked: no anon/authenticated access) · `app_private.secrets` + RLS + `ledger_secret_salt` placeholder · `system_config` + RLS (`sc_admin_all` policy) · partial unique index `unique_student_source_event` (WHERE source_event_id IS NOT NULL) · `rpc_process_transaction` v2 (SECURITY DEFINER, reads `app_private.secrets`, explicit null school_id guard) · `rpc_reconcile_wallets` (school-scoped) · `rpc_complete_quest(uuid, uuid)` · REVOKE anon من `rpc_scan_ar_glyph` + `rpc_purchase_furniture`. ملاحظة: vault schema محجوب لـ postgres (CREATE/INSERT مرفوضان) — `app_private` هو البديل المُعتمَد. |
+| `20260605_enforce_tenant_not_null_and_fix_rls` | Phase 5: `school_id NOT NULL` على 10 جداول tenant + DROP سياسة `"Staff Insert Events"` (خرق عزل) + DROP سياسة SELECT مكررة على `user_personas`. |
+| `20260605_medium_risk_cleanup` | DROP 8 فهارس مكررة + 8 سياسات RLS قديمة/مكسورة + إنشاء 36 فهرس (school_id + FKs عالية الاستخدام). |
+| `20260605_m78_quality_trigger` (M78) | AFTER INSERT trigger على `period_attendance` → ينشئ `quality_evidence` (ATT-001) آلياً لكل غياب/تأخر (SECURITY DEFINER, fault-tolerant). طُبِّق فعلياً في 3E-2 (2026-06-13). |
+| `20260605_m79_cron_ai_insights` (M79) | `get_cron_setting()` + `cron_trigger_ai_insights()` + pg_cron 01:00 UTC. الأسرار placeholder حتى ضبطها وقت التشغيل. |
+| `20260606_drop_classes_school_id_default` (Phase 2F) | `ALTER classes.school_id DROP DEFAULT` (إزالة الافتراضي الصفري) — مُطبَّق ومُتحقَّق. |
+| `20260613_quality_template_settings` (M80) | `school_quality_settings` + `school_quality_template_overrides` + RLS (`school_admin`/`system_owner`). إعدادات جودة قابلة للتحرير لكل مستأجر. |
+| `20260613_seed_quality_readiness` (M81) | seed سنة نشطة `2025-2026` + مؤشّر `ATT-001` (auto_fillable+active) لمدرسة الفلاح فقط (idempotent). |
+| `20260613_security_hardening` (M82) | **Security Hardening Sprint:** فهرس dedup فريد `generated_forms (school_id, form_code, source_table, source_record_id)` + REVOKE EXECUTE من PUBLIC/anon/authenticated عن 12 دالة trigger/أداة + سحب منح الكتابة المباشرة عن `transaction_logs`/`student_wallet` (append-only، الكتابة حصراً عبر `rpc_process_transaction`) + فهارس/تحسينات RLS لجدولي 3E-2. مُتتبَّع حياً. راجع `docs/security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md`. |
 
 Migrations are applied **once, in order**. To fix a mistake: write a new migration. Never edit an already-applied migration.
+
+> **تتبّع الترحيلات (واقع 2026-06-13):** ≈**92** ملف ترحيل محلي مقابل **9** إدخالات متتبَّعة في `supabase_migrations.schema_migrations` — انحراف **bookkeeping تجميلي فقط** (المخطط الحيّ مُجسَّد بالكامل: 114 جدول كلها RLS · 303 سياسة · 32 دالة · 27 trigger). **0 كائن مطلوب مفقود.** المصالحة المُوصى بها: **baseline موثّق (الخيار A) ثم repair محدَّد (الخيار B)** — **ممنوع** `supabase db reset`/`db push` على الحيّة. التفاصيل: `docs/db/MIGRATION_TRACKING_AUDIT.md`.
 
 ---
 
 ## Architecture Principles
 
-School OS is a **multi-tenant SaaS** system with strict tenant isolation.
+سِدرة is a **multi-tenant SaaS** system with strict tenant isolation.
 
 | Principle | Implementation |
 | --------- | -------------- |

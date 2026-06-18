@@ -2,7 +2,7 @@
 
 ## Project Identity
 
-You are reviewing and auditing **School OS / Sidra OS**, a multi-tenant school management SaaS.
+You are reviewing and auditing **سِدرة** (the visible product brand), a multi-tenant school management SaaS. *"School OS" / "Sidra OS" are internal repository names only — never user-facing branding.*
 
 This is not a small feature review.  
 This is a full engineering audit and radical restructuring review.
@@ -69,9 +69,9 @@ The following issues are **already resolved**. Do not report them as new finding
 | Background job infrastructure | M76 (2026-06-02): `pg_cron` + `pg_net` enabled. `cron_trigger_daily_feed()` SECURITY DEFINER. Job `daily-analytics-feed` active at `0 0 * * *`. |
 | Analytics cache → UI | All `/principal/analytics/*` hooks read from `daily_kpis` / `class_weekly_summary` / `student_analytics_cache`. No live DB queries for dashboard KPIs. |
 | `/api/cron/daily-feed` | Route exists at `app/api/cron/daily-feed/route.ts`, protected by `Authorization: Bearer <CRON_SECRET>`. |
-| Migration count | 80 migrations total: M01–M77 + R00–R12. `db/migrations/` is the single source of truth. |
+| Migration count | `db/migrations/` is the single source of truth (**≈92 local files**). Live Supabase tracking = **9 entries** (cosmetic bookkeeping drift; schema fully materialized, **0 required objects missing**). See `docs/db/MIGRATION_TRACKING_AUDIT.md`. |
 | `npm run lint` | Zero errors, zero warnings (ESLint 9.x, phases 1–5 complete). |
-| `npm run build` | 77/77 pages, zero TypeScript errors, zero warnings. |
+| `npm run build` | 63/63 pages, zero TypeScript errors, zero warnings (current, after UI Unification Sprint 1; older 77/78 counts are historical). |
 | `BulkUploadModal` | Uses Server Action with `school_id` — no direct browser write to DB. |
 | Notifications Center | `components/layout/NotificationsMenu.tsx` wired in `GlobalHeader` — bell icon, unread badge, dropdown (last 10 items, mark-all-read). `lib/services/notification-service.ts` + `app/notifications/` (page + client + actions) complete. |
 | Period Attendance service layer | `lib/services/period-attendance-service.ts` uses `period_id` UUID throughout (no `period_number`). `lib/types/academic.ts` + `lib/services/academic-service.ts` created post-M59. No hardcoded timing — `app/classroom/page.tsx` uses DB lookup. |
@@ -92,7 +92,7 @@ The following issues are **already resolved**. Do not report them as new finding
 | Phase 8c — timetable Server Component | `app/admin/timetable/page.tsx` converted to async Server Component; `app/admin/timetable/TimetableClient.tsx` extracted as `'use client'`. Fixes legacy `profiles.select('*').eq('role', 'teacher')` → `user_personas!inner(full_name)`. Data fetched server-side via `createSupabaseServerClient()`. commit `3b44d1b`. |
 | Phase 8e — period-attendance-service school_id | `lib/services/period-attendance-service.ts`: three queries hardened with explicit `.eq('school_id', persona.schoolId)` on `timetable_slots` and `classes` (defense-in-depth alongside RLS). commit `0bf76d8`. |
 | Phase 8f — meeting-service school_id | `lib/services/meeting-service.ts`: four UPDATE operations (`startMeeting`, `endMeeting`, `signMinutes` ×2) now include `.eq('school_id', persona.schoolId)`. commit `0bf76d8`. |
-| Virtual-Swimming-Wave — 100% complete | All Phase 9 verification checks passed: zero unofficial roles · zero mock IDs · zero .bak files · zero dark classes. Build: 77/77 pages, lint: zero errors. |
+| Virtual-Swimming-Wave — 100% complete | All Phase 9 verification checks passed: zero unofficial roles · zero mock IDs · zero .bak files · zero dark classes. Build: 77/77 pages (historical at that milestone; current 63/63), lint: zero errors. |
 | Edge Functions + LRC Maintenance | `supabase/functions/validate-bulk-upload/` (CSV validation, JWT-auth) · `supabase/functions/generate-qms-pdf/` (PDF generation via `npm:pdf-lib` → `qms-forms` Storage) · `supabase/functions/daily-maintenance/` (proxy → Next.js). `lib/jobs/lrc-maintenance-service.ts` (overdue loans + reminders, idempotent). `app/api/cron/daily-maintenance/route.ts` (CRON_SECRET-protected). commit `c05b95a`. |
 | Supabase Security Audit — Phase 3 | `db/migrations/20260604_harden_legacy_rpc_and_roles.sql`: REVOKE anon من dangerous RPCs · DROP `get_my_role()` · DROP policy `"Assigned Role Update Cases"` · CREATE `cases_update_assigned` (JWT-based) · تحويل `invites.target_role` + `cases.assigned_to_role` من `user_role` → `school_role_type` (CASE كامل: super_admin → system_owner) · DROP TYPE `user_role` · CREATE `rate_limit_tracker` + `increment_rate_limit`. مُطبَّق ✅ |
 | Supabase Security Audit — Phase 4 | `db/migrations/20260604_rebuild_gamification_ledger_infrastructure.sql` v2: CREATE `app_private` schema (بديل vault — postgres لا يملك CREATE على vault) · `app_private.secrets` + RLS · `system_config` + RLS · partial index `unique_student_source_event` (WHERE source_event_id IS NOT NULL) · `rpc_process_transaction` v2 (app_private.secrets + null school_id guard) · `rpc_reconcile_wallets` rebuild · `rpc_complete_quest(uuid, uuid)` · REVOKE anon من scan/furniture. مُطبَّق ✅ — `ledger_secret_salt` يُستبدل عند الإطلاق. |
@@ -114,7 +114,7 @@ The following issues are **already resolved**. Do not report them as new finding
 | Phase 3B — Visual Constitution (2026-06-06) | `app/globals.css` design-token system rebuilt **preserving shadcn/ui token names** (values only): `--background:#FBF7EF` (vanilla) · `--foreground:#111827` (charcoal) · `--card:#FFFFFF` · `--surface-soft:#FFFDF8` · `--primary:#0D9488` (teal) · `--color-info`/`--chart-2:#3B6FE0` (blue) · `--border:#E8E1D4` · `--radius:1rem`. Light-only; no dark/glass/holographic/antigravity; legacy gold neutralized to teal (back-compat). **Do not flag these token values as "off-brand" or "incomplete".** |
 | Font migration → IBM Plex Sans Arabic (2026-06-06) | `lib/fonts.ts`: primary `--font-sans` = `IBM_Plex_Sans_Arabic` (next/font/google). Saudi `localFont` + `Tajawal` + `Geist` removed from the chain. `--font-saudi` repointed to `var(--font-sans)`. Do not flag the retained `inter` (latin) export as dead — it is a back-compat keepalive. |
 | Public homepage redesign (2026-06-06) | `app/page.tsx` = thin Server Component (session-only, for auth-aware CTA) composing modular sections in `components/landing/`: LandingHeader · HeroSection (+HeroDashboardPreview, **SVG/CSS mock — no Recharts, no client boundary**) · SchoolPulse · RoleIntelligence · DataToAction · Workflow · Trust · StudentRoom · FinalCTA · LandingFooter. `GlobalHeader` hidden on `/` (landing uses its own header). **No new dependencies.** Internal role dashboards intentionally NOT redesigned yet (Phase 3C). |
-| Tab metadata / branding (2026-06-06) | `app/layout.tsx` title `{ default: "Sidra OS \| نظام تشغيل مدرسي", template: "%s \| Sidra OS" }`; `app/page.tsx` absolute `"الرئيسية \| Sidra OS"` (template does not apply to the root same-segment title in Next.js); `app/(auth)/login` `"تسجيل الدخول"`. Legacy `"أداة فلاح"` removed from all active metadata. (Occurrences of the school name `"مدارس الفلاح"` inside PDF/report content are not metadata — leave them.) |
+| Tab metadata / branding (2026-06-06 · **superseded 2026-06-10 → «سِدرة»**, see Brand-fixes row) | (historical) `app/layout.tsx` title `{ default: "Sidra OS \| نظام تشغيل مدرسي", template: "%s \| Sidra OS" }`; `app/page.tsx` absolute `"الرئيسية \| Sidra OS"` (template does not apply to the root same-segment title in Next.js); `app/(auth)/login` `"تسجيل الدخول"`. Legacy `"أداة فلاح"` removed from all active metadata. (Occurrences of the school name `"مدارس الفلاح"` inside PDF/report content are not metadata — leave them.) |
 | Dead landing/ui components removed (2026-06-06) | Deleted 8 zero-import files: `HighlightTile`, `KPIStatCard`, `LivePulse`, `PublicFeed`, `SkeletonLoaders` (landing) + `HolographicCard`, `AntigravityMagneticText`, `AntigravityParticlesCanvas` (ui). **Kept** `LoginCard` (used by `app/(auth)/login`) + `GlassSkeleton` (used by multiple `loading.tsx`). Build 63/63, lint clean. Do not re-flag the kept two as dead. |
 | Platform rename `/admin → /platform` + command center (2026-06-10) | `app/admin/*` → `app/platform/*`. `ROLE_DASHBOARD_MAP[system_owner]` = `/platform/dashboard`. `app/platform/layout.tsx` is system_owner-only and wraps `PlatformShell` (سِدرة header). `app/platform/dashboard/page.tsx` rebuilt as a real platform command center: executive overview · alerts/risks (deterministic rules) · honest-empty platform-health · role governance · data-quality center · audit stream (`action_audit_log`, `connected:false` on failure) · honest AI placeholder · quick actions · schools table. `lib/dashboard-data.ts`: `PlatformStats` computes `schoolsWithoutAdmin` + `roleDistribution` for real + `getCachedRecentAudit`. **No fake analytics / AI / platform-health.** |
 | bulk-upload relocated out of platform (2026-06-10) | `app/platform/bulk-upload` → top-level `app/bulk-upload` (school-scoped feature, NOT system-owner). `/bulk-upload` added to `ROLE_ACCESS_MAP` for `school_principal` · `school_admin` · `school_secretary`. Page self-guards (`ALLOWED_ROLES` + requires `persona.schoolId`); schoolId comes from server-side persona. `/school/[id]/bulk-upload` rejected (tree guard excludes principal/secretary); `/school/bulk-upload` rejected (would over-grant `/school` at the proxy layer). Notification links updated. |
@@ -317,7 +317,7 @@ The target architecture must follow these principles:
 - No duplicate role systems.
 - No old and new role names coexisting.
 - No duplicate tables serving the same domain.
-- `db/migrations/` is the authoritative database source (80 migrations: M01–M77 + R00–R12).
+- `db/migrations/` is the authoritative database source (≈92 local migration files; 9 tracked live; 0 required objects missing — see `docs/db/MIGRATION_TRACKING_AUDIT.md`).
 
 ### 5. Clean App Architecture
 
@@ -325,7 +325,7 @@ Clear separation must exist between: Server Components · Client Components · S
 
 ---
 
-## Official School OS Role Keys
+## Official Role Keys (سِدرة)
 
 Only these 16 role keys are valid:
 
@@ -469,3 +469,25 @@ Do not wait until the end to report everything. After each stage, give the user 
 - **Trigger/utility DB functions have no client EXECUTE** (PUBLIC/anon/authenticated revoked); every SECURITY DEFINER function sets `search_path`.
 - **Migrations:** Supabase tracking is partial (bookkeeping drift; schema fully materialized). Use baseline (`supabase db pull`) + targeted `migration repair`; never `db reset`/`db push` on live.
 - Full status: `docs/security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md`.
+
+---
+
+## Current State & Agent Guardrails — UI Unification Sprint 1 (2026-06-18 · commit `e913cc6`)
+
+**Completed since the last audit:** (1) **Security Hardening Sprint** (migration `M82`) — `generateInvite` tenant isolation, `generate-qms-pdf` fail-closed, private QMS bucket + short-lived signed URLs, ledger/wallet writes blocked (RPC-only via `rpc_process_transaction`), unnecessary PUBLIC/anon/authenticated EXECUTE revoked, `generated_forms` dedup index. (2) **Phase 3D** tenant quality templates + **3E** auto-fill/`generated_forms`/`quality_evidence` service foundation. (3) **CRON_SECRET runtime setup documented** (deployment/config still pending — owner action). (4) **UI Unification Sprint 1.**
+
+**UI Unification — design principle: _Unified Experience, Role-Specific Content._** One design system + one shell across administrative role dashboards. Role differences are expressed through widgets, content, permissions, data, actions, quality panels, and `lib/dashboard/role-dashboard.ts` — **never** through separate visual systems / card / header / button styles.
+
+- Shared kit: `components/dashboard/` (`PageHeader` · `DashboardSection` · `MetricCard` · `ActionCard` · `EmptyState` · `DashboardGrid` · `RoleWelcomeCard` · `SegmentedTabs`). Badges reuse `components/ui/StatusBadge.tsx`/`Pill.tsx`; quality surface = `components/quality/QualityOwnerPanel.tsx`.
+- Fully unified (8): `/educational` `/staff-evaluation` `/science` `/qa` `/secretary` `/activity` `/counselor` `/health`. Partial (2): `/principal` `/classroom`. Not yet (3): `/student-affairs`, `/lrc`, `/school/[id]/dashboard`. Report: `docs/ui/ROLE_DASHBOARD_UNIFICATION_REPORT.md`.
+
+### Binding guardrails for future AI agents
+- **Do NOT touch DB / RLS / migrations / Supabase Edge Functions unless explicitly asked.** Do NOT modify auth / persona / role keys unless explicitly asked. Use only the official 16 role keys.
+- **No fake data, fake analytics, fake AI, or fake PDF generation** — honest empty state instead of any fabricated number.
+- **Prefer the shared `components/dashboard/` primitives before creating new UI components.** Use `RoleDashboardShell` (or `SchoolDashboardShell` for the `/school/[id]` tree) where appropriate.
+- **Preserve tenant isolation** — derive `school_id` from `getActivePersona()`/`ctx.user`, never client input.
+- **Visible brand stays «سِدرة».** Never expose `School OS` / `Sidra OS` / `Smart School OS` / `Antigravity` / `سِدرة OS` in the UI.
+- **No new dependencies.** **After important code changes, run `npm run lint` then `npm run build`.**
+
+### Next recommended work
+**UI Unification Sprint 2 — LRC Shell Migration** (`app/lrc/_components/LrcWorkspace.tsx` → `RoleDashboardShell`), then **Sprint 3 — Student Affairs refactor**, then `school/[id]/dashboard` extraction, then deeper cleanup of legacy `Card`/`KPICard` usage inside child components. **Pending owner action:** runtime `CRON_SECRET` / Vercel / Supabase Edge deployment (`docs/security/CRON_SECRET_RUNTIME_SETUP.md`).

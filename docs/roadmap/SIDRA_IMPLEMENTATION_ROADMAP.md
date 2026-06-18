@@ -2,7 +2,15 @@
 
 > **النوع:** خارطة طريق — ترتيب المراحل والنطاق.
 > **العلاقة:** ينفّذ ما تثبّته [SIDRA_SYSTEM_DOCTRINE](../architecture/SIDRA_SYSTEM_DOCTRINE.md).
-> **حالة المشروع:** PRE-LAUNCH — لا مستخدمون · لا بيانات إنتاجية. **آخر تحديث:** 2026-06-12.
+> **حالة المشروع:** PRE-LAUNCH — لا مستخدمون · لا بيانات إنتاجية. **آخر تحديث:** 2026-06-18 (بعد Security Hardening Sprint + UI Unification Sprint 1 · commit `e913cc6`).
+
+---
+
+## ✅ Security Hardening Sprint (2026-06-13) — مُنجزة
+
+سبرنت أمني مستقل عالج أبرز نتائج **High** من تدقيق 3E-5 من الجذر (الترحيل `M82`):
+عزل مستأجر `generateInvite` · `generate-qms-pdf` **fail-closed** · QMS PDF عبر **bucket خاص + signed URLs** و`pdf_url=null` · منع الكتابة المباشرة للـ ledger/المحفظة (الكتابة **حصراً** عبر `rpc_process_transaction`) · موافقة الرحلة العامة → **server actions مُقيَّدة بتوكن** (لا anon client) · **REVOKE EXECUTE** عن 12 دالة trigger/أداة (PUBLIC/anon/authenticated) · فهرس **dedup** فريد لـ `generated_forms` · تدوير `ledger_secret_salt`. advisors بعد الإصلاح: **0 ERROR**.
+**متبقٍّ (إجراء مالك فقط):** ضبط `CRON_SECRET` وقت التشغيل (Vercel + Supabase Edge + DB) — حتى ذلك تبقى cron و`generate-qms-pdf` **fail-closed (آمنة)**. التفاصيل: [ملخّص الأمن](../security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md) · [إعداد CRON](../security/CRON_SECRET_RUNTIME_SETUP.md).
 
 ---
 
@@ -31,11 +39,23 @@
 
 ---
 
-## ▶️ المرحلة 2 — توحيد الأصداف والتنظيف البنيوي (Shell/Layout Unification & Structural Cleanup) — لم تبدأ
+## 🚧 المرحلة 2 — توحيد الواجهة والأصداف والتنظيف البنيوي (UI / Shell Unification) — قيد التنفيذ
 
-**الهدف:** صدفة موحّدة (RoleDashboardShell) للوحات الأدوار «العارية» + تنظيف بنيوي + توحيد مصادر الأدوار + حُرّاس متبقّية — **دون** كسر أي خدمة قائمة.
+**الهدف:** نظام تصميم واحد + صدفة موحّدة (RoleDashboardShell) عبر لوحات الأدوار + تنظيف بنيوي — **دون** كسر أي خدمة قائمة. **المبدأ:** تجربة موحّدة، محتوى خاص بالدور (الفروق في الودجِت/المحتوى/الصلاحيات/الإعداد، لا في أنظمة بصرية منفصلة).
 
-**خطة تدقيق بـ 6 وكلاء (للتنفيذ لاحقاً عند اعتماد المرحلة):**
+### ✅ UI Unification Sprint 1 (2026-06-18 · commit `e913cc6`) — مُنجزة
+- **مجموعة مكوّنات موحّدة** `components/dashboard/` (`PageHeader`/`DashboardSection`/`MetricCard`/`ActionCard`/`EmptyState`/`DashboardGrid`/`RoleWelcomeCard`/`SegmentedTabs`) + **إعداد محتوى الأدوار** `lib/dashboard/role-dashboard.ts`.
+- **مُوحَّدة بالكامل (8):** `/educational` · `/staff-evaluation` · `/science` · `/qa` · `/secretary` · `/activity` · `/counselor` · `/health`. **جزئياً (2):** `/principal` · `/classroom`. نُقلت 6 لوحات عن `KPICard` القديمة إلى `MetricCard`.
+- app-code فقط · `npm run lint` صفر · `npm run build` 63/63 · بلا تغيير DB/RLS/auth/persona/مفاتيح الأدوار/التبعيات. التقرير: [توحيد لوحات الأدوار](../ui/ROLE_DASHBOARD_UNIFICATION_REPORT.md).
+
+### ▶️ المتبقّي (لم يبدأ)
+- **UI Unification Sprint 2 — ترحيل صدفة LRC:** استبدال الصدفة اليدوية في `app/lrc/_components/LrcWorkspace.tsx` بـ `RoleDashboardShell` (أعلى أولوية).
+- **UI Unification Sprint 3 — إعادة هيكلة شؤون الطلاب:** توحيد شجرة `/student-affairs` الضخمة على الـ kit مع حفظ التدفّقات الحيّة.
+- **استخراج/إعادة هيكلة `school/[id]/dashboard`** (المرجع المعتمد) لاستيراد المكوّنات المشتركة.
+- **تنظيف أعمق لبقايا `Card`/`KPICard` القديمة** داخل مكوّنات الأبناء (health/lrc/qa/science/secretary `_components`).
+- التنظيف البنيوي الأعمق (توحيد مصادر الأدوار · كود ميت · حُرّاس متبقّية) عبر خطة الوكلاء الستّة أدناه.
+
+**خطة تدقيق بـ 6 وكلاء (للتنظيف البنيوي الأعمق — للتنفيذ لاحقاً):**
 
 | الوكيل | المسؤولية |
 | --- | --- |
@@ -95,9 +115,24 @@
 | المرحلة | الوصف | الحالة |
 | --- | --- | --- |
 | 1 | التوثيق والدستور | ✅ مُنجزة |
-| 2 | توحيد الأصداف والتنظيف البنيوي | ▶️ لم تبدأ |
-| 3 | طبقة نماذج الجودة و PDF | 🚧 قيد التنفيذ (3B/3C/3D ✅) |
+| 2 | توحيد الواجهة والأصداف | 🚧 قيد التنفيذ (UI Sprint 1 ✅ · Sprint 2/3 ▶️) |
+| 3 | طبقة نماذج الجودة و PDF | 🚧 قيد التنفيذ (3B/3C/3D/3E ✅) |
 | 4 | الأتمتة والتعبئة التلقائية | ▶️ لم تبدأ |
 | 5 | التحليلات والذكاء | ▶️ لم تبدأ |
+| — | Security Hardening Sprint (M82) | ✅ مُنجزة (متبقٍّ: ضبط CRON_SECRET — إجراء مالك) |
 
-> **المرحلة 3 قيد التنفيذ بشرائح بتوجيه صريح** (3B/3C/3D مُنجزة 2026-06-13). المرحلة 2 + الشرائح المتبقية من 3 + المراحل 4–5 لم تبدأ بعد.
+### ✅ بنود مُنجزة (موجز)
+- **Security Hardening Sprint** (M82) — أبرز نتائج High مُعالَجة من الجذر.
+- **قوالب الجودة لكل مستأجر (3D)** — `lib/quality/tenant-templates.ts` + بوّابة fail-closed + تسجيل مدرسة الفلاح (`school_id = bfe99c43-fa5c-46f4-8ad0-05e12184b55e`).
+- **أساس التعبئة التلقائية والأدلة (3E)** — `generated-forms.ts` · `quality-evidence.ts` · `autofill.ts` + ربط qa/meeting + M78/M80/M81.
+- **UI Unification Sprint 1** — مجموعة `components/dashboard/` + `lib/dashboard/role-dashboard.ts` + 8 لوحات مُوحَّدة بالكامل.
+
+### ▶️ بنود معلّقة (موجز)
+- **ضبط `CRON_SECRET` وقت التشغيل** (Vercel + Supabase Edge + DB) — إجراء مالك.
+- **UI Unification Sprint 2 — ترحيل صدفة LRC.**
+- **UI Unification Sprint 3 — إعادة هيكلة شؤون الطلاب.**
+- **استخراج/إعادة هيكلة `school/[id]/dashboard`.**
+- **تنظيف أعمق لبقايا `Card`/`KPICard` القديمة** داخل مكوّنات الأبناء.
+- الشرائح المتبقية من المرحلة 3 (قوالب الأدوار الأربعة الرسمية · LRC الثمانية) + المرحلتان 4–5.
+
+> **المرحلة 3 قيد التنفيذ بشرائح** (3B/3C/3D/3E مُنجزة). **المرحلة 2 قيد التنفيذ** (UI Sprint 1 مُنجزة؛ Sprint 2/3 + التنظيف البنيوي الأعمق لم تبدأ). المراحل 4–5 لم تبدأ.

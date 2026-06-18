@@ -1,12 +1,14 @@
-# Sidra OS — School Management System
+# سِدرة — نظام إدارة مدرسي (School Management System)
 
-نظام إدارة مدرسي متعدد المستأجرين (**Multi-Tenant SaaS**) مبني على تقنيات حديثة وعالية الأداء (**Next.js + Supabase**).
+> **العلامة المرئية للمستخدم: «سِدرة».** الاسم «Sidra OS» يَرِد في هذا المستند كـ **اسم المستودع الداخلي فقط** (internal/developer repo name) ولا يُعرض في واجهة المستخدم. لا تُستخدم في الواجهة المرئية أيّ من: `School OS` · `Sidra OS` · `Smart School OS` · `Antigravity` · `سِدرة OS`.
+
+نظام إدارة مدرسي متعدد المستأجرين (**Multi-Tenant SaaS**) مبني على تقنيات حديثة وعالية الأداء (**Next.js 16 + React 19 + TypeScript + Tailwind CSS 4 + Supabase**).
 
 ---
 
 ## 📌 نظرة عامة
 
-**Sidra OS** هو نظام إدارة مدرسي متكامل يهدف إلى أتمتة وتنظيم العمليات التشغيلية واليومية داخل البيئة التعليمية. يتميز النظام بتقديم لوحات عمل متخصصة ومصممة بدقة بناءً على الدور الوظيفي للمستخدم لضمان كفاءة الأداء وسهولة الوصول إلى البيانات.
+**سِدرة** هو نظام إدارة مدرسي متكامل يهدف إلى أتمتة وتنظيم العمليات التشغيلية واليومية داخل البيئة التعليمية. يتميز النظام بتقديم لوحات عمل متخصصة ومصممة بدقة بناءً على الدور الوظيفي للمستخدم لضمان كفاءة الأداء وسهولة الوصول إلى البيانات.
 
 تم تصميم المعمارية البرمجية لتكون **متعددة المستأجرين (Multi-Tenant)**، مما يضمن عزل بيانات كل مدرسة بشكل كامل وآمن داخل بيئتها الخاصة دون أي تداخل مع المدارس الأخرى في النظام.
 
@@ -27,11 +29,13 @@
 
 ## 🚀 حالة المشروع الحالية (Current Status)
 
-* **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — البنية التحتية والأساسية للنظام مكتملة تماماً.
+* **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — لا مستخدمون حقيقيون ولا بيانات إنتاجية. آخر commit موثّق: `e913cc6` (feat: unify administrative dashboard design system).
 * **المستخدمون:** لا يوجد مستخدمون حقيقيون حالياً، ولا توجد بيانات إنتاجية (Production Data) نشطة.
-* **قاعدة البيانات:** ترحيلات من (`M01–M77 + R00–R12`) بإجمالي **80 ترحيل** — بنية البيانات مكتملة.
-* **واجهات المستخدم (UI):** **الدستور البصري المعتمد (Phase 3B) مُطبَّق** (خلفية vanilla · نص charcoal · أكسنت teal/أزرق · خط IBM Plex Sans Arabic · Light-only · بلا ذهبي/داكن/زجاج)، و**الصفحة الرئيسية العامة (Landing) أُعيد تصميمها بالكامل** عليه. **لوحات الأدوار الداخلية لم يُعَد تصميمها بعد** (Phase 3C لاحقاً) — راجع قسم «الهوية البصرية» أدناه.
-* **جودة الكود:** اكتملت مراحل تنظيف الكود الأساسية 1–5 — راجع القسم أدناه.
+* **قاعدة البيانات:** المصدر الموثوق هو `db/migrations/` (**≈92 ملف ترحيل محلي**). تتبّع Supabase الحيّ = **9 إدخالات** فقط (انحراف **bookkeeping تجميلي** — أغلب الترحيلات طُبِّقت عبر SQL مباشر/Dashboard). المخطط الحيّ **مُجسَّد بالكامل** (114 جدول كلها RLS) و**لا كائن مطلوب مفقود**. التفاصيل: [تدقيق تتبّع الترحيلات](docs/db/MIGRATION_TRACKING_AUDIT.md).
+* **الأمان:** الأساس الأمني **مُحصَّن بشكل كبير** بعد **Security Hardening Sprint** (الترحيل `M82`) — عُولِجت أبرز نتائج **High** من التدقيق السابق (عزل مستأجر `generateInvite` · `generate-qms-pdf` fail-closed · QMS PDF عبر bucket خاص + signed URLs · منع الكتابة المباشرة للـ ledger/المحفظة · REVOKE صلاحيات EXECUTE الزائدة · فهرس dedup لـ `generated_forms`). **متبقٍّ (إجراء مالك):** ضبط `CRON_SECRET` وقت التشغيل (Vercel + Supabase Edge + DB) — حتى ذلك تبقى cron و`generate-qms-pdf` **fail-closed (آمنة)**. التفاصيل: [ملخّص الأمن](docs/security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md) · [إعداد CRON](docs/security/CRON_SECRET_RUNTIME_SETUP.md).
+* **طبقة الجودة:** **قوالب الجودة لكل مستأجر (3D)** + **أساس التعبئة التلقائية والأدلة (3E)** مُنجزان. القوالب **tenant-specific** — قوالب «الفلاح» ليست افتراضات سِدرة العالمية. مدرسة الفلاح مُسجَّلة في سجلّ المستأجرين (`school_id = bfe99c43-fa5c-46f4-8ad0-05e12184b55e`). التفاصيل: [قوالب المستأجر](docs/quality/TENANT_QUALITY_TEMPLATES.md).
+* **واجهات المستخدم (UI):** الدستور البصري المعتمد (Phase 3B) مُطبَّق + الصفحة الرئيسية العامة مُعاد تصميمها. **UI Unification Sprint 1 مُنجزة** — مجموعة مكوّنات لوحات موحّدة (`components/dashboard/`) + إعداد محتوى الأدوار (`lib/dashboard/role-dashboard.ts`)؛ وُحِّدت **8 لوحات بالكامل** + **جزئياً** `/principal` و`/classroom`. **التالي: UI Unification Sprint 2 — ترحيل صدفة LRC.** التفاصيل: [تقرير توحيد لوحات الأدوار](docs/ui/ROLE_DASHBOARD_UNIFICATION_REPORT.md).
+* **جودة الكود:** اكتملت مراحل تنظيف الكود الأساسية 1–5 · `npm run lint` صفر · `npm run build` **63/63 صفحة** — راجع القسم أدناه.
 * **التوجيه وعزل المستأجر (Routing & Tenancy):** اكتملت **Phase 1 + Phase 2A → 2F** (مواءمة توجيه الأدوار · حارس مستأجر لـ `app/school/[id]/*` · عزل بيانات tenant-safe لـ `classroom/[classId]` · تصحيح ملكية المجالات بين `academic_vp`/`school_affairs_vp` · إغلاق DB hardening لـ `classes.school_id`). المشروع **PRE-LAUNCH** — لا مستخدمون ولا بيانات إنتاجية.
 
 ---
@@ -119,7 +123,7 @@ PublicShell · AuthShell · PortalShell · **PlatformShell** (منجز) · **Das
 
 ## 🧹 حالة جودة الكود (Code Quality Status)
 
-> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **77/77 صفحة** بدون أي خطأ TypeScript. **Virtual-Swimming-Wave (2026-06-03): 100% مكتمل** — تأمين 9 نقاط أمنية + M77 compound unique + layout guards (lrc/qa/science/student-affairs/educational/staff-evaluation/metaverse/admin) + Phase 6 browser hooks → Server Actions + Phase 8c/8e/8f hardening. **Edge Functions + LRC Maintenance (2026-06-03): مُنجز** — `validate-bulk-upload` + `generate-qms-pdf` + `daily-maintenance` + `lrc-maintenance-service`. commit `c05b95a`.
+> **الحالة الراهنة:** جميع المراحل (1–5) مكتملة. `npm run lint` → **صفر أخطاء وصفر تحذيرات**. `npm run build` → **63/63 صفحة** بدون أي خطأ TypeScript. **Virtual-Swimming-Wave (2026-06-03): 100% مكتمل** — تأمين 9 نقاط أمنية + M77 compound unique + layout guards (lrc/qa/science/student-affairs/educational/staff-evaluation/metaverse/admin) + Phase 6 browser hooks → Server Actions + Phase 8c/8e/8f hardening. **Edge Functions + LRC Maintenance (2026-06-03): مُنجز** — `validate-bulk-upload` + `generate-qms-pdf` + `daily-maintenance` + `lrc-maintenance-service`. commit `c05b95a`.
 
 ### ✅ المرحلة الأولى — مكتملة
 
@@ -156,7 +160,7 @@ PublicShell · AuthShell · PortalShell · **PlatformShell** (منجز) · **Das
 
 ## 🛠️ التقنيات والمكتبات المستخدمة (Tech Stack)
 
-يعتمد مشروع **Sidra OS** على حزمة برمجية متطورة وموحدة لضمان الأداء والجمالية والاستقرار:
+يعتمد مشروع **سِدرة** على حزمة برمجية متطورة وموحدة لضمان الأداء والجمالية والاستقرار:
 
 | الطبقة التقنية (Layer) | التقنيات والمكتبات المعتمدة (Technologies) |
 | :--- | :--- |
@@ -175,7 +179,7 @@ PublicShell · AuthShell · PortalShell · **PlatformShell** (منجز) · **Das
 
 ## 📐 مبادئ تصميم الواجهة (UI Design Principles)
 
-يجب أن تلتزم واجهات **Sidra OS** بشكل صارم بالمبادئ التصميمية التالية لضمان تجربة مستخدم موحدة واحترافية:
+يجب أن تلتزم واجهات **سِدرة** بشكل صارم بالمبادئ التصميمية التالية لضمان تجربة مستخدم موحدة واحترافية:
 
 1. **الالتزام بالمكونات القياسية:** استخدام مكونات `shadcn/ui` كخيار أول وأساسي قدر الإمكان.
 2. **التفاعلية منخفضة المستوى:** الاعتماد على `Radix UI` عند الحاجة لبناء أو تخصيص مكونات تفاعلية معقدة.
@@ -214,7 +218,7 @@ PublicShell · AuthShell · PortalShell · **PlatformShell** (منجز) · **Das
 
 ## 🎨 الهوية البصرية ونظام التصميم (Visual Constitution)
 
-> **الحالة (2026-06-06):** الأساس البصري المعتمد (**Phase 3B**) مُطبَّق بالكامل، و**الصفحة الرئيسية العامة (Landing)** أُعيد تصميمها عليه. **لوحات الأدوار الداخلية لم يُعَد تصميمها بعد.**
+> **الحالة:** الأساس البصري المعتمد (**Phase 3B**) مُطبَّق بالكامل، و**الصفحة الرئيسية العامة (Landing)** أُعيد تصميمها عليه. **UI Unification Sprint 1 مُنجزة** — لوحات الأدوار الإدارية بدأت التقارب على نظام تصميم واحد عبر `components/dashboard/` (راجع قسم «توحيد لوحات الأدوار» أدناه). المتبقّي: Sprint 2 (صدفة LRC) + Sprint 3 (شؤون الطلاب) + بعض اللوحات.
 
 ### الـ Design Tokens المعتمدة (في `app/globals.css`)
 
@@ -259,6 +263,24 @@ PublicShell · AuthShell · PortalShell · **PlatformShell** (منجز) · **Das
 - **أُبقيت:** `LoginCard` (تستخدمها صفحة الدخول) · `GlassSkeleton` (تستخدمها صفحات `loading.tsx`).
 
 > `npm run lint` → صفر أخطاء/تحذيرات · `npm run build` → **63/63 صفحة** · لا تبعيات جديدة.
+
+---
+
+## 🧩 توحيد لوحات الأدوار (UI Unification — Sprint 1) — مُنجزة
+
+> **المبدأ:** **تجربة موحّدة، محتوى خاص بالدور (Unified Experience, Role-Specific Content).** نظام تصميم واحد وصدفة واحدة عبر لوحات الأدوار الإدارية؛ الاختلافات بين الأدوار تُدار عبر **الودجِت · المحتوى · الصلاحيات · البيانات · الإجراءات · لوحات الجودة** — **لا** عبر أنظمة بصرية أو بطاقات أو ترويسات أو أزرار منفصلة.
+
+### المُخرجات
+- **مجموعة مكوّنات موحّدة** في `components/dashboard/`: `PageHeader` · `DashboardSection` · `MetricCard` · `ActionCard` · `EmptyState` · `DashboardGrid` · `RoleWelcomeCard` · `SegmentedTabs` (+ `tones.ts`). للشارات: أُعيد استخدام `components/ui/StatusBadge.tsx` و`Pill.tsx`؛ لسطح الجودة: `components/quality/QualityOwnerPanel.tsx`.
+- **طبقة إعداد محتوى الأدوار** `lib/dashboard/role-dashboard.ts` (العنوان · الفرعي · وحدة الجودة المملوكة لكل دور) — تنقل الاختلافات إلى بيانات إعداد بدل `if role === ...`.
+
+### الحالة لكل صفحة
+- **مُوحَّدة بالكامل (8):** `/educational` · `/staff-evaluation` · `/science` · `/qa` · `/secretary` · `/activity` · `/counselor` · `/health`.
+- **مُوحَّدة جزئياً (2):** `/principal` (ترويسة + مؤشّرات حقيقية + شبكة تنقّل؛ حُذفت التحليلات الوهمية المُثبَّتة سابقاً واستُبدلت بحالة فارغة صادقة) · `/classroom`.
+- **لم تُوحَّد بعد (3):** `/student-affairs` (شجرة ضخمة — Sprint 3) · `/lrc` (صدفة يدوية — **Sprint 2**) · `/school/[id]/dashboard` (المرجع المعتمد — استخراج لاحق).
+- نُقلت 6 لوحات عن `KPICard` القديمة إلى `MetricCard`. **التالي المُوصى به: UI Unification Sprint 2 — ترحيل صدفة LRC** إلى `RoleDashboardShell`.
+
+> التقرير الكامل: [docs/ui/ROLE_DASHBOARD_UNIFICATION_REPORT.md](docs/ui/ROLE_DASHBOARD_UNIFICATION_REPORT.md). `npm run lint` → صفر · `npm run build` → **63/63** · بلا تغيير DB/RLS/migrations/auth/persona/مفاتيح الأدوار/التبعيات.
 
 ---
 
@@ -307,7 +329,7 @@ lib/
 └── types/                   — ملفات تعريف الأنواع والـ TypeScript (academic · lrc · health · qa · ai ...)
 
 db/
-└── migrations/              — السجل التاريخي والترجيلات الخاصة بقاعدة البيانات (M01–M77 + R00–R12 بإجمالي 80 ترحيل)
+└── migrations/              — المصدر الموثوق لمخطط قاعدة البيانات (≈92 ملف ترحيل · 9 متتبَّعة حياً · 0 كائن مطلوب مفقود — راجع docs/db/MIGRATION_TRACKING_AUDIT.md)
 
 ```
 
@@ -376,7 +398,7 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 
 ## 🎭 الأدوار الرسمية المعتمدة في النظام (Official System Roles)
 
-يحتوي نظام **Sidra OS** على **16 دوراً رسمياً ومحدداً** يمنع تعديل مسمياتها أو صلاحياتها إلا بعد الرجوع لهندسة النظام وإجراء مراجعة شاملة للأثر الكلي:
+يحتوي نظام **سِدرة** على **16 دوراً رسمياً ومحدداً** يمنع تعديل مسمياتها أو صلاحياتها إلا بعد الرجوع لهندسة النظام وإجراء مراجعة شاملة للأثر الكلي:
 
 1. `system_owner` (مالك النظام)
 2. `school_admin` (منسق المدرسة — دور على مستوى المدرسة، **ليس** مالك النظام)
@@ -463,4 +485,4 @@ npx shadcn@latest add button card table dialog dropdown-menu tabs input select t
 
 ## 🎯 الهدف العام للنظام (Ultimate Goal)
 
-إن الهدف الأسمى من بناء وتطوير نظام **Sidra OS** هو تقديم منظومة برمجية مدرسية فائقة التنظيم، آمنة للغاية، وقابلة للتوسع اللانهائي، تساعد المؤسسات التعليمية على إدارة وتسيير عملياتها اليومية بسلاسة تامة، بالإضافة إلى تحويل البيانات التشغيلية والمدرسية الخام إلى مؤشرات إحصائية واضحة ورسوم بيانية ذكية تدعم صناع القرار الإداري والتربوي داخل المدرسة.
+إن الهدف الأسمى من بناء وتطوير نظام **سِدرة** هو تقديم منظومة برمجية مدرسية فائقة التنظيم، آمنة للغاية، وقابلة للتوسع اللانهائي، تساعد المؤسسات التعليمية على إدارة وتسيير عملياتها اليومية بسلاسة تامة، بالإضافة إلى تحويل البيانات التشغيلية والمدرسية الخام إلى مؤشرات إحصائية واضحة ورسوم بيانية ذكية تدعم صناع القرار الإداري والتربوي داخل المدرسة.
