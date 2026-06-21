@@ -376,6 +376,12 @@ export async function generateInsight(
   const roleTarget = persona.role as AIRoleTarget;
   const schoolId   = persona.schoolId;
 
+  // فشل صريح وصادق عند غياب مفتاح Claude — لا توليد وهمي. رسالة تكشف السبب الحقيقي (إعداد بيئة)
+  // بدل الخطأ العام "فشل توليد الرؤية من Claude API" الذي يُوهم بانقطاع الخدمة.
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return { ok: false, error: 'طبقة الذكاء غير مُفعّلة: مفتاح ANTHROPIC_API_KEY غير مضبوط في البيئة.' };
+  }
+
   // 1. timezone المدرسة → generated_date بتوقيتها
   const { data: school } = await supabaseAdmin
     .from('schools')
@@ -481,6 +487,11 @@ export async function generateInsightSystem(
   scopeId:     string,
   roleTarget:  AIRoleTarget,
 ): Promise<WorkflowResult<AIInsight>> {
+  // فشل صريح وصادق عند غياب مفتاح Claude (نفس قاعدة generateInsight) — لا توليد وهمي في الـ cron.
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return { ok: false, error: 'طبقة الذكاء غير مُفعّلة: مفتاح ANTHROPIC_API_KEY غير مضبوط في البيئة.' };
+  }
+
   const { data: school } = await supabaseAdmin
     .from('schools')
     .select('timezone')

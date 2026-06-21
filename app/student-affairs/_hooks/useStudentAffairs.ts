@@ -56,13 +56,15 @@ export function useStudentAffairs() {
     // 1. Data Loaders
     const loadStudents = useCallback(async () => {
         setLoading(true);
+        // ملاحظة: جدول student_profiles لا يحوي عمود student_id؛ المعرّف هو national_id.
+        // نُسمّيه student_id عبر alias في PostgREST لتطابق نوع StudentProfile دون لمس قاعدة البيانات.
         const { data, error } = await supabase
             .from('student_profiles')
-            .select('*')
+            .select('*, student_id:national_id')
             .order('name', { ascending: true });
 
         if (error) setMsg({ text: error.message, type: 'error' });
-        else setStudents(data || []);
+        else setStudents((data ?? []) as unknown as StudentProfile[]);
         setLoading(false);
     }, [supabase]);
 
@@ -70,7 +72,7 @@ export function useStudentAffairs() {
         setLoading(true);
         const { data, error } = await supabase
             .from('student_daily_attendance')
-            .select('*, student:student_profiles(name, student_id)')
+            .select('*, student:student_profiles(name, student_id:national_id)')
             .eq('attendance_date', date);
 
         if (error) setMsg({ text: error.message, type: 'error' });
@@ -82,7 +84,7 @@ export function useStudentAffairs() {
         setLoading(true);
         let query = supabase
             .from('behavioral_referrals')
-            .select('*, student:student_profiles(name, student_id)')
+            .select('*, student:student_profiles(name, student_id:national_id)')
             .order('created_at', { ascending: false });
 
         if (status) query = query.eq('status', status);

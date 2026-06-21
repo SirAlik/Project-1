@@ -31,7 +31,10 @@ type Role = "vp" | "counselor";
 export default function StudentAffairsPage() {
   const { state, actions } = useStudentAffairs();
   const [tab, setTab] = useState<Tab>("dashboard");
-  const [role, setRole] = useState<Role>("vp");
+  // هذه صفحة وكيل شؤون الطلاب (student_affairs_vp). أُزيل مبدّل المنظور (وكيل/مرشد) من الصفحة —
+  // المنظور يساوي دور الـ persona الفعلي فقط؛ لا تبديل أدوار داخل الصفحة (الموجه الطلابي له صفحته /counselor).
+  // يبقى role ثابتاً على "vp" بلا مُبدِّل؛ فروع المرشد محفوظة كمسار خامل دون حذف منطق.
+  const [role] = useState<Role>("vp");
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [isKnightsOpen, setIsKnightsOpen] = useState(false);
 
@@ -166,29 +169,12 @@ export default function StudentAffairsPage() {
         title="شؤون الطلاب"
         subtitle="الحضور والسلوك والإحالات والعهد الطلابية في مكان واحد."
         actions={
-          <>
-            {/* مبدّل منظور الدور (وكيل/مرشد) — يؤثّر في التبويبات المتاحة وسياق فرسان الانضباط */}
-            <div className="inline-flex rounded-2xl border border-border bg-card p-1">
-              <button
-                onClick={() => setRole("vp")}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition-colors ${role === "vp" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                وكيل الشؤون
-              </button>
-              <button
-                onClick={() => setRole("counselor")}
-                className={`rounded-xl px-4 py-2 text-xs font-bold transition-colors ${role === "counselor" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                الموجه الطلابي
-              </button>
-            </div>
-            <button
-              onClick={() => setIsKnightsOpen(true)}
-              className="flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition-colors hover:bg-muted"
-            >
-              <Trophy className="h-4 w-4 text-primary" /> فرسان الانضباط
-            </button>
-          </>
+          <button
+            onClick={() => setIsKnightsOpen(true)}
+            className="flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition-colors hover:bg-muted"
+          >
+            <Trophy className="h-4 w-4 text-primary" /> فرسان الانضباط
+          </button>
         }
       />
 
