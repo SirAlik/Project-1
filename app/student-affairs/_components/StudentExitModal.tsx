@@ -14,20 +14,20 @@ export function StudentExitModal({ studentName, studentId, isOpen, onClose, onCo
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/95 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="w-full max-w-md bg-stone-100 border border-stone-200 rounded-[3rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
-                <div className="flex justify-between items-start mb-6">
-                    <div className="flex items-center gap-4">
-                        <div className="p-4 bg-indigo-500 text-white rounded-3xl">
-                            <LogOut className="w-6 h-6" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-sm" dir="rtl">
+            <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+                <div className="mb-6 flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                            <LogOut className="h-6 w-6" />
                         </div>
                         <div>
-                            <h3 className="text-xl font-black text-foreground">تسجيل خروج طالب</h3>
-                            <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">{studentName} ({studentId})</p>
+                            <h3 className="text-lg font-black text-foreground">تسجيل خروج طالب</h3>
+                            <p className="text-[11px] font-bold text-muted-foreground">{studentName} ({studentId})</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full transition-colors" aria-label="إغلاق النافذة">
-                        <X size={20} className="text-stone-500 hover:text-foreground" />
+                    <button onClick={onClose} className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground" aria-label="إغلاق النافذة">
+                        <X size={20} />
                     </button>
                 </div>
 
@@ -40,47 +40,47 @@ export function StudentExitModal({ studentName, studentId, isOpen, onClose, onCo
                         formData.get('reason') as string
                     );
                 }} className="space-y-4">
-                    <div className="space-y-2">
-                        <label className="text-[10px] font-black text-stone-500 uppercase px-2">اسم ولي الأمر المُستلم</label>
+                    <div className="space-y-1.5">
+                        <label className="px-1 text-[11px] font-bold text-muted-foreground">اسم ولي الأمر المُستلم</label>
                         <input
                             name="guardian"
                             required
-                            className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                            placeholder="Guardian Name"
+                            className="w-full rounded-2xl border border-border bg-surface-soft p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            placeholder="اسم ولي الأمر"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-stone-500 uppercase px-2">الصلة</label>
+                        <div className="space-y-1.5">
+                            <label className="px-1 text-[11px] font-bold text-muted-foreground">الصلة</label>
                             <input
                                 name="relation"
                                 required
-                                className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                                placeholder="Relationship"
+                                className="w-full rounded-2xl border border-border bg-surface-soft p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                                placeholder="صلة القرابة"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-stone-500 uppercase px-2">السبب</label>
+                        <div className="space-y-1.5">
+                            <label className="px-1 text-[11px] font-bold text-muted-foreground">السبب</label>
                             <input
                                 name="reason"
                                 required
-                                className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-                                placeholder="Reason"
+                                className="w-full rounded-2xl border border-border bg-surface-soft p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                                placeholder="سبب الاستئذان"
                             />
                         </div>
                     </div>
 
-                    <div className="flex gap-4 pt-4">
+                    <div className="flex gap-3 pt-2">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 bg-stone-200 text-stone-700 py-4 rounded-2xl font-bold text-sm hover:bg-stone-300 transition-all"
+                            className="flex-1 rounded-2xl border border-border bg-card py-3 text-sm font-bold text-foreground transition-colors hover:bg-muted"
                         >
                             إلغاء
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 bg-indigo-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20"
+                            className="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                         >
                             تأكيد الخروج
                         </button>

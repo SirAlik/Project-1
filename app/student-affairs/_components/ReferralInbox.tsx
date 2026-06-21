@@ -6,9 +6,10 @@ import {
     User,
     Search,
     Clock,
-    ShieldAlert
 } from "lucide-react";
 import { BehavioralReferral } from "@/lib/types/student-affairs";
+import { DashboardSection, EmptyState } from "@/components/dashboard";
+import { ActionRecorder } from "./ActionRecorder";
 
 interface Props {
     referrals: BehavioralReferral[];
@@ -28,149 +29,143 @@ export function ReferralInbox({ referrals, onSend, onResolve, onEscalate, role }
     );
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-700">
-            {/* Header */}
-            <div className="flex justify-between items-center bg-card/40 p-6 rounded-[2.5rem] border border-border backdrop-blur-md">
-                <div className="flex items-center gap-4">
-                    <div className="p-4 bg-destructive/10 text-destructive rounded-3xl border border-destructive/20">
-                        <ShieldAlert className="w-6 h-6" />
+        <div className="space-y-6">
+            <DashboardSection
+                title={
+                    <span className="flex items-center gap-2">
+                        صندوق الإحالات السلوكية
+                        <span className="text-[10px] font-bold text-muted-foreground">QF71-C-5-3</span>
+                    </span>
+                }
+                icon={AlertTriangle}
+                action={
+                    <div className="relative hidden w-64 md:block">
+                        <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <input
+                            type="text"
+                            placeholder="بحث في الإحالات..."
+                            className="w-full rounded-2xl border border-border bg-surface-soft py-2 pr-10 pl-4 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </div>
-                    <div>
-                        <h2 className="text-xl font-black text-foreground">صندوق الإحالات السلوكية</h2>
-                        <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Behavioral Referrals (QF71-C-5-3)</p>
-                    </div>
-                </div>
-
-                <div className="relative hidden md:block w-64">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder="Search referrals..."
-                        className="w-full bg-background border border-border rounded-2xl py-2 pl-12 pr-4 text-xs text-foreground focus:outline-none"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                    />
-                </div>
-            </div>
-
-            {/* Referral Cards */}
-            <div className="space-y-4">
+                }
+            >
                 {filtered.length === 0 ? (
-                    <div className="text-center py-20 bg-card/20 rounded-[3rem] border border-border/50 border-dashed">
-                        <AlertTriangle className="w-12 h-12 text-muted mx-auto mb-4" />
-                        <p className="text-muted-foreground font-bold">لا يوجد إحالات حالية</p>
-                    </div>
+                    <EmptyState icon={AlertTriangle} title="لا يوجد إحالات حالية" hint="ستظهر الإحالات السلوكية هنا فور إنشائها." />
                 ) : (
-                    filtered.map(referral => (
-                        <div
-                            key={referral.id}
-                            className="group bg-card/30 border border-border rounded-[2.5rem] p-6 hover:bg-card/60 transition-all duration-500"
-                        >
-                            <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
-                                <div className="flex items-center gap-4 min-w-[300px]">
-                                    <div className="w-14 h-14 bg-background rounded-[1.5rem] flex items-center justify-center border border-border group-hover:border-destructive/30 transition-colors">
-                                        <User className="w-6 h-6 text-muted-foreground group-hover:text-destructive" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-black text-foreground">{referral.student?.name}</h4>
-                                        <p className="text-[10px] text-muted-foreground font-medium mb-2">{referral.student?.student_id}</p>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${referral.referral_type === 'lateness' ? 'bg-warning/10 text-warning' :
-                                                referral.referral_type === 'absence' ? 'bg-destructive/10 text-destructive' :
-                                                    'bg-primary/10 text-primary'
-                                                }`}>
-                                                {referral.referral_type}
-                                            </span>
-                                            <span className="text-[10px] text-muted-foreground font-bold italic">
-                                                {referral.trigger_count} occurrences in {referral.trigger_period}
-                                            </span>
+                    <div className="space-y-4">
+                        {filtered.map(referral => (
+                            <div
+                                key={referral.id}
+                                className="group rounded-2xl border border-border bg-surface-soft p-5 transition-colors hover:border-primary/30"
+                            >
+                                <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+                                    <div className="flex min-w-[300px] items-center gap-4">
+                                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground transition-colors group-hover:border-destructive/30 group-hover:text-destructive">
+                                            <User className="h-6 w-6" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-black text-foreground">{referral.student?.name}</h4>
+                                            <p className="mb-2 text-[10px] font-medium text-muted-foreground">{referral.student?.student_id}</p>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`rounded-full px-2 py-0.5 text-[8px] font-black uppercase ${referral.referral_type === 'lateness' ? 'bg-warning/10 text-warning' :
+                                                    referral.referral_type === 'absence' ? 'bg-destructive/10 text-destructive' :
+                                                        'bg-primary/10 text-primary'
+                                                    }`}>
+                                                    {referral.referral_type}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-muted-foreground">
+                                                    {referral.trigger_count} حالات خلال {referral.trigger_period}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="flex-1 px-4 border-l border-border/50">
-                                    <div className="flex items-start gap-3">
-                                        <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
-                                        <p className="text-xs text-foreground/80 leading-relaxed font-medium">{referral.vp_reason}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 w-full lg:w-auto">
-                                    {role === 'vp' && referral.status === 'draft' && (
-                                        <button
-                                            onClick={() => {
-                                                const notes = prompt("Add notes for the counselor:");
-                                                if (notes !== null) onSend(referral.id, notes);
-                                            }}
-                                            className="w-full lg:w-auto px-6 py-4 bg-destructive text-destructive-foreground rounded-2xl text-xs font-black flex items-center justify-center gap-2 hover:bg-destructive/90 transition-all shadow-lg shadow-destructive/20"
-                                        >
-                                            <Send className="w-4 h-4" />
-                                            إرسال إلى الموجه الطلابي
-                                        </button>
-                                    )}
-
-                                    {role === 'counselor' && referral.status === 'pending_counselor' && (
-                                        <button
-                                            onClick={() => {
-                                                setRecordingFor({ id: referral.id, name: referral.student?.name || "Student" });
-                                            }}
-                                            className="w-full lg:w-auto px-6 py-4 bg-success text-success-foreground rounded-2xl text-xs font-black flex items-center justify-center gap-2 hover:bg-success/90 transition-all shadow-lg shadow-success/20"
-                                        >
-                                            <CheckCircle className="w-4 h-4" />
-                                            Record Intervention
-                                        </button>
-                                    )}
-
-                                    <div className="flex flex-col gap-2 w-full lg:w-auto">
-                                        <div className={`px-4 py-2 rounded-2xl border text-[9px] font-black uppercase tracking-widest text-center ${referral.status === 'resolved' ? 'border-success/30 text-success' :
-                                            referral.status === 'pending_counselor' ? 'border-warning/30 text-warning' :
-                                                referral.status === 'escalated' ? 'border-destructive/50 text-destructive bg-destructive/5' :
-                                                    'border-border text-muted-foreground'
-                                            }`}>
-                                            {referral.status}
+                                    <div className="flex-1 border-r border-border px-4">
+                                        <div className="flex items-start gap-3">
+                                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+                                            <p className="text-xs font-medium leading-relaxed text-foreground">{referral.vp_reason}</p>
                                         </div>
+                                    </div>
 
-                                        {role === 'vp' && referral.status === 'pending_counselor' && (
+                                    <div className="flex w-full items-center gap-3 lg:w-auto">
+                                        {role === 'vp' && referral.status === 'draft' && (
                                             <button
                                                 onClick={() => {
-                                                    const reason = prompt("Why are you escalating this case?");
-                                                    if (reason) onEscalate?.(referral.id, reason);
+                                                    const notes = prompt("أضف ملاحظات للموجه الطلابي:");
+                                                    if (notes !== null) onSend(referral.id, notes);
                                                 }}
-                                                className="px-4 py-2 bg-destructive/10 text-destructive border border-destructive/20 rounded-xl text-[8px] font-black uppercase hover:bg-destructive hover:text-destructive-foreground transition-all"
+                                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-destructive px-6 py-3 text-xs font-black text-destructive-foreground shadow-sm transition-colors hover:bg-destructive/90 lg:w-auto"
                                             >
-                                                التصعيد إلى مدير المدرسة
+                                                <Send className="h-4 w-4" />
+                                                إرسال إلى الموجه الطلابي
                                             </button>
                                         )}
+
+                                        {role === 'counselor' && referral.status === 'pending_counselor' && (
+                                            <button
+                                                onClick={() => {
+                                                    setRecordingFor({ id: referral.id, name: referral.student?.name || "الطالب" });
+                                                }}
+                                                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-success px-6 py-3 text-xs font-black text-success-foreground shadow-sm transition-colors hover:bg-success/90 lg:w-auto"
+                                            >
+                                                <CheckCircle className="h-4 w-4" />
+                                                تسجيل إجراء
+                                            </button>
+                                        )}
+
+                                        <div className="flex w-full flex-col gap-2 lg:w-auto">
+                                            <div className={`rounded-2xl border px-4 py-2 text-center text-[9px] font-black uppercase tracking-widest ${referral.status === 'resolved' ? 'border-success/30 text-success' :
+                                                referral.status === 'pending_counselor' ? 'border-warning/30 text-warning' :
+                                                    referral.status === 'escalated' ? 'border-destructive/50 bg-destructive/5 text-destructive' :
+                                                        'border-border text-muted-foreground'
+                                                }`}>
+                                                {referral.status}
+                                            </div>
+
+                                            {role === 'vp' && referral.status === 'pending_counselor' && (
+                                                <button
+                                                    onClick={() => {
+                                                        const reason = prompt("ما سبب التصعيد إلى مدير المدرسة؟");
+                                                        if (reason) onEscalate?.(referral.id, reason);
+                                                    }}
+                                                    className="rounded-xl border border-destructive/20 bg-destructive/10 px-4 py-2 text-[8px] font-black uppercase text-destructive transition-colors hover:bg-destructive hover:text-destructive-foreground"
+                                                >
+                                                    التصعيد إلى مدير المدرسة
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Timeline Mini-indicator */}
-                            <div className="mt-6 pt-6 border-t border-border/30 flex items-center justify-between">
-                                <div className="flex items-center gap-6">
-                                    <div className="flex items-center gap-2">
-                                        <Clock className="w-3 h-3 text-muted-foreground" />
-                                        <span className="text-[10px] text-muted-foreground font-bold">{new Date(referral.created_at).toLocaleDateString()}</span>
-                                    </div>
-                                    {referral.vp_sent_at && (
+                                {/* Timeline Mini-indicator */}
+                                <div className="mt-6 flex items-center justify-between border-t border-border pt-6">
+                                    <div className="flex items-center gap-6">
                                         <div className="flex items-center gap-2">
-                                            <Send className="w-3 h-3 text-muted-foreground" />
-                                            <span className="text-[10px] text-muted-foreground font-medium">Sent to Counselor {new Date(referral.vp_sent_at).toLocaleTimeString()}</span>
+                                            <Clock className="h-3 w-3 text-muted-foreground" />
+                                            <span className="text-[10px] font-bold text-muted-foreground">{new Date(referral.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        {referral.vp_sent_at && (
+                                            <div className="flex items-center gap-2">
+                                                <Send className="h-3 w-3 text-muted-foreground" />
+                                                <span className="text-[10px] font-medium text-muted-foreground">أُرسلت للموجه {new Date(referral.vp_sent_at).toLocaleTimeString()}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {referral.status === 'resolved' && (
+                                        <div className="flex items-center gap-2 text-success">
+                                            <CheckCircle className="h-4 w-4" />
+                                            <span className="text-[10px] font-black uppercase tracking-tight">مُعتمد آلياً</span>
                                         </div>
                                     )}
                                 </div>
-
-                                {referral.status === 'resolved' && (
-                                    <div className="flex items-center gap-2 text-success/50">
-                                        <CheckCircle className="w-4 h-4" />
-                                        <span className="text-[10px] font-black uppercase tracking-tight">System Validated</span>
-                                    </div>
-                                )}
                             </div>
-                        </div>
-                    ))
+                        ))}
+                    </div>
                 )}
-            </div>
+            </DashboardSection>
 
             {/* Action Recorder Modal */}
             <ActionRecorder
@@ -186,6 +181,3 @@ export function ReferralInbox({ referrals, onSend, onResolve, onEscalate, role }
         </div>
     );
 }
-
-import { ActionRecorder } from "./ActionRecorder";
-

@@ -6,6 +6,7 @@ import {
     User
 } from "lucide-react";
 import { BehavioralContract, StudentProfile } from "@/lib/types/student-affairs";
+import { DashboardSection, EmptyState } from "@/components/dashboard";
 
 interface Props {
     student: StudentProfile;
@@ -19,44 +20,38 @@ export function ContractSigner({ student, contracts, onSign }: Props) {
     const pendingContracts = contracts.filter(c => !c.parent_signed_at);
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Header */}
-            <div className="flex items-center gap-4 bg-white/80 p-6 rounded-[2.5rem] border border-stone-200">
-                <div className="p-4 bg-emerald-500/10 text-emerald-400 rounded-3xl border border-emerald-500/20">
-                    <Signature className="w-6 h-6" />
-                </div>
-                <div>
-                    <h2 className="text-xl font-black text-foreground">التوقيع الإلكتروني للتعهدات</h2>
-                    <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Digital Behavioral Contracts (QF71-C-6-1)</p>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DashboardSection
+            title={
+                <span className="flex items-center gap-2">
+                    التوقيع الإلكتروني للتعهدات
+                    <span className="text-[10px] font-bold text-muted-foreground">QF71-C-6-1</span>
+                </span>
+            }
+            icon={Signature}
+        >
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* Pending List */}
-                <div className="bg-white/80 border border-stone-200 rounded-[2.5rem] p-6 backdrop-blur-md">
-                    <h3 className="text-xs font-black text-stone-500 uppercase tracking-widest mb-6 px-2 flex items-center gap-2">
-                        <FileText className="w-4 h-4" /> تفاويض بانتظار التوقيع
+                <div className="rounded-2xl border border-border bg-surface-soft p-5">
+                    <h3 className="mb-5 flex items-center gap-2 px-1 text-xs font-black uppercase tracking-widest text-muted-foreground">
+                        <FileText className="h-4 w-4 text-primary" /> تفاويض بانتظار التوقيع
                     </h3>
 
                     <div className="space-y-3">
                         {pendingContracts.length === 0 ? (
-                            <div className="text-center py-12 border border-stone-200 border-dashed rounded-[2rem]">
-                                <CheckCircle className="w-10 h-10 text-emerald-500/20 mx-auto mb-3" />
-                                <p className="text-xs text-stone-500 font-bold">لا توجد تعهدات معلقة لهذا الطالب</p>
-                            </div>
+                            <EmptyState icon={CheckCircle} title="لا توجد تعهدات معلقة لهذا الطالب" tone="ok" />
                         ) : (
                             pendingContracts.map(contract => (
                                 <button
                                     key={contract.id}
                                     onClick={() => setSelectedContract(contract)}
-                                    className={`w-full text-right p-4 rounded-2xl border transition-all ${selectedContract?.id === contract.id ? 'bg-indigo-500/10 border-indigo-500/50 text-white' : 'bg-white/80 border-stone-200 text-stone-500 hover:bg-stone-100'}`}
+                                    className={`w-full rounded-2xl border p-4 text-right transition-colors ${selectedContract?.id === contract.id ? 'border-primary/40 bg-primary/10 text-primary' : 'border-border bg-card text-foreground hover:bg-muted'}`}
                                     dir="rtl"
                                 >
-                                    <div className="flex justify-between items-center mb-1">
+                                    <div className="mb-1 flex items-center justify-between">
                                         <span className="text-xs font-black">تعهد سلوكي</span>
-                                        <span className="text-[10px] opacity-60">{new Date(contract.created_at).toLocaleDateString()}</span>
+                                        <span className="text-[10px] text-muted-foreground">{new Date(contract.created_at).toLocaleDateString()}</span>
                                     </div>
-                                    <p className="text-[10px] line-clamp-1 opacity-50">بناءً على التوصية التربوية للمرشد الطلابي</p>
+                                    <p className="line-clamp-1 text-[10px] text-muted-foreground">بناءً على التوصية التربوية للمرشد الطلابي</p>
                                 </button>
                             ))
                         )}
@@ -64,23 +59,23 @@ export function ContractSigner({ student, contracts, onSign }: Props) {
                 </div>
 
                 {/* Signer Detail */}
-                <div className="bg-stone-100 border border-stone-200 rounded-[2.5rem] overflow-hidden">
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
                     {selectedContract ? (
-                        <div className="p-8 flex flex-col h-full">
-                            <h4 className="text-lg font-black text-foreground mb-4 text-center">محتوى التعهد</h4>
-                            <div className="flex-1 bg-white/95 border border-stone-200 rounded-3xl p-6 text-right leading-loose text-stone-600 text-sm mb-6" dir="rtl">
-                                أنا ولي أمر الطالب/ <span className="text-indigo-400 font-bold">{student.name}</span>،
+                        <div className="flex h-full flex-col p-6">
+                            <h4 className="mb-4 text-center text-lg font-black text-foreground">محتوى التعهد</h4>
+                            <div className="mb-6 flex-1 rounded-2xl border border-border bg-surface-soft p-5 text-right text-sm leading-loose text-foreground/80" dir="rtl">
+                                أنا ولي أمر الطالب/ <span className="font-bold text-primary">{student.name}</span>،
                                 أقر باطلاعي على المخالفة السلوكية المذكورة وأتعهد بالتعاون مع المدرسة للحد من تكرارها،
                                 والالتزام بكافة اللوائح والأنظمة المنصوص عليها في لائحة السلوك والمواظبة.
                             </div>
 
                             <div className="space-y-4">
-                                <div className="p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl flex items-center gap-4">
-                                    <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
-                                        <User className="w-5 h-5" />
+                                <div className="flex items-center gap-4 rounded-2xl border border-primary/15 bg-primary/5 p-4">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                                        <User className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-indigo-400 uppercase">اسم ولي الأمر</p>
+                                        <p className="text-[10px] font-black uppercase text-primary">اسم ولي الأمر</p>
                                         <p className="text-sm font-bold text-foreground">{student.guardian_name || "سيتم جلب الاسم من الملف"}</p>
                                     </div>
                                 </div>
@@ -92,24 +87,24 @@ export function ContractSigner({ student, contracts, onSign }: Props) {
                                             setSelectedContract(null);
                                         }
                                     }}
-                                    className="w-full py-4 bg-indigo-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:bg-indigo-600 transition-all flex items-center justify-center gap-3"
+                                    className="flex w-full items-center justify-center gap-3 rounded-2xl bg-primary py-4 text-xs font-black uppercase tracking-widest text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
                                 >
-                                    <Signature className="w-5 h-5" />
-                                    تأكيد التوقيع الرقمي (Sign Contract)
+                                    <Signature className="h-5 w-5" />
+                                    تأكيد التوقيع الرقمي
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <div className="h-[400px] flex flex-col items-center justify-center p-8 text-center">
-                            <div className="w-20 h-20 bg-white rounded-[2rem] border border-stone-200 flex items-center justify-center text-zinc-800 mb-6">
-                                <FileText className="w-10 h-10" />
+                        <div className="flex h-[400px] flex-col items-center justify-center p-8 text-center">
+                            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl border border-border bg-surface-soft text-muted-foreground">
+                                <FileText className="h-10 w-10" />
                             </div>
-                            <h4 className="text-stone-500 font-black uppercase tracking-widest mb-2">جهة التوقيع</h4>
-                            <p className="text-xs text-zinc-700 max-w-[200px]">اختر أحد التعهدات من القائمة الجانبية للمراجعة والتوقيع</p>
+                            <h4 className="mb-2 font-black uppercase tracking-widest text-muted-foreground">جهة التوقيع</h4>
+                            <p className="max-w-[200px] text-xs text-muted-foreground">اختر أحد التعهدات من القائمة الجانبية للمراجعة والتوقيع</p>
                         </div>
                     )}
                 </div>
             </div>
-        </div>
+        </DashboardSection>
     );
 }

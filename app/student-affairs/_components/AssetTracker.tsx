@@ -8,6 +8,7 @@ import {
     RefreshCw
 } from "lucide-react";
 import { StudentProfile, StudentAsset } from "@/lib/types/student-affairs";
+import { DashboardSection } from "@/components/dashboard";
 
 interface Props {
     students: StudentProfile[];
@@ -28,97 +29,93 @@ export function AssetTracker({ students, assets, onIssue, onReturn }: Props) {
     );
 
     return (
-        <div className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-700">
-            {/* Action Bar */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white/80 p-6 rounded-[2.5rem] border border-stone-200">
-                <div className="flex items-center gap-4">
-                    <div className="p-4 bg-indigo-500/10 text-indigo-400 rounded-3xl border border-indigo-500/20">
-                        <Book className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-black text-foreground">متتبع العهد والكتب</h2>
-                        <p className="text-[10px] text-stone-500 font-bold uppercase tracking-widest">Asset Tracking (QF71-C-3-1)</p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-500" />
-                        <input
-                            type="text"
-                            placeholder="Search assets or students..."
-                            className="w-full bg-white border border-stone-200 rounded-2xl py-3 pl-12 pr-4 text-xs text-foreground focus:outline-none"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+        <div className="space-y-6">
+            <DashboardSection
+                title={
+                    <span className="flex items-center gap-2">
+                        متتبع العهد والكتب
+                        <span className="text-[10px] font-bold text-muted-foreground">QF71-C-3-1</span>
+                    </span>
+                }
+                icon={Book}
+                action={
+                    <div className="flex w-full items-center gap-3 md:w-auto">
+                        <div className="relative flex-1 md:w-64">
+                            <Search className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="بحث عن عهدة أو طالب..."
+                                className="w-full rounded-2xl border border-border bg-surface-soft py-3 pr-12 pl-10 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                            <button
+                                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-lg border border-border bg-card p-2 text-muted-foreground transition-colors hover:text-foreground"
+                                aria-label="تحديث القائمة"
+                            >
+                                <RefreshCw size={16} />
+                            </button>
+                        </div>
                         <button
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-stone-100 border border-stone-200 rounded-lg text-stone-500 hover:text-foreground hover:border-stone-300 transition-colors"
-                            aria-label="تحديث القائمة"
+                            onClick={() => setIsIssuing(true)}
+                            className="rounded-2xl bg-primary p-3 text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                            aria-label="تسليم عهدة جديدة"
                         >
-                            <RefreshCw size={18} />
+                            <Plus className="h-5 w-5" />
                         </button>
                     </div>
-                    <button
-                        onClick={() => setIsIssuing(true)}
-                        className="p-3 bg-indigo-500 text-white rounded-2xl hover:bg-indigo-600 transition-all shadow-lg shadow-indigo-500/20"
-                        aria-label="Issue new asset" // Added aria-label
-                    >
-                        <Plus className="w-6 h-6" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Assets Table */}
-            <div className="bg-white/80 border border-stone-200 rounded-[3rem] overflow-hidden backdrop-blur-md">
-                <div className="overflow-x-auto text-right" dir="rtl">
+                }
+            >
+                {/* Assets Table */}
+                <div className="overflow-x-auto rounded-xl border border-border text-right" dir="rtl">
                     <table className="w-full border-collapse">
                         <thead>
-                            <tr className="bg-white/80 border-b border-stone-200">
-                                <th className="p-6 text-xs font-black text-stone-500 uppercase tracking-widest">الطالب</th>
-                                <th className="p-6 text-xs font-black text-stone-500 uppercase tracking-widest">العهدة / الكتاب</th>
-                                <th className="p-6 text-xs font-black text-stone-500 uppercase tracking-widest">تاريخ الاستلام</th>
-                                <th className="p-6 text-xs font-black text-stone-500 uppercase tracking-widest">الحالة</th>
-                                <th className="p-6 text-xs font-black text-stone-500 uppercase tracking-widest text-left">العمليات</th>
+                            <tr className="border-b border-border bg-surface-soft">
+                                <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">الطالب</th>
+                                <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">العهدة / الكتاب</th>
+                                <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">تاريخ الاستلام</th>
+                                <th className="p-4 text-xs font-black uppercase tracking-widest text-muted-foreground">الحالة</th>
+                                <th className="p-4 text-left text-xs font-black uppercase tracking-widest text-muted-foreground">العمليات</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-800/50">
+                        <tbody className="divide-y divide-border">
                             {filteredAssets.map(asset => (
-                                <tr key={asset.id} className="group hover:bg-stone-100/80 transition-colors">
-                                    <td className="p-6">
+                                <tr key={asset.id} className="transition-colors hover:bg-muted/60">
+                                    <td className="p-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-stone-200 text-stone-500">
-                                                <User className="w-4 h-4" />
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-surface-soft text-muted-foreground">
+                                                <User className="h-4 w-4" />
                                             </div>
                                             <span className="text-sm font-bold text-foreground">{asset.student?.name}</span>
                                         </div>
                                     </td>
-                                    <td className="p-6">
-                                        <span className="text-sm font-medium text-stone-600">{asset.asset_name}</span>
+                                    <td className="p-4">
+                                        <span className="text-sm font-medium text-foreground">{asset.asset_name}</span>
                                     </td>
-                                    <td className="p-6">
-                                        <span className="text-xs text-stone-500 font-mono">{asset.handover_date}</span>
+                                    <td className="p-4">
+                                        <span className="font-mono text-xs text-muted-foreground">{asset.handover_date}</span>
                                     </td>
-                                    <td className="p-6">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${asset.status === 'assigned' ? 'bg-indigo-500/10 text-indigo-400' :
-                                            asset.status === 'returned' ? 'bg-emerald-500/10 text-emerald-400' :
-                                                'bg-rose-500/10 text-rose-400'
+                                    <td className="p-4">
+                                        <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase ${asset.status === 'assigned' ? 'bg-primary/10 text-primary' :
+                                            asset.status === 'returned' ? 'bg-success/10 text-success' :
+                                                'bg-destructive/10 text-destructive'
                                             }`}>
                                             {asset.status === 'assigned' ? 'بانتظار العودة' :
                                                 asset.status === 'returned' ? 'تمت العودة' : 'مفقود'}
                                         </span>
                                     </td>
-                                    <td className="p-6 text-left">
+                                    <td className="p-4 text-left">
                                         {asset.status === 'assigned' && (
                                             <button
                                                 onClick={() => {
-                                                    const condition = prompt("Condition on return (e.g. Good, Damaged):");
+                                                    const condition = prompt("حالة العهدة عند الإرجاع (مثال: سليمة، تالفة):");
                                                     if (condition) onReturn(asset.id, condition);
                                                 }}
-                                                className="p-3 bg-white text-stone-500 hover:text-foreground hover:bg-emerald-500 transition-all rounded-2xl border border-stone-200"
-                                                title="Return Asset"
-                                                aria-label={`Return asset ${asset.asset_name} from ${asset.student?.name}`}
+                                                className="rounded-2xl border border-border bg-surface-soft p-3 text-muted-foreground transition-colors hover:border-success/50 hover:text-success"
+                                                title="إرجاع العهدة"
+                                                aria-label={`إرجاع العهدة ${asset.asset_name} من ${asset.student?.name}`}
                                             >
-                                                <ArrowRightLeft className="w-4 h-4" />
+                                                <ArrowRightLeft className="h-4 w-4" />
                                             </button>
                                         )}
                                     </td>
@@ -127,46 +124,46 @@ export function AssetTracker({ students, assets, onIssue, onReturn }: Props) {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </DashboardSection>
 
             {/* Issue Asset Modal */}
             {isIssuing && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/95 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="w-full max-w-md bg-stone-100 border border-stone-200 rounded-[3rem] p-8 shadow-2xl">
-                        <h3 className="text-xl font-black text-foreground mb-6">تسليم عهدة جديدة</h3>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-sm" dir="rtl">
+                    <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-xl">
+                        <h3 className="mb-6 text-lg font-black text-foreground">تسليم عهدة جديدة</h3>
 
                         <div className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-stone-500 uppercase px-2">اختر الطالب</label>
+                            <div className="space-y-1.5">
+                                <label className="px-1 text-[11px] font-bold text-muted-foreground">اختر الطالب</label>
                                 <select
-                                    className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full rounded-2xl border border-border bg-surface-soft p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                                     value={selectedStudent}
                                     onChange={(e) => setSelectedStudent(e.target.value)}
-                                    aria-label="Select student"
+                                    aria-label="اختر الطالب"
                                 >
-                                    <option value="">Select Student...</option>
+                                    <option value="">اختر الطالب...</option>
                                     {students.map(s => (
                                         <option key={s.id} value={s.id}>{s.name} ({s.student_id})</option>
                                     ))}
                                 </select>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-stone-500 uppercase px-2">اسم العهدة / الكتاب</label>
+                            <div className="space-y-1.5">
+                                <label className="px-1 text-[11px] font-bold text-muted-foreground">اسم العهدة / الكتاب</label>
                                 <input
-                                    className="w-full bg-white border border-stone-200 rounded-2xl p-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                    placeholder="Book Name / Asset Name"
+                                    className="w-full rounded-2xl border border-border bg-surface-soft p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+                                    placeholder="اسم الكتاب / العهدة"
                                     value={assetName}
                                     onChange={(e) => setAssetName(e.target.value)}
-                                    aria-label="Asset name or book name"
+                                    aria-label="اسم العهدة أو الكتاب"
                                 />
                             </div>
 
-                            <div className="flex gap-4 pt-4">
+                            <div className="flex gap-3 pt-2">
                                 <button
                                     onClick={() => setIsIssuing(false)}
-                                    className="flex-1 bg-stone-200 text-stone-700 py-4 rounded-2xl font-bold text-sm hover:bg-stone-300"
-                                    aria-label="Cancel asset issuance"
+                                    className="flex-1 rounded-2xl border border-border bg-card py-3 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+                                    aria-label="إلغاء التسليم"
                                 >
                                     إلغاء
                                 </button>
@@ -178,7 +175,7 @@ export function AssetTracker({ students, assets, onIssue, onReturn }: Props) {
                                             setAssetName("");
                                         }
                                     }}
-                                    className="flex-1 bg-indigo-500 text-white py-4 rounded-2xl font-bold text-sm hover:bg-indigo-600 shadow-lg shadow-indigo-500/20"
+                                    className="flex-1 rounded-2xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 disabled:opacity-50"
                                     disabled={!selectedStudent || !assetName}
                                 >
                                     تأكيد التسليم
