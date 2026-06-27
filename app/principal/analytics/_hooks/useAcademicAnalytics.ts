@@ -8,6 +8,8 @@ type DailyMetrics = Record<string, number>;
 export function useAcademicAnalytics() {
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({
+        // Sprint 7: placeholder غير مربوط بميزة تقدّم المنهج الحقيقية (per-class في
+        // /classroom/[classId]). يبقى فارغاً — لا نسبة مُختلَقة على مستوى المدرسة.
         curriculumCompletion: [] as { subject: string; progress: number }[],
         teacherPerformance: [] as { metric: string; score: number; fullMark: number }[],
         gradeTrend: [] as { month: string; average: number }[],

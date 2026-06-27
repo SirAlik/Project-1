@@ -5,6 +5,10 @@ import { supabase } from '@/lib/db/supabase';
 
 type DailyMetrics = Record<string, number>;
 
+// ملاحظة (Sprint 7): حقول المنهج أدناه placeholders غير مربوطة بميزة تقدّم المنهج
+// الحقيقية. الميزة الحقيقية على مستوى (فصل + درس) في /classroom/[classId]
+// (جداول curriculum_units/curriculum_lessons/class_curriculum_progress). لا تجميع
+// على مستوى المعلّم هنا بعد — تبقى القيم فارغة (لا نسبة مُختلَقة).
 export type TeacherScore = {
     id: string;
     name: string;

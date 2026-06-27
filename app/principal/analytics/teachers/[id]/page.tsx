@@ -121,7 +121,13 @@ export default function TeacherDeepDive() {
                                             </div>
                                         </div>
                                     ))}
-                                    <p className="text-[9px] text-stone-500 italic">ملاحظة: البيانات تتوافق مع الخطط المسجلة في Classroom.</p>
+                                    {/* Sprint 7: تقدّم المنهج يُتابَع لكل فصل في /classroom؛ لا تجميع على مستوى المعلّم بعد — لا نسبة مُختلَقة هنا */}
+                                    {teacher.curriculumDetails.length === 0 && (
+                                        <p className="text-[11px] text-stone-500">
+                                            لا تتوفّر نسبة تقدّم منهج مُجمَّعة على مستوى المعلّم في هذه اللوحة بعد.
+                                        </p>
+                                    )}
+                                    <p className="text-[9px] text-stone-400 italic">يُتابَع تقدّم المنهج لكل فصل داخل صفحة الفصل (/classroom).</p>
                                 </div>
                             </AnalyticsCard>
 
