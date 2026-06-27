@@ -100,7 +100,7 @@ export function AIInsightCard({
           </div>
           <div>
             <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">
-              AI · {insight.model_version}
+              الذكاء الاصطناعي
             </p>
             <h3 className="text-sm font-bold text-text-primary">{title}</h3>
           </div>

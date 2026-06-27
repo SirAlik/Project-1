@@ -23,6 +23,10 @@ interface ClaudeMessage {
   recommendations: Array<{ title: string; action: string; priority?: 'high' | 'medium' | 'low' }>;
 }
 
+// رسالة آمنة موحّدة للمستخدم عند تعذّر الذكاء (مفتاح غير مضبوط · لا قالب · فشل المزوّد · فشل الحفظ).
+// التفاصيل التقنية (اسم المزوّد/المفتاح/حالة الـAPI) تبقى في سجلّ الخادم فقط ولا تُعرض للمستخدم.
+const AI_UNAVAILABLE = 'الرؤى الذكية غير مفعّلة حاليًا.';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Prompt rendering
 // ─────────────────────────────────────────────────────────────────────────────
@@ -226,7 +230,137 @@ async function buildHealthTrendPayload(
   };
 }
 
-// سيناريوهات لم تُبنَ لها payload builders بعد — ترجع فارغة
+// تقرير الفصل — يقرأ آخر ملخّص أسبوعي للفصل + عدد طلابه. لا بيانات → null (صادق).
+async function buildClassReportPayload(
+  schoolId: string,
+  classId:  string,
+): Promise<PayloadData> {
+  const { data: summary } = await supabaseAdmin
+    .from('class_weekly_summary')
+    .select('total_absences, total_lates, avg_participation, behavior_incidents, referrals_count')
+    .eq('school_id', schoolId)
+    .eq('class_id',  classId)
+    .order('week_start', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const { count: studentsCount } = await supabaseAdmin
+    .from('student_profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId)
+    .eq('class_id',  classId);
+
+  return {
+    students_count:     studentsCount ?? null,
+    week_absences:      summary?.total_absences     ?? null,
+    week_lates:         summary?.total_lates        ?? null,
+    avg_participation:  summary?.avg_participation   ?? null,
+    behavior_incidents: summary?.behavior_incidents ?? null,
+    referrals_count:    summary?.referrals_count    ?? null,
+  };
+}
+
+// نمط السلوك — أعداد حقيقية من الإحالات السلوكية + مؤشرات الخطر + الحالات السلوكية المفتوحة.
+async function buildBehaviorPatternPayload(
+  schoolId: string,
+  date:     string,
+): Promise<PayloadData> {
+  const from = new Date(date);
+  from.setDate(from.getDate() - 29);
+  const fromIso = from.toISOString();
+
+  const { count: recentReferrals } = await supabaseAdmin
+    .from('behavioral_referrals')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId)
+    .gte('created_at', fromIso);
+
+  const { count: highRisk } = await supabaseAdmin
+    .from('student_risk_flags')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId)
+    .eq('risk_level', 'high')
+    .is('resolved_at', null);
+
+  const { count: openBehaviorCases } = await supabaseAdmin
+    .from('cases')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId)
+    .eq('category', 'سلوكي')
+    .neq('status', 'مغلقة');
+
+  // أكثر أنواع الإحالات تكراراً خلال آخر 30 يوماً
+  const { data: types } = await supabaseAdmin
+    .from('behavioral_referrals')
+    .select('referral_type')
+    .eq('school_id', schoolId)
+    .gte('created_at', fromIso)
+    .not('referral_type', 'is', null);
+
+  const freq: Record<string, number> = {};
+  for (const t of types ?? []) {
+    if (t.referral_type) freq[t.referral_type] = (freq[t.referral_type] ?? 0) + 1;
+  }
+  const topType = Object.entries(freq).sort(([, a], [, b]) => b - a)[0]?.[0] ?? null;
+
+  return {
+    recent_referrals:    recentReferrals ?? null,
+    high_risk_students:  highRisk ?? null,
+    open_behavior_cases: openBehaviorCases ?? null,
+    top_referral_type:   topType,
+  };
+}
+
+// ملخّص الجودة — مؤشرات نشطة + أدلّة مجمّعة + متوسط درجات الملاحظات + حالات عدم المطابقة المفتوحة.
+async function buildQualitySummaryPayload(
+  schoolId: string,
+  date:     string,
+): Promise<PayloadData> {
+  const { count: activeIndicators } = await supabaseAdmin
+    .from('quality_indicators')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId)
+    .eq('is_active', true);
+
+  const { count: evidenceCount } = await supabaseAdmin
+    .from('quality_evidence')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId);
+
+  // متوسط درجات الملاحظات الصفية خلال آخر 30 يوماً
+  const from = new Date(date);
+  from.setDate(from.getDate() - 29);
+  const fromDate = from.toISOString().slice(0, 10);
+
+  const { data: obs } = await supabaseAdmin
+    .from('qa_observations')
+    .select('overall_score')
+    .eq('school_id', schoolId)
+    .gte('date', fromDate)
+    .not('overall_score', 'is', null);
+
+  let avgScore: number | null = null;
+  if (obs && obs.length > 0) {
+    const sum = obs.reduce((s, o) => s + (Number(o.overall_score) || 0), 0);
+    avgScore = Math.round((sum / obs.length) * 10) / 10;
+  }
+
+  // حالات عدم المطابقة المفتوحة = التي لم يتم التحقّق منها بعد (verified_at IS NULL)
+  const { count: openNcr } = await supabaseAdmin
+    .from('nonconformance_reports')
+    .select('id', { count: 'exact', head: true })
+    .eq('school_id', schoolId)
+    .is('verified_at', null);
+
+  return {
+    active_indicators:     activeIndicators ?? null,
+    evidence_collected:    evidenceCount ?? null,
+    avg_observation_score: avgScore,
+    open_nonconformances:  openNcr ?? null,
+  };
+}
+
+// احتياطي لأي سياق غير معروف — يرجع فارغاً (renderPrompt يعرض 'غير متوفر').
 function buildEmptyPayload(): PayloadData {
   return {};
 }
@@ -244,6 +378,9 @@ async function buildPayload(
     case 'student_profile':     return buildStudentProfilePayload(scopeId, schoolId);
     case 'lrc_usage':           return buildLrcUsagePayload(schoolId, date);
     case 'health_trend':        return buildHealthTrendPayload(schoolId, date);
+    case 'class_report':        return buildClassReportPayload(schoolId, scopeId);
+    case 'behavior_pattern':    return buildBehaviorPatternPayload(schoolId, date);
+    case 'quality_summary':     return buildQualitySummaryPayload(schoolId, date);
     default:                    return buildEmptyPayload();
   }
 }
@@ -376,10 +513,10 @@ export async function generateInsight(
   const roleTarget = persona.role as AIRoleTarget;
   const schoolId   = persona.schoolId;
 
-  // فشل صريح وصادق عند غياب مفتاح Claude — لا توليد وهمي. رسالة تكشف السبب الحقيقي (إعداد بيئة)
-  // بدل الخطأ العام "فشل توليد الرؤية من Claude API" الذي يُوهم بانقطاع الخدمة.
+  // غياب المفتاح: رسالة آمنة موحّدة للمستخدم + سبب تقني في سجلّ الخادم فقط (لا كشف للمزوّد/المفتاح).
   if (!process.env.ANTHROPIC_API_KEY) {
-    return { ok: false, error: 'طبقة الذكاء غير مُفعّلة: مفتاح ANTHROPIC_API_KEY غير مضبوط في البيئة.' };
+    console.error('[ai-service] ANTHROPIC_API_KEY غير مضبوط — طبقة الذكاء غير مفعّلة');
+    return { ok: false, error: AI_UNAVAILABLE };
   }
 
   // 1. timezone المدرسة → generated_date بتوقيتها
@@ -412,7 +549,8 @@ export async function generateInsight(
     .maybeSingle();
 
   if (tErr || !template) {
-    return { ok: false, error: `لا يوجد قالب نشط لـ ${roleTarget} / ${contextType}` };
+    console.error(`[ai-service] لا يوجد قالب نشط لـ ${roleTarget} / ${contextType}`);
+    return { ok: false, error: AI_UNAVAILABLE };
   }
 
   const tmpl = template as AIPromptTemplate;
@@ -442,7 +580,7 @@ export async function generateInsight(
   const claudeResult  = await callClaudeAPI(rendered, tmpl.max_tokens, MODEL);
 
   if (!claudeResult) {
-    return { ok: false, error: 'فشل توليد الرؤية من Claude API' };
+    return { ok: false, error: AI_UNAVAILABLE };
   }
 
   // 7. UPSERT في ai_insights (يُحدِّث لو الدور + السياق + اليوم موجود مسبقاً)
@@ -472,7 +610,7 @@ export async function generateInsight(
     .select()
     .single();
 
-  if (insErr) return { ok: false, error: insErr.message };
+  if (insErr) { console.error('[ai-service] فشل حفظ الرؤية:', insErr.message); return { ok: false, error: AI_UNAVAILABLE }; }
   return { ok: true, data: saved as AIInsight };
 }
 
@@ -487,9 +625,10 @@ export async function generateInsightSystem(
   scopeId:     string,
   roleTarget:  AIRoleTarget,
 ): Promise<WorkflowResult<AIInsight>> {
-  // فشل صريح وصادق عند غياب مفتاح Claude (نفس قاعدة generateInsight) — لا توليد وهمي في الـ cron.
+  // غياب المفتاح في الـ cron: تسجيل خادمي + رسالة آمنة (لا توليد وهمي، لا كشف للمزوّد/المفتاح).
   if (!process.env.ANTHROPIC_API_KEY) {
-    return { ok: false, error: 'طبقة الذكاء غير مُفعّلة: مفتاح ANTHROPIC_API_KEY غير مضبوط في البيئة.' };
+    console.error('[ai-service:system] ANTHROPIC_API_KEY غير مضبوط — تخطّي توليد الرؤية');
+    return { ok: false, error: AI_UNAVAILABLE };
   }
 
   const { data: school } = await supabaseAdmin
@@ -518,7 +657,8 @@ export async function generateInsightSystem(
     .maybeSingle();
 
   if (tErr || !template) {
-    return { ok: false, error: `لا يوجد قالب نشط لـ ${roleTarget} / ${contextType}` };
+    console.error(`[ai-service] لا يوجد قالب نشط لـ ${roleTarget} / ${contextType}`);
+    return { ok: false, error: AI_UNAVAILABLE };
   }
 
   const tmpl = template as AIPromptTemplate;
@@ -535,7 +675,7 @@ export async function generateInsightSystem(
   const claudeResult = await callClaudeAPI(rendered, tmpl.max_tokens, MODEL);
 
   if (!claudeResult) {
-    return { ok: false, error: 'فشل توليد الرؤية من Claude API' };
+    return { ok: false, error: AI_UNAVAILABLE };
   }
 
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
@@ -564,7 +704,7 @@ export async function generateInsightSystem(
     .select()
     .single();
 
-  if (insErr) return { ok: false, error: insErr.message };
+  if (insErr) { console.error('[ai-service] فشل حفظ الرؤية:', insErr.message); return { ok: false, error: AI_UNAVAILABLE }; }
   return { ok: true, data: saved as AIInsight };
 }
 
