@@ -189,6 +189,68 @@ export async function awardClassroomRewardsAction(input: {
     return { ok: true };
 }
 
+// ─── سجلّ مكافآت/أوسمة الطالب (قراءة فقط من classroom_rewards) ─────────────────
+export type RewardHistoryRow = {
+    id: string;
+    reward_date: string;
+    reward_type: RewardType;
+    label: string;
+    points: number;
+    class_name: string | null;
+    created_by_name: string | null;
+};
+
+export async function getStudentRewardsHistoryAction(
+    studentId: string,
+): Promise<ARData<RewardHistoryRow[]>> {
+    const persona = await getActivePersona();
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
+    if (!studentId) return { ok: false, error: 'الطالب غير محدد' };
+
+    const supabase = await createSupabaseServerClient();
+    // عزل المستأجر: الطالب يجب أن يتبع مدرسة المُستدعي (دفاع عميق فوق RLS)
+    const { data: stu } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', studentId).eq('school_id', persona.schoolId).maybeSingle();
+    if (!stu) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
+    const { data, error } = await supabase
+        .from('classroom_rewards')
+        .select('id, reward_date, reward_type, label, points, created_by, classes(name)')
+        .eq('student_id', studentId)
+        .eq('school_id', persona.schoolId)
+        .order('reward_date', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+    if (error) { console.error('[classroom] rewardsHistory:', error.message); return { ok: false, error: WRITE_FAILED }; }
+
+    const rows = (data ?? []) as unknown as Array<{
+        id: string; reward_date: string; reward_type: string; label: string;
+        points: number; created_by: string | null; classes: { name: string } | null;
+    }>;
+
+    // أسماء المُنشئين (طاقم) — best-effort عبر profiles؛ null إن تعذّر (لا يكسر العرض)
+    const creatorIds = [...new Set(rows.map(r => r.created_by).filter((x): x is string => !!x))];
+    let nameMap: Record<string, string> = {};
+    if (creatorIds.length) {
+        const { data: profs } = await supabase.from('profiles').select('id, full_name').in('id', creatorIds);
+        nameMap = Object.fromEntries((profs ?? []).map(p => [p.id as string, p.full_name as string]));
+    }
+
+    const out: RewardHistoryRow[] = rows.map(r => ({
+        id: r.id,
+        reward_date: r.reward_date,
+        reward_type: r.reward_type as RewardType,
+        label: r.label,
+        points: r.points,
+        class_name: r.classes?.name ?? null,
+        created_by_name: r.created_by ? (nameMap[r.created_by] ?? null) : null,
+    }));
+
+    return { ok: true, data: out };
+}
+
 export async function saveParentNoteAction(
     studentId: string,
     content: string,

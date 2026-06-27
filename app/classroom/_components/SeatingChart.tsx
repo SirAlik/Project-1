@@ -1,6 +1,5 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from 'react';
 import { StudentOption } from "@/lib/types/classroom";
 import { motion } from "framer-motion";
 import { Shield, ArrowLeftRight } from "lucide-react";
@@ -11,7 +10,6 @@ const ROWS = 5;
 interface SeatingChartProps {
     students: StudentOption[];
     seatingMap?: Record<string, { x: number; y: number }>;
-    onUpdateSeating?: Dispatch<SetStateAction<Record<string, { x: number; y: number }>>>;
     studentRoles: Record<string, string>;
     badges: Record<string, string[]>;
     dailyScores: Record<string, number>;

@@ -25,6 +25,7 @@ import { GradebookDrawer } from "../../_components/GradebookDrawer";
 import { SeatingChart } from "../../_components/SeatingChart";
 import { ParentNoteModal } from "../../_components/ParentNoteModal";
 import { BadgesModal } from "../../_components/BadgesModal";
+import { StudentRewardsHistory } from "./StudentRewardsHistory";
 
 interface ClassroomWorkspaceProps {
     classId: string;
@@ -300,6 +301,14 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
                                 </div>
                             )}
 
+                            {state.selectedStudentIds.length === 1 && (
+                                <StudentRewardsHistory
+                                    key={state.selectedStudentIds[0]}
+                                    studentId={state.selectedStudentIds[0]}
+                                    studentName={state.selectedStudentName}
+                                />
+                            )}
+
                             <EventButtons
                                 onAdd={handleAddEvent}
                                 onOpenReferral={() => actions.toggleModal("referral", true)}
@@ -499,7 +508,6 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
                                             <SeatingChart
                                                 students={state.students}
                                                 seatingMap={state.seatingMap}
-                                                onUpdateSeating={actions.setSeatingMap}
                                                 studentRoles={state.studentRoles}
                                                 badges={state.badges}
                                                 dailyScores={state.dailyScores}
