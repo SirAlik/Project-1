@@ -8,6 +8,23 @@ Do NOT treat this codebase as a running system.
 
 ---
 
+## 🧭 حالة المشروع للجلسة القادمة (Next-Session State) — 2026-06-27
+
+> ملخّص الانتقال الكامل: **`docs/audits/CONVERSATION_HANDOFF_SUMMARY.md`** (اقرأه أولاً عند بدء محادثة جديدة). آخر commit: `cd6c6f4` · الفرع `main` · DB حيّة: 1 مدرسة · 0 فصول/طلاب/تكليفات/منهج · **99 ترحيل محلي / 15 متتبَّع / 118 جدول / 314 سياسة** (مُتحقَّق حياً) · advisors 0 ERROR.
+
+**أحدث ما اكتمل:** توزيع المنهج للمعلّم (Sprint 8) · تقدّم المنهج · مكافآت/مقاعد/أدوار الفصل · سجلّ مكافآت الطالب · `/classroom/[classId]` بـclassId حقيقي · رسائل آمنة `toSafeError` على مستوى المنصّة. **التالي المقترح:** Sprint 9 — واجهة متابعة الإدارة للمنهج + إعادة ترتيب الوحدات/الدروس + بيانات اختبار.
+
+**قواعد صارمة إلزامية (المنهج وعموم العمل):**
+- **الإدارة لا تؤلّف المنهج.** الإدارة (`school_admin`/`school_principal`/`academic_vp`) **تُسند** المادة/الفصل عبر `teacher_assignments` و**تتابع** فقط (قراءة). **المعلّم المُسنَد** يؤلّف ويدير «توزيع المنهج» (وحدات/دروس/تواريخ/حالة/ملاحظات) لفصله ومادته. **ممنوع** جعل الإدارة المؤلِّف الافتراضي أو إضافة سياسة كتابة admin على `curriculum_units`/`curriculum_lessons`.
+- **ممنوع نسب تقدّم وهمية.** النسبة دائماً `completed_lessons / total_active_lessons * 100`؛ `total=0` → 0% + حالة فارغة صادقة. لا 20%/40% مُثبَّتة.
+- **ممنوع مكافآت/بيانات/تحليلات/ذكاء/أدلة وهمية** — حالة فارغة صادقة بدل أي رقم مُختلَق.
+- **عزل المستأجر:** `school_id` من `getActivePersona()`/`get_my_school_id()` فقط (لا من العميل). لا `USING(true)` لجداول المستأجر. لا وصول عبر-المدارس.
+- **رسائل آمنة:** لا `error.message`/`serverError`/JSON خام للمستخدم — `toSafeError` + `console.error` خادمي.
+- **العلامة «سِدرة»** دائماً · **«الموجه الطلابي»** دائماً (لا «المرشد الطلابي») · مفتاح الدور `student_counselor` بلا تغيير · مفاتيح الأدوار الـ16 ثابتة.
+- **بعد أي تغيير مهم:** `npm run lint` ثم `npm run build` (هدف **63/63**) ثم `npx tsc --noEmit` ثم `npm test` (**26/26**). أي تغيير DB عبر migration واضح + فحص حيّ + advisors 0 ERROR؛ **ممنوع** `supabase db reset`/`db push` على الحيّة.
+
+---
+
 ## Engineering Mandate
 
 You are operating as a **Senior Software Architect** performing a

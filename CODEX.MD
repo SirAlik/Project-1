@@ -7,6 +7,20 @@ You are reviewing and auditing **سِدرة** (the visible product brand), a mul
 This is not a small feature review.  
 This is a full engineering audit and radical restructuring review.
 
+---
+
+## 🧭 Next-Session Operational State — 2026-06-27
+
+> Full handoff: **`docs/audits/CONVERSATION_HANDOFF_SUMMARY.md`** (read first). Last commit `cd6c6f4` · branch `main` · PRE-LAUNCH (live DB: 1 school · 0 classes/students/assignments/curriculum) · **99 local migrations / 15 tracked / 118 tables / 314 policies** (verified live) · advisors 0 ERROR · build 63/63 · test 26/26.
+
+**Completed (latest):** teacher-authored curriculum distribution (Sprint 8), curriculum progress, classroom rewards/seating/roles, student rewards history, real `/classroom/[classId]`, platform-wide `toSafeError`. **Proposed next:** Sprint 9 — admin curriculum monitoring UI + manual unit/lesson reorder + demo/test data.
+
+**Known risks (current):** (a) no admin monitoring UI for curriculum yet (RLS read is ready); (b) no manual reorder of units/lessons (`sort_order` auto-set on insert); (c) `academic_year_id`/`term_id` not linked to distribution; (d) live browser verification blocked (0 rows, no approved seed); (e) owner actions pending: `CRON_SECRET`, `cron_site_url`, `ANTHROPIC_API_KEY`, Edge Functions deploy; (f) legacy principal-analytics placeholders are dead/unreachable (not user-visible).
+
+**Strict rules:** admin does NOT author curriculum — assigns + monitors only; the assigned teacher authors «توزيع المنهج»; no admin write policy on `curriculum_units`/`curriculum_lessons`. No fake progress percentages (`completed_lessons/total_active_lessons*100`, `total=0`→0% + honest empty). No fake rewards/data/AI/evidence. Tenant isolation via `school_id = get_my_school_id()`; no `USING(true)`; no cross-school access. Safe Arabic errors via `toSafeError` (never raw `error.message`/`serverError`). Brand «سِدرة»; label «الموجه الطلابي» (never «المرشد الطلابي»); role key `student_counselor` unchanged.
+
+**Validation expectations (every important change):** `git diff --check` clean · `npm run lint` 0 · `npm run build` 63/63 · `npx tsc --noEmit` clean · `npm test` 26/26 · security advisors 0 ERROR. DB changes only via a clear migration + live verification; never `supabase db reset`/`db push` on live.
+
 Your role is:
 
 ### Senior Software Architect + Principal Software Engineer + Security-Focused Reviewer

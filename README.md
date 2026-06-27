@@ -42,7 +42,7 @@
 
 ## 🛡️ سبرنتات تحصين ما بعد التوحيد (Post-Unification Hardening — Sprints 1–8)
 
-> بعد UI Unification Sprint 1، نُفِّذت **8 سبرنتات app-code** (2026-06-27 → 06-30). كل سبرنت: `npm run lint` صفر · `npm run build` **63/63** · `tsc` نظيف · `npm test` **26/26**. **بلا** تغيير auth/persona/مفاتيح الأدوار/التبعيات/`.env`. advisors أمنية: **0 ERROR**. التفاصيل الكاملة: [تقرير الإغلاق](docs/audits/REMAINING_ITEMS_CLOSURE_REPORT.md).
+> بعد UI Unification Sprint 1، نُفِّذت **8 سبرنتات app-code** (2026-06-27 → 06-30). كل سبرنت: `npm run lint` صفر · `npm run build` **63/63** · `tsc` نظيف · `npm test` **26/26**. **بلا** تغيير auth/persona/مفاتيح الأدوار/التبعيات/`.env`. advisors أمنية: **0 ERROR**. التفاصيل الكاملة: [تقرير الإغلاق](docs/audits/REMAINING_ITEMS_CLOSURE_REPORT.md) · **ملخّص الانتقال للمحادثة الجديدة:** [Conversation Handoff](docs/audits/CONVERSATION_HANDOFF_SUMMARY.md).
 
 - **Sprint 1 — كتابات حرجة وقت التشغيل:** تحويل `events.type` خادمياً إلى enum القاعدة (`mapToDbEventType`، 7 قيم فقط) · حضور `student_daily_attendance` بـ`term_id` إلزامي · رفض كتابات `class_id=NULL` · إزالة استيراد منصّة وهمي · تأكيد مكتوب لإعادة تعيين الفصول.
 - **Sprint 2 — أمن/تشغيل High (+3 migrations مُطبَّقة حياً):** بوّابة دور المشغّل داخل RPCs الاقتصاد الأربعة + إسقاط التواقيع الأُحاديّة القديمة · حذف كتابة PII من المتصفّح (`HealthSocialModal`) · حصر تحقّق الاستيراد بالمستأجر · `toSafeError` للكتابات عالية الخطر · webhook بصمة fail-closed عبر `biometric_devices` · مسار **`/classroom/[classId]`** بـ`classId` حقيقي + خروج الفصل عبر `classroom_exits`.
