@@ -4,8 +4,8 @@ import { QAObservation, StudentRiskFlag, Intervention, DailyKPI } from "@/lib/ty
 import { addObservationAction } from "@/app/qa/_actions";
 
 type ObsRow = QAObservation & { profiles: { name: string } | null; classes: { name: string } | null };
-type RiskRow = StudentRiskFlag & { students: { name: string } | null };
-type IntRow = Intervention & { students: { name: string } | null };
+type RiskRow = StudentRiskFlag & { student_profiles: { name: string } | null };
+type IntRow = Intervention & { student_profiles: { name: string } | null };
 
 export function useQA() {
     const [loading, setLoading] = useState(false);
@@ -20,8 +20,8 @@ export function useQA() {
         setLoading(true);
         const [obsRes, riskRes, intRes, kpiRes] = await Promise.all([
             supabase.from("qa_observations").select("*, profiles!teacher_id(name), classes(name)").order("date", { ascending: false }),
-            supabase.from("student_risk_flags").select("*, students(name)").order("detected_at", { ascending: false }),
-            supabase.from("interventions").select("*, students(name)").order("start_date", { ascending: false }),
+            supabase.from("student_risk_flags").select("*, student_profiles(name)").order("detected_at", { ascending: false }),
+            supabase.from("interventions").select("*, student_profiles(name)").order("start_date", { ascending: false }),
             supabase.from("qa_kpis_daily").select("*").order("date", { ascending: true }) // Ascending for charts
         ]);
 
@@ -36,14 +36,14 @@ export function useQA() {
         if (riskRes.data) {
             setRisks((riskRes.data as unknown as RiskRow[]).map(r => ({
                 ...r,
-                student_name: r.students?.name
+                student_name: r.student_profiles?.name
             })) as StudentRiskFlag[]);
         }
 
         if (intRes.data) {
             setInterventions((intRes.data as unknown as IntRow[]).map(i => ({
                 ...i,
-                student_name: i.students?.name
+                student_name: i.student_profiles?.name
             })) as Intervention[]);
         }
 

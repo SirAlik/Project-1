@@ -27,7 +27,7 @@ export function AttendanceBoard({ students, attendance, onMark, onRecordExit }: 
     // Filter Logic
     const filteredStudents = students.filter(s => {
         const matchesSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
-            s.student_id.includes(search);
+            (s.student_id ?? "").includes(search);
         const matchesGrade = filter === "all" || s.grade_level === filter;
         return matchesSearch && matchesGrade;
     });

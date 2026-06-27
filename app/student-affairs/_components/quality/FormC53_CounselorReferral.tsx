@@ -18,19 +18,19 @@ export function FormC53_CounselorReferral() {
 
         const { data, error } = await supabase
             .from("attendance_scans")
-            .select("student_id, students(name, class_id, classes(name))")
+            .select("student_id, student_profiles(name, class_id, classes(name))")
             .gte("scan_time", startOfMonth.toISOString());
 
         if (!error && data) {
-            type ScanRow = { student_id: string; students: { name: string; classes: { name: string } | null } | null };
+            type ScanRow = { student_id: string; student_profiles: { name: string; classes: { name: string } | null } | null };
             const counts: Record<string, { count: number; name: string; class: string }> = {};
             (data as unknown as ScanRow[]).forEach((s) => {
                 const id = s.student_id;
                 if (!counts[id]) {
                     counts[id] = {
                         count: 0,
-                        name: s.students?.name ?? "",
-                        class: s.students?.classes?.name ?? ""
+                        name: s.student_profiles?.name ?? "",
+                        class: s.student_profiles?.classes?.name ?? ""
                     };
                 }
                 counts[id].count++;
