@@ -5,6 +5,7 @@ import { getActivePersona }           from '../auth/context-service';
 import { startWorkflow, advanceWorkflow } from '../workflow-service';
 import type { WorkflowResult }        from '../workflow-service';
 import { createGeneratedForm }        from '../quality/generated-forms';
+import { toSafeError }                from '../safe-error';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -99,7 +100,7 @@ export async function getMyMeetings(): Promise<WorkflowResult<MeetingListItem[]>
     .eq('school_id', persona.schoolId)
     .order('scheduled_date', { ascending: false });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[meetings] load', error) };
 
   return { ok: true, data: (data ?? []) as MeetingListItem[] };
 }
@@ -121,7 +122,7 @@ export async function getMeetingInviteeOptions(): Promise<WorkflowResult<Meeting
     .select('id, user_id, role, job_title')
     .eq('school_id', persona.schoolId);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[meetings] load', error) };
   if (!personas?.length) return { ok: true, data: [] };
 
   const userIds = personas.map((p) => p.user_id);
@@ -262,7 +263,7 @@ export async function createMeeting(
     .single();
 
   if (meetErr || !meeting) {
-    return { ok: false, error: `فشل إنشاء الاجتماع: ${meetErr?.message}` };
+    return { ok: false, error: toSafeError('[meetings] createMeeting', meetErr, 'تعذّر إنشاء الاجتماع، يرجى المحاولة لاحقاً') };
   }
 
   // إضافة المدعوِّين
@@ -461,7 +462,7 @@ export async function addNote(
     .select('id')
     .single();
 
-  if (error || !note) return { ok: false, error: `فشل حفظ الملاحظة: ${error?.message}` };
+  if (error || !note) return { ok: false, error: toSafeError('[meetings] addNote', error, 'تعذّر حفظ الملاحظة، يرجى المحاولة لاحقاً') };
 
   return { ok: true, data: { note_id: note.id } };
 }
@@ -601,7 +602,7 @@ export async function signMinutes(
     .eq('persona_id', personaRow.id)
     .eq('school_id', persona.schoolId);
 
-  if (error) return { ok: false, error: `فشل التوقيع: ${error.message}` };
+  if (error) return { ok: false, error: toSafeError('[meetings] signMinutes', error, 'تعذّر التوقيع، يرجى المحاولة لاحقاً') };
 
   // التحقق إذا اكتملت جميع التوقيعات
   const { data: unsigned } = await supabase

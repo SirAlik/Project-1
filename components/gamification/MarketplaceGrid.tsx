@@ -25,7 +25,7 @@ export function MarketplaceGrid() {
 
             if (error) {
                 console.error('Error fetching marketplace items:', error);
-                setError(error.message);
+                setError('تعذّر تحميل المتجر، يرجى المحاولة لاحقاً');
             } else {
                 setItems(data || []);
             }
@@ -105,7 +105,7 @@ export function MarketplaceGrid() {
     }
 
     if (error) {
-        return <div className="text-center py-10 text-red-500">حدث خطأ أثناء تحميل المتجر: {error}</div>;
+        return <div className="text-center py-10 text-red-500">{error}</div>;
     }
 
     if (items.length === 0) {

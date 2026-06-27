@@ -55,7 +55,7 @@ export function QuestTree() {
             setQuests(formattedQuests);
         } catch (err: unknown) {
             console.error('Error fetching quests:', err);
-            setError(err instanceof Error ? err.message : String(err));
+            setError('تعذّر تحميل المهام، يرجى المحاولة لاحقاً');
         } finally {
             setLoading(false);
         }

@@ -53,7 +53,7 @@ export function Locker() {
                 setInventory((data as unknown as InventoryItem[]) || []);
             } catch (err: unknown) {
                 console.error('Error fetching inventory:', err);
-                setError(err instanceof Error ? err.message : String(err));
+                setError('تعذّر تحميل الخزانة، يرجى المحاولة لاحقاً');
             } finally {
                 setLoading(false);
             }

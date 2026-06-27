@@ -77,7 +77,8 @@ export function PortalClient({ personas, userName }: PortalClientProps) {
                 } else if (err.error === 'MISSING_DASHBOARD_MAPPING') {
                     setError("هذا الدور صحيح لكن لا توجد صفحة مرتبطة به في النظام (Dashboard Mapping). راجع إعدادات الأدوار.");
                 } else {
-                    setError(err.message || "فشل تفعيل الدور");
+                    // التفاصيل التقنية مُسجَّلة في console.error أعلاه — رسالة آمنة للمستخدم
+                    setError("تعذّر تفعيل الدور، يرجى المحاولة لاحقاً");
                 }
                 setSwitchingTo(null);
             }

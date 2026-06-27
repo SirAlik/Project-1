@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
 import { startWorkflow }              from '../workflow-service';
 import type { WorkflowResult }        from '../workflow-service';
+import { toSafeError }                from '../safe-error';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Configuration
@@ -207,7 +208,7 @@ export async function recordAttendance(
     .single();
 
   if (error || !log) {
-    return { ok: false, error: `فشل تسجيل الحضور: ${error?.message}` };
+    return { ok: false, error: toSafeError('[hr-attendance] record', error, 'تعذّر تسجيل الحضور، يرجى المحاولة لاحقاً') };
   }
 
   return {
@@ -274,7 +275,7 @@ export async function createViolationTicket(
     .single();
 
   if (ticketErr || !ticket) {
-    return { ok: false, error: `فشل إنشاء التذكرة: ${ticketErr?.message}` };
+    return { ok: false, error: toSafeError('[hr-attendance] ticket', ticketErr, 'تعذّر إنشاء التذكرة، يرجى المحاولة لاحقاً') };
   }
 
   // ربط التذكرة بسجل الحضور
@@ -369,7 +370,7 @@ export async function getAttendanceSummary(
     .eq('log_date', logDate)
     .order('persona_name_snapshot', { ascending: true });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[hr-attendance] list', error) };
 
   const rows = (logs ?? []) as AttendanceLogRow[];
   return {
@@ -410,7 +411,7 @@ export async function getHRTickets(
 
   const { data, error } = await query;
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[hr-attendance] list', error) };
 
   return { ok: true, data: (data ?? []) as HRTicketRow[] };
 }
