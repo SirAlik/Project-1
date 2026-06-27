@@ -20,6 +20,7 @@ interface SentinelFlag {
 export function SentinelDashboard() {
     const [flags, setFlags] = useState<SentinelFlag[]>([]);
     const [loading, setLoading] = useState(true);
+    const [statusMsg, setStatusMsg] = useState<string | null>(null);
     const [stats, setStats] = useState({
         critical: 0,
         high: 0,
@@ -92,12 +93,16 @@ export function SentinelDashboard() {
         try {
             const result = await toggleCircuitBreakerAction();
             if (!result.ok) {
-                alert(`خطأ: ${result.error}`);
+                console.error('[Sentinel] circuit breaker toggle failed:', result.error);
+                setStatusMsg('تعذّر تبديل قاطع الطوارئ، يرجى المحاولة لاحقاً.');
                 return;
             }
-            alert(`Circuit Breaker ${result.is_active ? 'ACTIVATED' : 'DEACTIVATED'}`);
+            setStatusMsg(result.is_active
+                ? 'تم تفعيل قاطع الطوارئ (إيقاف الاقتصاد مؤقتاً).'
+                : 'تم إلغاء تفعيل قاطع الطوارئ (استئناف الاقتصاد).');
         } catch (err) {
             console.error('Failed to toggle circuit breaker', err);
+            setStatusMsg('حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.');
         }
     };
 
@@ -220,6 +225,12 @@ export function SentinelDashboard() {
                         </table>
                     </div>
                 </div>
+
+                {statusMsg && (
+                    <div className="rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-xs font-bold text-foreground" dir="rtl">
+                        {statusMsg}
+                    </div>
+                )}
 
                 {/* Footer Actions */}
                 <div className="flex justify-between items-center text-[10px] font-bold">

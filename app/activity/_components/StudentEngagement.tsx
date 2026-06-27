@@ -245,10 +245,12 @@ function HonorsSection({ honors, students, onAward }: { honors: StudentHonor[]; 
 function TripSection({ trips, consents, classes, onCreate }: { trips: ActivityTrip[]; consents: TripConsent[]; classes: { id: string; name: string }[]; onCreate: (data: CreateTripInput) => void }) {
     const [showModal, setShowModal] = useState(false);
     const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+    const [copiedMsg, setCopiedMsg] = useState(false);
 
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text);
-        alert("📋 تم نسخ الرابط بنجاح");
+        setCopiedMsg(true);
+        setTimeout(() => setCopiedMsg(false), 2000);
     };
 
     return (
@@ -265,6 +267,12 @@ function TripSection({ trips, consents, classes, onCreate }: { trips: ActivityTr
                     <Bus className="w-4 h-4" /> إنشاء رحلة جديدة
                 </button>
             </div>
+
+            {copiedMsg && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700" dir="rtl">
+                    تم نسخ الرابط
+                </div>
+            )}
 
             <div className="space-y-4">
                 {trips.map(trip => {

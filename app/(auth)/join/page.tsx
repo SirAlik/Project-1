@@ -19,6 +19,7 @@ function JoinPageContent() {
     // Form State
     const [password, setPassword] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
     useEffect(() => {
         if (!token) {
@@ -56,6 +57,7 @@ function JoinPageContent() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setSubmitError('');
 
         try {
             const res = await joinSchool({ token: token!, password });
@@ -65,11 +67,13 @@ function JoinPageContent() {
                     router.push('/login?email=' + res.email);
                 }, 3000);
             } else {
-                alert(res.error || 'حدث خطأ غير متوقع');
+                // لا تُعرض رسالة الخادم الخام — رسالة عربية آمنة + سجلّ تقني
+                console.error('[join] joinSchool failed:', res.error);
+                setSubmitError('تعذّر إكمال التسجيل. تأكّد من كلمة المرور وحاول مجدداً.');
             }
         } catch (e) {
             console.error(e);
-            alert('فشل في إكمال التسجيل');
+            setSubmitError('فشل في إكمال التسجيل، يرجى المحاولة لاحقاً.');
         } finally {
             setIsSubmitting(false);
         }
@@ -160,6 +164,12 @@ function JoinPageContent() {
                                 يجب أن تحتوي على حرف كبير ورقم واحد على الأقل
                             </p>
                         </div>
+
+                        {submitError && (
+                            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-600 text-center">
+                                {submitError}
+                            </div>
+                        )}
 
                         <button
                             type="submit"

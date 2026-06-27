@@ -36,6 +36,7 @@ export function TimetableEditor({ slots, teachers }: Props) {
     const [selectedSlot, setSelectedSlot] = useState<TimetableSlot | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
     // Group slots by day/period for easy lookup
     const getSlot = (dayIndex: number, period: number) => {
@@ -49,14 +50,18 @@ export function TimetableEditor({ slots, teachers }: Props) {
 
         try {
             const res = await assignTeacherToSlot({ slotId: selectedSlot.id, teacherId });
-            if (res.serverError) {
-                alert(res.serverError);
+            if (res.serverError || res.validationErrors) {
+                // لا تُسرَّب رسالة الخادم الخام للمستخدم — رسالة عربية آمنة + سجلّ تقني
+                console.error('[TimetableEditor] assign failed:', res.serverError || res.validationErrors);
+                setStatusMsg('تعذّر تعيين المعلم للحصة، يرجى المحاولة لاحقاً.');
             } else {
+                setStatusMsg(null);
                 setSelectedSlot(null);
                 router.refresh(); // Refresh to show new data
             }
-        } catch {
-            alert('حدث خطأ غير متوقع');
+        } catch (err) {
+            console.error('[TimetableEditor] unexpected error:', err);
+            setStatusMsg('حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.');
         } finally {
             setIsSaving(false);
         }
@@ -68,6 +73,12 @@ export function TimetableEditor({ slots, teachers }: Props) {
 
     return (
         <div className="space-y-8">
+            {statusMsg && (
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-400" dir="rtl">
+                    {statusMsg}
+                </div>
+            )}
+
             {/* Grid */}
             <div className="overflow-x-auto pb-4">
                 <div className="min-w-[1000px] grid grid-cols-[100px_repeat(7,1fr)] gap-2">
