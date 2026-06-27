@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import {
     ChevronRight, Users, AlertCircle, Clock,
     BookOpen, GraduationCap, HeartPulse, Eye, CheckCircle, Play, Save,
-    RotateCcw, Grid3X3, LayoutGrid
+    RotateCcw, Grid3X3, LayoutGrid, ArrowLeftRight
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -88,6 +88,67 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
             });
         }, 1000);
     };
+
+    // --- أسطح حفظ المقاعد والأدوار (تُخزَّن في classroom_metadata بـ classId حقيقي) ---
+    const CLASS_ROLES = ['رئيس الفصل', 'نائب الرئيس', 'مسؤول النظام', 'مسؤول السبورة', 'مسؤول التواصل'];
+    const SEAT_COLS = 6;
+    const [arrangeMode, setArrangeMode] = useState(false);
+    const [swapFirst, setSwapFirst] = useState<string | null>(null);
+    const [seatingDirty, setSeatingDirty] = useState(false);
+    const [rolesDirty, setRolesDirty] = useState(false);
+    const [savingLayout, setSavingLayout] = useState(false);
+
+    // يضمن إحداثيات لكل طالب قبل التبديل (يُبنى من الترتيب الحالي إن كان seatingMap فارغاً)
+    const ensureSeatingMap = (): Record<string, { x: number; y: number }> => {
+        const map = { ...state.seatingMap };
+        state.students.forEach((s, i) => {
+            if (!map[s.id]) map[s.id] = { x: i % SEAT_COLS, y: Math.floor(i / SEAT_COLS) };
+        });
+        return map;
+    };
+
+    const handleSeatClick = (id: string) => {
+        if (!arrangeMode) { actions.toggleSelection(id); return; }
+        if (!swapFirst) { setSwapFirst(id); return; }
+        if (swapFirst === id) { setSwapFirst(null); return; }
+        const map = ensureSeatingMap();
+        const a = map[swapFirst];
+        const b = map[id];
+        map[swapFirst] = b;
+        map[id] = a;
+        actions.setSeatingMap(map);
+        setSwapFirst(null);
+        setSeatingDirty(true);
+    };
+
+    const handleSaveSeating = async () => {
+        if (!seatingDirty || savingLayout) return;
+        setSavingLayout(true);
+        const ok = await actions.saveSeatingMap(state.seatingMap);
+        if (ok) setSeatingDirty(false);
+        setSavingLayout(false);
+    };
+
+    const handleAssignRole = (role: string) => {
+        const id = state.selectedStudentIds[0];
+        if (!id) return;
+        const next = { ...state.studentRoles };
+        if (role === '' || next[id] === role) delete next[id]; else next[id] = role;
+        actions.setStudentRoles(next);
+        setRolesDirty(true);
+    };
+
+    const handleSaveRoles = async () => {
+        if (!rolesDirty || savingLayout) return;
+        setSavingLayout(true);
+        const ok = await actions.saveStudentRoles(state.studentRoles);
+        if (ok) setRolesDirty(false);
+        setSavingLayout(false);
+    };
+
+    const selectedRole = state.selectedStudentIds.length === 1
+        ? (state.studentRoles[state.selectedStudentIds[0]] ?? '')
+        : '';
 
     return (
         <main className="min-h-screen text-[var(--text)] p-8 font-sans bg-[var(--bg)] relative overflow-hidden" dir="rtl">
@@ -173,6 +234,22 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
                     {/* Left Column: Events & Stars */}
                     <div className="lg:col-span-4 space-y-8">
                         <Card title="الإجراءات والنجوم" className="overflow-hidden border-stone-200 bg-white/80">
+                            {/* ملخّص مكافآت اليوم — من classroom_rewards الحقيقي فقط */}
+                            <div className="mb-6 grid grid-cols-3 gap-2">
+                                <div className="rounded-2xl border border-stone-200 bg-white/80 p-3 text-center">
+                                    <p className="text-[8px] font-black uppercase tracking-widest text-stone-400">نقاط إيجابية</p>
+                                    <p className="text-lg font-black text-[var(--primary)]">{state.rewardsSummary.totalPoints}</p>
+                                </div>
+                                <div className="rounded-2xl border border-stone-200 bg-white/80 p-3 text-center">
+                                    <p className="text-[8px] font-black uppercase tracking-widest text-stone-400">أوسمة اليوم</p>
+                                    <p className="text-lg font-black text-[var(--accent)]">{state.rewardsSummary.badgeCount}</p>
+                                </div>
+                                <div className="rounded-2xl border border-stone-200 bg-white/80 p-3 text-center">
+                                    <p className="text-[8px] font-black uppercase tracking-widest text-stone-400">طلاب مُكافأون</p>
+                                    <p className="text-lg font-black text-foreground">{state.rewardsSummary.studentsRewarded}</p>
+                                </div>
+                            </div>
+
                             <div className="mb-8 p-6 rounded-2xl bg-white/80 border border-stone-200">
                                 <p className="text-[10px] font-black opacity-40 uppercase tracking-widest mb-3 text-stone-500">الطالب المختار حالياً</p>
                                 <div className="flex items-center gap-4">
@@ -182,6 +259,46 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
                                     <p className="font-black text-xl text-[var(--text)]">{state.selectedStudentName || "لم يتم الاختيار"}</p>
                                 </div>
                             </div>
+
+                            {/* تعيين دور الطالب في الفصل (يُحفظ في classroom_metadata) */}
+                            {state.selectedStudentIds.length === 1 && (
+                                <div className="mb-6 p-4 rounded-2xl bg-white/80 border border-stone-200">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-stone-500">دور الطالب في الفصل</p>
+                                        {rolesDirty && (
+                                            <button
+                                                type="button"
+                                                onClick={handleSaveRoles}
+                                                disabled={savingLayout}
+                                                className="flex items-center gap-1.5 rounded-lg bg-[var(--primary)] px-3 py-1 text-[10px] font-black text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                            >
+                                                <Save className="w-3 h-3" /> {savingLayout ? 'جارٍ الحفظ…' : 'حفظ الأدوار'}
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {CLASS_ROLES.map(r => (
+                                            <button
+                                                key={r}
+                                                type="button"
+                                                onClick={() => handleAssignRole(r)}
+                                                className={`rounded-lg border px-2.5 py-1 text-[10px] font-bold transition-all ${selectedRole === r ? 'border-[var(--accent)] bg-[var(--accent)]/15 text-[var(--accent)]' : 'border-stone-200 bg-stone-100 text-stone-600 hover:border-[var(--accent)]/40'}`}
+                                            >
+                                                {r}
+                                            </button>
+                                        ))}
+                                        {selectedRole && (
+                                            <button
+                                                type="button"
+                                                onClick={() => handleAssignRole('')}
+                                                className="rounded-lg border border-stone-200 bg-stone-100 px-2.5 py-1 text-[10px] font-bold text-stone-500 transition-all hover:text-[var(--danger)]"
+                                            >
+                                                بلا دور
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
 
                             <EventButtons
                                 onAdd={handleAddEvent}
@@ -358,16 +475,40 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
                                             </div>
                                         </div>
                                     ) : (
-                                        <SeatingChart
-                                            students={state.students}
-                                            seatingMap={state.seatingMap}
-                                            onUpdateSeating={actions.setSeatingMap}
-                                            studentRoles={state.studentRoles}
-                                            badges={state.badges}
-                                            dailyScores={state.dailyScores}
-                                            onStudentClick={(id) => actions.toggleSelection(id)}
-                                            selectedStudentIds={state.selectedStudentIds}
-                                        />
+                                        <div className="space-y-3">
+                                            {/* شريط ترتيب المقاعد + حفظ */}
+                                            <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-stone-200 bg-white/70 px-4 py-2.5">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => { setArrangeMode(v => !v); setSwapFirst(null); }}
+                                                    className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-[11px] font-black transition-all ${arrangeMode ? 'bg-[var(--accent)] text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'}`}
+                                                >
+                                                    <ArrowLeftRight className="w-3.5 h-3.5" />
+                                                    {arrangeMode ? 'إنهاء الترتيب' : 'وضع الترتيب'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleSaveSeating}
+                                                    disabled={!seatingDirty || savingLayout}
+                                                    className="flex items-center gap-2 rounded-xl bg-[var(--primary)] px-4 py-1.5 text-[11px] font-black text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                                >
+                                                    <Save className="w-3.5 h-3.5" />
+                                                    {savingLayout ? 'جارٍ الحفظ…' : seatingDirty ? 'حفظ المقاعد' : 'محفوظ'}
+                                                </button>
+                                            </div>
+                                            <SeatingChart
+                                                students={state.students}
+                                                seatingMap={state.seatingMap}
+                                                onUpdateSeating={actions.setSeatingMap}
+                                                studentRoles={state.studentRoles}
+                                                badges={state.badges}
+                                                dailyScores={state.dailyScores}
+                                                onStudentClick={handleSeatClick}
+                                                selectedStudentIds={state.selectedStudentIds}
+                                                arrangeMode={arrangeMode}
+                                                swapFirstId={swapFirst}
+                                            />
+                                        </div>
                                     )}
                                 </div>
                             </Card>

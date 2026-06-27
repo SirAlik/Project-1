@@ -96,6 +96,14 @@ export function useClassroom(classId?: string) {
         return scores;
     }, [events, rewards]);
 
+    // ملخّص مكافآت اليوم — من بيانات classroom_rewards الحقيقية فقط (لا مقاييس وهمية)
+    const rewardsSummary = useMemo(() => {
+        const totalPoints = rewards.reduce((a, r) => a + (r.points || 0), 0);
+        const badgeCount = Object.values(badges).reduce((a, list) => a + list.length, 0);
+        const studentsRewarded = new Set(rewards.map(r => r.student_id)).size;
+        return { totalPoints, badgeCount, studentsRewarded };
+    }, [rewards, badges]);
+
     // Modals
     const [modals, setModals] = useState({
         referral: false,
@@ -623,20 +631,22 @@ export function useClassroom(classId?: string) {
         }
     }, [supabase, classId]);
 
-    async function saveSeatingMap(newMap: Record<string, { x: number; y: number }>) {
+    async function saveSeatingMap(newMap: Record<string, { x: number; y: number }>): Promise<boolean> {
         setSeatingMap(newMap);
-        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return false; }
         const result = await saveSeatingMapAction(classId, newMap);
-        if (!result.ok) setMsg(`⚠️ فشل حفظ الخريطة: ${result.error ?? "خطأ"}`);
-        else setMsg("✅ تم حفظ مخطط الجلوس.");
+        if (!result.ok) { setMsg(`⚠️ ${result.error ?? "تعذّر حفظ مخطط المقاعد"}`); return false; }
+        setMsg("✅ تم حفظ مخطط المقاعد.");
+        return true;
     }
 
-    async function saveStudentRoles(newRoles: Record<string, string>) {
+    async function saveStudentRoles(newRoles: Record<string, string>): Promise<boolean> {
         setStudentRoles(newRoles);
-        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return false; }
         const result = await saveStudentRolesAction(classId, newRoles);
-        if (!result.ok) setMsg(`⚠️ فشل حفظ الأدوار: ${result.error ?? "خطأ"}`);
-        else setMsg("✅ تم تحديث أدوار الطلاب.");
+        if (!result.ok) { setMsg(`⚠️ ${result.error ?? "تعذّر حفظ الأدوار"}`); return false; }
+        setMsg("✅ تم حفظ أدوار الطلاب.");
+        return true;
     }
 
     // --- Effects ---
@@ -658,7 +668,7 @@ export function useClassroom(classId?: string) {
             subject, students, selectedStudentIds, selectedStudentName,
             events, stars, savingStars, autoPick, modals,
             classStarted, attendance, savingAttendance, healthAlerts,
-            dailyScores, lastAction, todayExitCount,
+            dailyScores, rewardsSummary, lastAction, todayExitCount,
             activeExits, gradebookItems, studentRoles, seatingMap, parentNotes, badges,
             picking, pickedStudent, alreadyPicked, pickerType
         },
