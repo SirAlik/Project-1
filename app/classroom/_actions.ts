@@ -126,16 +126,67 @@ export async function undoEventsAction(ids: string[]): Promise<AR> {
     return { ok: true };
 }
 
-// نجوم الحصة مكافأة لا تُمثَّل في enum event_type الحالي ولا يوجد جدول مكافآت صفّي.
-// رفض صادق بدل كتابة قيمة enum خاطئة أو ادّعاء نجاح. تفعيلها يتطلب migration (انظر
-// db/migrations/20260628_classroom_event_types_expansion.sql — غير مُطبَّق).
-export async function saveStarsAction(
-    _stars: { studentId: string; studentName: string }[],
-    _classId?: string,
-): Promise<AR> {
+// ─── مكافآت الفصل الإيجابية (classroom_rewards) ───────────────────────────────
+// النجوم/النقاط الإيجابية/الأوسمة تُخزَّن في جدول مخصّص (لا في enum events التأديبي
+// ولا في اقتصاد الـmetaverse). تحقّق دفاعي: persona + schoolId + دور مشغّل +
+// classId ضمن المدرسة + كل studentId ضمن المدرسة. RLS الحدّ الأخير.
+type RewardType = 'star' | 'positive_point' | 'badge';
+const REWARD_OPERATORS = ['teacher', 'school_admin', 'school_principal', 'activity_leader'];
+
+export async function awardClassroomRewardsAction(input: {
+    classId: string;
+    studentIds: string[];
+    rewardType: RewardType;
+    label: string;
+    points?: number;
+    note?: string;
+}): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
-    return { ok: false, error: 'تسجيل نجوم الحصة غير مفعّل بعد في السجل الرسمي' };
+    if (!REWARD_OPERATORS.includes(persona.role)) return { ok: false, error: 'دورك الحالي لا يسمح بمنح المكافآت' };
+    if (!input.classId || input.classId.trim() === '') return { ok: false, error: CLASS_NOT_LINKED };
+    if (!input.label || input.label.trim() === '') return { ok: false, error: 'نوع المكافأة غير صالح' };
+
+    const ids = [...new Set(input.studentIds.filter(Boolean))];
+    if (ids.length === 0) return { ok: false, error: 'اختر طالبًا أولاً' };
+
+    const supabase = await createSupabaseServerClient();
+    if (!(await classBelongsToSchool(supabase, input.classId, persona.schoolId))) {
+        return { ok: false, error: CLASS_NOT_LINKED };
+    }
+
+    // كل الطلاب يجب أن يتبعوا مدرسة المُستدعي (دفاع عميق فوق RLS)
+    const { data: owned } = await supabase
+        .from('student_profiles').select('id')
+        .eq('school_id', persona.schoolId).in('id', ids);
+    const ownedSet = new Set((owned ?? []).map(r => r.id as string));
+    if (ids.some(id => !ownedSet.has(id))) {
+        return { ok: false, error: 'أحد الطلاب لا ينتمي لهذه المدرسة' };
+    }
+
+    const { data: personaRow } = await supabase
+        .from('user_personas').select('id')
+        .eq('user_id', persona.userId).eq('school_id', persona.schoolId).eq('role', persona.role)
+        .limit(1).maybeSingle();
+
+    const today = new Date().toISOString().split('T')[0];
+    const points = typeof input.points === 'number' ? input.points : 1;
+    const rows = ids.map(studentId => ({
+        school_id: persona.schoolId,
+        class_id: input.classId,
+        student_id: studentId,
+        reward_type: input.rewardType,
+        label: input.label.trim(),
+        points,
+        note: input.note ?? null,
+        created_by: persona.userId,
+        created_by_persona_id: personaRow?.id ?? null,
+        reward_date: today,
+    }));
+
+    const { error } = await supabase.from('classroom_rewards').insert(rows);
+    if (error) { console.error('[classroom] awardRewards:', error.message); return { ok: false, error: WRITE_FAILED }; }
+    return { ok: true };
 }
 
 export async function saveParentNoteAction(

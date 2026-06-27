@@ -70,7 +70,12 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
         });
         setAnimatingIds(nextAnims);
 
-        actions.addEvent(type as EventType, note, isReward ? 1 : -1, isReward ? 'reward' : 'penalty');
+        // السلوك الإيجابي → classroom_rewards (نقطة إيجابية)؛ التأديبي → events
+        if (isReward) {
+            actions.addPositivePoint(type, note || undefined);
+        } else {
+            actions.addEvent(type as EventType, note, -1, 'penalty');
+        }
 
         // Clear animations after 1s
         setTimeout(() => {

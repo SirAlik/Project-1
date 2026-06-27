@@ -6,7 +6,7 @@ import {
     saveAttendanceAction,
     addEventAction,
     undoEventsAction,
-    saveStarsAction,
+    awardClassroomRewardsAction,
     saveParentNoteAction,
     saveSeatingMapAction,
     saveStudentRolesAction,
@@ -48,11 +48,12 @@ export function useClassroom(classId?: string) {
     // --- Phase 2 State ---
     const [activeExits, setActiveExits] = useState<Record<string, { startTime: string; type: "دورة مياه" | "عيادة" | "أخرى"; exitId?: string }>>({});
     const [todayExits, setTodayExits] = useState<{ student_id: string }[]>([]);
+    const [rewards, setRewards] = useState<{ student_id: string; points: number }[]>([]);
     const [gradebookItems, setGradebookItems] = useState<GradebookItem[]>([]);
     const [studentRoles, setStudentRoles] = useState<Record<string, string>>({});
     const [seatingMap, setSeatingMap] = useState<Record<string, { x: number; y: number }>>({});
     const [parentNotes] = useState<ParentNote[]>([]);
-    const [badges] = useState<Record<string, string[]>>({}); // studentId -> badge types (غير مفعّل بعد)
+    const [badges, setBadges] = useState<Record<string, string[]>>({}); // studentId -> أوسمة اليوم (من classroom_rewards)
     const [offlineQueue, setOfflineQueue] = useState<Record<string, unknown>[]>([]);
 
     // Picker State
@@ -70,30 +71,30 @@ export function useClassroom(classId?: string) {
         return counts;
     }, [todayExits]);
 
-    // Daily Scores
+    // Daily Scores: الإيجابي من classroom_rewards (مكافآت حقيقية مخزَّنة)، والسلبي من
+    // أحداث events التأديبية (metadata.app_type لأن type يُخزَّن مُجمَّعاً في "مخالفة").
     const dailyScores = useMemo(() => {
         const scores: Record<string, number> = {};
         const today = new Date().toISOString().split('T')[0];
 
+        // (1) إيجابي: مجموع نقاط المكافآت الصفّية الحقيقية
+        for (const r of rewards) {
+            if (!r.student_id) continue;
+            scores[r.student_id] = (scores[r.student_id] || 0) + (r.points || 0);
+        }
+
+        // (2) سلبي: المخالفات الصفّية من events
+        const negative = ["تأخر عن دخول الحصة", "مقاطعة", "حديث جانبي", "عدم إحضار واجب", "عدم إحضار الأدوات", "نوم في الحصة", "عرقلة سير الحصة", "لم يسمّع القرآن"];
         events.filter(e => e.created_at?.startsWith(today)).forEach(e => {
             if (!e.student_id) return;
-            // المصدر: metadata.app_type (المفهوم الأصلي المحفوظ) لأن type يُخزَّن مُجمَّعاً في enum (مثل "مخالفة").
             const meta = e.metadata as { app_type?: string } | null | undefined;
             const type = (meta?.app_type as string) ?? (e.type as string);
-
-            // Positive actions
-            const positive = ["شارك اليوم", "تفكير إبداعي", "مبادرة/قيادة", "التزام وانضباط", "تميز ملحوظ", "نجم الحصة 1", "نجم الحصة 2", "نجم الحصة 3"];
-            // Negative actions
-            const negative = ["تأخر عن دخول الحصة", "مقاطعة", "حديث جانبي", "عدم إحضار واجب", "عدم إحضار الأدوات", "نوم في الحصة", "عرقلة سير الحصة", "لم يسمّع القرآن"];
-
-            if (positive.includes(type)) {
-                scores[e.student_id] = (scores[e.student_id] || 0) + (e.points_delta || 1);
-            } else if (negative.includes(type)) {
+            if (negative.includes(type)) {
                 scores[e.student_id] = (scores[e.student_id] || 0) - (Math.abs(e.points_delta || 1));
             }
         });
         return scores;
-    }, [events]);
+    }, [events, rewards]);
 
     // Modals
     const [modals, setModals] = useState({
@@ -190,6 +191,30 @@ export function useClassroom(classId?: string) {
             setActiveExits(active);
         } catch (e) {
             console.error("Exits load failed", e);
+        }
+    }, [supabase, classId]);
+
+    // تحميل مكافآت اليوم من classroom_rewards (للنقاط اليومية الإيجابية + أوسمة العرض)
+    const loadRewards = useCallback(async () => {
+        if (!classId) { setRewards([]); setBadges({}); return; }
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const { data } = await supabase
+                .from("classroom_rewards")
+                .select("student_id, points, reward_type, label")
+                .eq("class_id", classId)
+                .eq("reward_date", today);
+            const rows = (data ?? []) as { student_id: string; points: number; reward_type: string; label: string }[];
+            setRewards(rows.map(r => ({ student_id: r.student_id, points: r.points })));
+            const badgeMap: Record<string, string[]> = {};
+            for (const r of rows) {
+                if (r.reward_type === 'badge' && r.student_id) {
+                    (badgeMap[r.student_id] ||= []).push(r.label);
+                }
+            }
+            setBadges(badgeMap);
+        } catch (e) {
+            console.error("Rewards load failed", e);
         }
     }, [supabase, classId]);
 
@@ -358,10 +383,29 @@ export function useClassroom(classId?: string) {
         setTimeout(() => setMsg(""), 5000);
     }
 
-    async function awardBadge(_studentId: string, _badgeType: string) {
-        // الأوسمة مكافأة لا تُمثَّل في enum event_type ولا يوجد جدول مكافآت صفّي — لا ادّعاء نجاح
-        // ولا تخزين محلي وهمي. تفعيلها لاحقاً عبر طبقة gamification (انظر تقرير الإغلاق).
-        setMsg("⚠️ منح الأوسمة غير مفعّل بعد في السجل الرسمي.");
+    async function awardBadge(studentId: string, badgeType: string) {
+        // الأوسمة تُخزَّن الآن في classroom_rewards (reward_type='badge', points=0 افتراضاً)
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
+        if (!studentId) { setMsg("⚠️ اختر طالبًا أولاً."); return; }
+        const result = await awardClassroomRewardsAction({
+            classId, studentIds: [studentId], rewardType: 'badge', label: badgeType, points: 0,
+        });
+        if (!result.ok) setMsg(`⚠️ ${result.error ?? "تعذّر منح الوسام"}`);
+        else { setMsg(`🏅 تم منح وسام «${badgeType}».`); await loadRewards(); }
+    }
+
+    // نقطة سلوك إيجابي (شارك اليوم/تفكير إبداعي/…) → classroom_rewards (positive_point)
+    async function addPositivePoint(label: string, note?: string) {
+        if (selectedStudentIds.length === 0) { setMsg("⚠️ اختر طالبًا أولاً."); return; }
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
+        const result = await awardClassroomRewardsAction({
+            classId, studentIds: selectedStudentIds, rewardType: 'positive_point', label, points: 1, note,
+        });
+        if (!result.ok) { setMsg(`⚠️ ${result.error ?? "تعذّر تسجيل النقطة"}`); return; }
+        setMsg(`✅ تم تسجيل «${label}».`);
+        setSelectedStudentIds([]);
+        await loadRewards();
+        setTimeout(() => setMsg(""), 4000);
     }
 
     async function undoLastAction() {
@@ -518,21 +562,23 @@ export function useClassroom(classId?: string) {
             setMsg("⚠️ اختر 3 نجوم.");
             return;
         }
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
         setSavingStars(true);
 
-        const starsPayload = stars.map(name => {
-            const sObj = students.find(s => s.name === name);
-            return { studentId: sObj?.id ?? '', studentName: name };
-        });
+        const studentIds = stars
+            .map(name => students.find(s => s.name === name)?.id)
+            .filter((id): id is string => !!id);
 
-        const result = await saveStarsAction(starsPayload);
+        const result = await awardClassroomRewardsAction({
+            classId, studentIds, rewardType: 'star', label: 'نجم الحصة', points: 1,
+        });
         setSavingStars(false);
 
-        if (!result.ok) setMsg(`خطأ حفظ النجوم: ${result.error ?? "خطأ"}`);
+        if (!result.ok) setMsg(`⚠️ ${result.error ?? "تعذّر حفظ النجوم"}`);
         else {
-            setMsg("✅ تم حفظ النجوم.");
+            setMsg("✅ تم تسجيل نجوم الحصة.");
             setStars([]);
-            loadEvents();
+            await loadRewards();
         }
     }
 
@@ -600,9 +646,10 @@ export function useClassroom(classId?: string) {
             await loadHealthAlerts();
             await loadEvents();
             await loadExits();
+            await loadRewards();
             await loadPhase2Data();
         });
-    }, [loadStudents, loadHealthAlerts, loadEvents, loadExits, loadPhase2Data]);
+    }, [loadStudents, loadHealthAlerts, loadEvents, loadExits, loadRewards, loadPhase2Data]);
 
 
     return {
@@ -622,7 +669,7 @@ export function useClassroom(classId?: string) {
             undoLastAction,
             toggleModal: (key: keyof typeof modals, val: boolean) => setModals(p => ({ ...p, [key]: val })),
             sendReferral, sendExcuse,
-            toggleStar, saveStars,
+            toggleStar, saveStars, addPositivePoint,
             startClass, toggleAttendance, saveAttendance, updateStudentStatus,
             // Phase 2
             startExit, endExit,
