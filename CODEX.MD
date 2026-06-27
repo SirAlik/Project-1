@@ -491,3 +491,17 @@ Do not wait until the end to report everything. After each stage, give the user 
 
 ### Next recommended work
 **UI Unification Sprint 2 — LRC Shell Migration** (`app/lrc/_components/LrcWorkspace.tsx` → `RoleDashboardShell`), then **Sprint 3 — Student Affairs refactor**, then `school/[id]/dashboard` extraction, then deeper cleanup of legacy `Card`/`KPICard` usage inside child components. **Pending owner action:** runtime `CRON_SECRET` / Vercel / Supabase Edge deployment (`docs/security/CRON_SECRET_RUNTIME_SETUP.md`).
+
+---
+
+## Remaining-Items Closure (2026-06-27) — standing rules
+
+> Closure sprint for the open items confirmed by the cross-document audit against live code/DB. **App-code only** · lint 0 · build 63/63 · tsc clean · tests 25/25 · **no** DB/RLS/migrations/Edge/auth/persona/role-keys/deps/`.env` changes. Full report: `docs/audits/REMAINING_ITEMS_CLOSURE_REPORT.md`.
+
+- **Student-counselor Arabic label** is always **«الموجه الطلابي»** in UI/reports/human comments — never **«المرشد الطلابي»**. The role key `student_counselor` and routes (`/counselor`, `app/counselor`, `useCounselor`, `CounselorWorkbench`) are unchanged (Arabic-label only).
+- **Safe AI message:** any AI failure returns only **«الرؤى الذكية غير مفعّلة حاليًا.»** to the user; never expose the provider name / `ANTHROPIC_API_KEY` / API status to school users — keep details in server `console.error` only. Do not render `model_version` in the UI.
+- **Student relationship:** use `student_profiles(...)` in every embed — never `students(...)` / `.from('students')` (relationship dropped; identifier is `national_id`, FK target is `student_profiles.id`). Null-guard display identifiers.
+- **Counselor writes** go through `app/counselor/_actions.ts` only (`getActivePersona` + server `school_id` + `student_counselor` guard) — no browser writes to `cases`/`parent_reports`/`case_actions`/`counseling_sessions`. `case_actions` uses `actor_id` (not `actor_name/actor_role`); `case_category` enum is `سلوكي/غياب-تأخر/أكاديمي/نفسي/اجتماعي/صحي/أخرى` (coerce, never fabricate).
+- **LRC attendance** is filled from real `student_daily_attendance` (absent/excused excluded); explicit fallback when no data. **LRC→quality_evidence is DB-blocked** (`source_module` CHECK + seeded indicator + QF code) — no fake evidence.
+- **Login cards:** never print a hardcoded password; use a masked "issued by admin / reset" placeholder.
+- **Owner-blocked (ops, not code defects):** `CRON_SECRET`+`cron_site_url` (live placeholders) · `ANTHROPIC_API_KEY` · Edge Function deployment (`list_edge_functions=[]`). · **Intentionally `implemented:false`:** 8 LRC templates + `AL_FALAH_PLANNED` + the three AI contexts (no seed) — awaiting official QF codes, **never invent them**.
