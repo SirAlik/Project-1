@@ -1,6 +1,7 @@
 'use server';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 import { getActivePersona } from '@/lib/auth/context-service';
+import { toSafeError } from '@/lib/safe-error';
 import type { HealthSupply } from '@/lib/types/health';
 
 type AR = { ok: boolean; error?: string };
@@ -17,15 +18,21 @@ export async function addVisitAction(visit: {
     status: 'completed' | 'referred';
 }): Promise<ARData<{ id: string }>> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
+    // عزل المستأجر: الطالب المُشار إليه يجب أن يتبع مدرسة المُستدعي (دفاع عميق فوق RLS)
+    const { data: visitStudent } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', visit.student_id).eq('school_id', persona.schoolId).maybeSingle();
+    if (!visitStudent) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
     const { data, error } = await supabase.from('health_visits').insert([{
         ...visit,
         school_id: persona.schoolId,
     }]).select('id').single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true, data: data as { id: string } };
 }
 
@@ -38,7 +45,7 @@ export async function addReferralAction(referral: {
     notes: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('health_referrals').insert([{
@@ -46,7 +53,7 @@ export async function addReferralAction(referral: {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }
 
@@ -57,7 +64,7 @@ export async function addAwarenessAction(event: {
     description: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('health_awareness').insert([{
@@ -65,13 +72,13 @@ export async function addAwarenessAction(event: {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }
 
 export async function addHygieneLogAction(log: Record<string, unknown>): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('hygiene_logs').insert([{
@@ -79,13 +86,13 @@ export async function addHygieneLogAction(log: Record<string, unknown>): Promise
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }
 
 export async function addCanteenCheckAction(check: Record<string, unknown>): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('canteen_checks').insert([{
@@ -93,7 +100,7 @@ export async function addCanteenCheckAction(check: Record<string, unknown>): Pro
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }
 
@@ -101,7 +108,7 @@ export async function addSupplyItemAction(
     item: Pick<HealthSupply, 'item_name' | 'quantity' | 'category'>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('health_supplies').insert([{
@@ -109,7 +116,7 @@ export async function addSupplyItemAction(
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }
 
@@ -118,7 +125,7 @@ export async function updateSupplyAction(
     updates: Partial<HealthSupply>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('health_supplies')
@@ -127,19 +134,19 @@ export async function updateSupplyAction(
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }
 
 export async function deleteSupplyItemAction(id: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('health_supplies').delete().eq('id', id);
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[health]', error) };
     return { ok: true };
 }

@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { createSafeAction } from '@/lib/safe-action';
 import { supabaseAdmin } from '@/lib/db/supabase-admin';
 import { getActivePersona } from '@/lib/auth/context-service';
+import { toSafeError } from '@/lib/safe-error';
 import type { UserRole } from '@/lib/auth/roles';
 
 // ============================================================
@@ -168,6 +169,12 @@ export async function markAttendanceAction(
 
     const supabase = await createSupabaseServerClient();
 
+    // عزل المستأجر: الطالب يجب أن يتبع مدرسة المُستدعي قبل تسجيل أي حضور (دفاع عميق فوق RLS)
+    const { data: attStudent } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', studentId).eq('school_id', persona.schoolId).maybeSingle();
+    if (!attStudent) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
     // term_id إلزامي (NOT NULL بلا default) — يُحلّ خادمياً من الفصل الدراسي النشط للمدرسة.
     const { data: termRow } = await supabase
         .from('terms')
@@ -226,7 +233,7 @@ export async function markAttendanceAction(
 
 export async function sendToCounselorAction(referralId: string, vpNotes: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('behavioral_referrals')
@@ -239,7 +246,7 @@ export async function sendToCounselorAction(referralId: string, vpNotes: string)
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }
 
@@ -249,7 +256,7 @@ export async function resolveReferralAction(
     counselorNotes?: string,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('behavioral_referrals')
@@ -263,13 +270,13 @@ export async function resolveReferralAction(
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }
 
 export async function escalateReferralAction(referralId: string, reason: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('behavioral_referrals')
@@ -278,7 +285,7 @@ export async function escalateReferralAction(referralId: string, reason: string)
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }
 
@@ -288,9 +295,15 @@ export async function issueAssetAction(
     assetType: string = 'book',
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
+    // عزل المستأجر: الطالب يجب أن يتبع مدرسة المُستدعي قبل تسليم أي عهدة (دفاع عميق فوق RLS)
+    const { data: assetStudent } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', studentId).eq('school_id', persona.schoolId).maybeSingle();
+    if (!assetStudent) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
     const { error } = await supabase.from('student_assets').insert([{
         student_id: studentId,
         asset_name: assetName,
@@ -299,13 +312,13 @@ export async function issueAssetAction(
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }
 
 export async function returnAssetAction(assetId: string, condition: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('student_assets')
@@ -319,7 +332,7 @@ export async function returnAssetAction(assetId: string, condition: string): Pro
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }
 
@@ -328,7 +341,7 @@ export async function updateStudentProfileAction(
     updates: Partial<Omit<StudentProfile, 'id' | 'school_id'>>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('student_profiles')
@@ -337,13 +350,13 @@ export async function updateStudentProfileAction(
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }
 
 export async function signContractAction(contractId: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('behavioral_contracts')
@@ -352,6 +365,6 @@ export async function signContractAction(contractId: string): Promise<AR> {
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[student-affairs]', error) };
     return { ok: true };
 }

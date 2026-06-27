@@ -12,10 +12,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as contextService from '../../lib/auth/context-service';
 
 // ─── مزيف لـ Supabase server client ───────────────────────────────────────────
+// addVisitAction ينفّذ خطوتين:
+//   (1) فحص ملكية الطالب: from('student_profiles').select().eq().eq().maybeSingle()
+//   (2) إدراج الزيارة:    from('health_visits').insert().select().single()
+const ownershipMaybeSingle = vi.fn().mockResolvedValue({ data: { id: 'student-1' }, error: null });
+const makeOwnershipChain = (): Record<string, unknown> => {
+    const chain: Record<string, unknown> = {};
+    chain.eq = vi.fn(() => chain);
+    chain.maybeSingle = ownershipMaybeSingle;
+    return chain;
+};
 const mockSingle = vi.fn().mockResolvedValue({ data: { id: 'visit-uuid-123' }, error: null });
 const mockSelect = vi.fn(() => ({ single: mockSingle }));
 const mockInsert = vi.fn(() => ({ select: mockSelect, error: null }));
-const mockFrom   = vi.fn(() => ({ insert: mockInsert }));
+const mockFrom   = vi.fn(() => ({ insert: mockInsert, select: vi.fn(() => makeOwnershipChain()) }));
 
 vi.mock('../../lib/db/supabase-server', () => ({
     createSupabaseServerClient: vi.fn(() => Promise.resolve({ from: mockFrom })),
@@ -47,10 +57,13 @@ describe('E2E: العيادة الصحية (addVisitAction)', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // فحص الملكية يعيد طالباً صالحاً افتراضياً (يتبع المدرسة) كي يمضي تدفّق الإدراج
+        ownershipMaybeSingle.mockResolvedValue({ data: { id: 'student-1' }, error: null });
         // إعادة ضبط insert ليُعيد select → single صحيح
         const singleMock = vi.fn().mockResolvedValue({ data: { id: 'visit-uuid-123' }, error: null });
         const selectMock = vi.fn(() => ({ single: singleMock }));
         mockInsert.mockImplementation(() => ({ select: selectMock }));
+        mockFrom.mockImplementation(() => ({ insert: mockInsert, select: vi.fn(() => makeOwnershipChain()) }));
     });
 
     it('يرفض الطلب إذا لم تكن هناك persona نشطة', async () => {
@@ -91,7 +104,8 @@ describe('E2E: العيادة الصحية (addVisitAction)', () => {
         const result = await addVisitAction(validVisit);
 
         expect(result.ok).toBe(false);
-        expect(result.error).toBe('constraint violation');
+        // رسالة عربية آمنة موحّدة بدل تسريب رسالة Postgres الخام (toSafeError)
+        expect(result.error).toBe('تعذّر إتمام العملية، يرجى المحاولة لاحقاً');
     });
 
 });

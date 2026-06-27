@@ -1,6 +1,7 @@
 'use server';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 import { getActivePersona } from '@/lib/auth/context-service';
+import { toSafeError } from '@/lib/safe-error';
 import type { BookRow, BookingStatus } from '@/lib/types/lrc';
 
 type AR = { ok: boolean; error?: string };
@@ -10,7 +11,7 @@ export async function addBookAction(
     book: Omit<BookRow, 'id' | 'school_id'>,
 ): Promise<ARData<{ id: string }>> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from('lrc_books').insert([{
@@ -18,7 +19,7 @@ export async function addBookAction(
         school_id: persona.schoolId,
     }]).select('id').single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[lrc]', error) };
     return { ok: true, data: data as { id: string } };
 }
 
@@ -30,7 +31,7 @@ export async function borrowBookAction(input: {
     dueDate: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
 
@@ -58,7 +59,7 @@ export async function borrowBookAction(input: {
         school_id: persona.schoolId,
     }]);
 
-    if (loanErr) return { ok: false, error: loanErr.message };
+    if (loanErr) return { ok: false, error: toSafeError('[lrc]', loanErr) };
 
     // Decrement available copies
     const { error: updateErr } = await supabase
@@ -67,13 +68,13 @@ export async function borrowBookAction(input: {
         .eq('id', input.bookId)
         .eq('school_id', persona.schoolId);
 
-    if (updateErr) return { ok: false, error: updateErr.message };
+    if (updateErr) return { ok: false, error: toSafeError('[lrc]', updateErr) };
     return { ok: true };
 }
 
 export async function returnBookAction(loanId: string, bookId: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
 
@@ -83,7 +84,7 @@ export async function returnBookAction(loanId: string, bookId: string): Promise<
     if (persona.schoolId) loanQuery = loanQuery.eq('school_id', persona.schoolId);
 
     const { error: loanErr } = await loanQuery;
-    if (loanErr) return { ok: false, error: loanErr.message };
+    if (loanErr) return { ok: false, error: toSafeError('[lrc]', loanErr) };
 
     // Increment available copies
     const { data: book } = await supabase
@@ -110,7 +111,7 @@ export async function startClassVisitAction(input: {
     studentIds: { id: string; name: string }[];
 }): Promise<ARData<{ visitId: string }>> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
 
@@ -123,7 +124,7 @@ export async function startClassVisitAction(input: {
         school_id: persona.schoolId,
     }]).select('id').single();
 
-    if (vErr || !visit) return { ok: false, error: vErr?.message ?? 'فشل إنشاء الزيارة' };
+    if (vErr || !visit) return { ok: false, error: vErr ? toSafeError('[lrc]', vErr) : 'فشل إنشاء الزيارة' };
 
     const visitId = (visit as { id: string }).id;
 
@@ -171,7 +172,7 @@ export async function startClassVisitAction(input: {
             };
         });
         const { error: aErr } = await supabase.from('lrc_visit_attendance').insert(attendanceRows);
-        if (aErr) return { ok: false, error: aErr.message };
+        if (aErr) return { ok: false, error: toSafeError('[lrc]', aErr) };
     }
 
     return { ok: true, data: { visitId } };
@@ -185,7 +186,7 @@ export async function requestLrcBookingAction(input: {
     subject: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('lrc_bookings').insert([{
@@ -198,7 +199,7 @@ export async function requestLrcBookingAction(input: {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[lrc]', error) };
     return { ok: true };
 }
 
@@ -207,7 +208,7 @@ export async function updateLrcBookingStatusAction(
     status: BookingStatus,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     // عند الاعتماد: تسجيل وقت الاعتماد (approved_at) لإثبات حدوث الموافقة فعلياً — بيانات حقيقية لا وهمية.
@@ -218,6 +219,6 @@ export async function updateLrcBookingStatusAction(
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[lrc]', error) };
     return { ok: true };
 }

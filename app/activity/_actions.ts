@@ -1,6 +1,7 @@
 'use server';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 import { getActivePersona } from '@/lib/auth/context-service';
+import { toSafeError } from '@/lib/safe-error';
 import type {
     ActivityEvent,
     ActivityClub,
@@ -21,7 +22,7 @@ type FinancialInput = {
 
 export async function addBudgetItemAction(item: FinancialInput): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('activity_financials').insert([{
@@ -31,13 +32,13 @@ export async function addBudgetItemAction(item: FinancialInput): Promise<AR> {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
 export async function addExpenseAction(expense: FinancialInput): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('activity_financials').insert([{
@@ -47,20 +48,20 @@ export async function addExpenseAction(expense: FinancialInput): Promise<AR> {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
 export async function deleteFinancialAction(id: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('activity_financials').delete().eq('id', id);
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -68,7 +69,7 @@ export async function addClubAction(
     club: Pick<ActivityClub, 'name' | 'category' | 'description' | 'location' | 'capacity'>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('activity_clubs').insert([{
@@ -76,7 +77,7 @@ export async function addClubAction(
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -86,7 +87,7 @@ export async function assignTeacherToClubAction(assignment: {
     role: 'supervisor' | 'assistant';
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     // تحقق أن المعلم ينتمي لنفس المدرسة
     const supabase = await createSupabaseServerClient();
@@ -105,7 +106,7 @@ export async function assignTeacherToClubAction(assignment: {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -116,7 +117,7 @@ export async function evaluatePerformanceAction(evaluation: {
     notes: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('club_evaluations').insert([{
@@ -124,7 +125,7 @@ export async function evaluatePerformanceAction(evaluation: {
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -136,15 +137,21 @@ export async function submitWishAction(wish: {
     school_year: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
+    // عزل المستأجر: الطالب المُشار إليه يجب أن يتبع مدرسة المُستدعي (دفاع عميق فوق RLS)
+    const { data: wishStudent } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', wish.student_id).eq('school_id', persona.schoolId).maybeSingle();
+    if (!wishStudent) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
     const { error } = await supabase.from('student_wishes').upsert([{
         ...wish,
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -155,16 +162,22 @@ export async function awardStudentAction(honor: {
     awarded_date: string;
 }): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
+    // عزل المستأجر: الطالب المُشار إليه يجب أن يتبع مدرسة المُستدعي (دفاع عميق فوق RLS)
+    const { data: honorStudent } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', honor.student_id).eq('school_id', persona.schoolId).maybeSingle();
+    if (!honorStudent) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
     const { error } = await supabase.from('student_honors').insert([{
         ...honor,
         awarded_by: persona.userId,
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -176,7 +189,7 @@ export async function createTripAction(trip: {
     cost: number;
 }): Promise<ARData<{ id: string }>> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.from('activity_trips').insert([{
@@ -184,7 +197,7 @@ export async function createTripAction(trip: {
         school_id: persona.schoolId,
     }]).select('id').single();
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
 
     const tripId = (data as { id: string }).id;
 
@@ -214,7 +227,7 @@ export async function scheduleActivityEventAction(
     event: Omit<ActivityEvent, 'id' | 'created_at' | 'participants_count'>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('activity_events').insert([{
@@ -222,7 +235,7 @@ export async function scheduleActivityEventAction(
         school_id: persona.schoolId,
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
@@ -231,26 +244,26 @@ export async function updateActivityEventAction(
     updates: Partial<Omit<ActivityEvent, 'id' | 'created_at'>>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('activity_events').update(updates).eq('id', id);
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
 
 export async function deleteActivityEventAction(id: string): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('activity_events').delete().eq('id', id);
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) return { ok: false, error: toSafeError('[activity]', error) };
     return { ok: true };
 }
