@@ -69,7 +69,7 @@ The following issues are **already resolved**. Do not report them as new finding
 | Background job infrastructure | M76 (2026-06-02): `pg_cron` + `pg_net` enabled. `cron_trigger_daily_feed()` SECURITY DEFINER. Job `daily-analytics-feed` active at `0 0 * * *`. |
 | Analytics cache → UI | All `/principal/analytics/*` hooks read from `daily_kpis` / `class_weekly_summary` / `student_analytics_cache`. No live DB queries for dashboard KPIs. |
 | `/api/cron/daily-feed` | Route exists at `app/api/cron/daily-feed/route.ts`, protected by `Authorization: Bearer <CRON_SECRET>`. |
-| Migration count | `db/migrations/` is the single source of truth (**≈92 local files**). Live Supabase tracking = **9 entries** (cosmetic bookkeeping drift; schema fully materialized, **0 required objects missing**). See `docs/db/MIGRATION_TRACKING_AUDIT.md`. |
+| Migration count | `db/migrations/` is the single source of truth (**≈97 local files**). Live Supabase tracking = **13 entries** (rose from 9 — Sprint 2–3 migrations applied via `apply_migration` are recorded; the rest is cosmetic bookkeeping drift). Schema fully materialized (**116 tables · 306 policies**), **0 required objects missing**. See `docs/db/MIGRATION_TRACKING_AUDIT.md`. |
 | `npm run lint` | Zero errors, zero warnings (ESLint 9.x, phases 1–5 complete). |
 | `npm run build` | 63/63 pages, zero TypeScript errors, zero warnings (current, after UI Unification Sprint 1; older 77/78 counts are historical). |
 | `BulkUploadModal` | Uses Server Action with `school_id` — no direct browser write to DB. |
@@ -317,7 +317,7 @@ The target architecture must follow these principles:
 - No duplicate role systems.
 - No old and new role names coexisting.
 - No duplicate tables serving the same domain.
-- `db/migrations/` is the authoritative database source (≈92 local migration files; 9 tracked live; 0 required objects missing — see `docs/db/MIGRATION_TRACKING_AUDIT.md`).
+- `db/migrations/` is the authoritative database source (≈97 local migration files; 13 tracked live; 116 tables; 0 required objects missing — see `docs/db/MIGRATION_TRACKING_AUDIT.md`).
 
 ### 5. Clean App Architecture
 

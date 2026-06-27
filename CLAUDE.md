@@ -115,7 +115,7 @@ Use the approved dependency baseline unless a documented architectural decision 
 - `lib/` — خدمات مشتركة مثل Supabase client وPBAC وcontext services
 - `lib/auth/` — `pbac.ts` · `roles.ts` · `context-service.ts`
 - `components/` — مكونات React
-- `db/migrations/` — ترحيلات قاعدة البيانات (المصدر الموثوق · ≈92 ملف · 9 متتبَّعة حياً · 0 كائن مطلوب مفقود — راجع `docs/db/MIGRATION_TRACKING_AUDIT.md`)
+- `db/migrations/` — ترحيلات قاعدة البيانات (المصدر الموثوق · ≈97 ملف · 13 متتبَّعة حياً · 116 جدول · 0 كائن مطلوب مفقود — راجع `docs/db/MIGRATION_TRACKING_AUDIT.md`)
 - `components/dashboard/` — مجموعة مكوّنات لوحات الأدوار الموحّدة (UI Unification) · `lib/dashboard/role-dashboard.ts` — إعداد محتوى الأدوار
 - `proxy.ts` — حماية المسارات (تمّت المهاجرة من `middleware.ts` لاصطلاح Next.js 16)
 - `.env.example` — قالب متغيرات البيئة الـ8 المطلوبة للمطورين الجدد

@@ -71,7 +71,7 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260530_academic_structure` | M59: school_stages + periods + terms — UUID FKs replace period INT + term TEXT everywhere |
 | `20260530_guardian_profile_link` | M60: guardian_profile_link — ربط حسابات أولياء الأمور بـ profiles |
 | `20260530_automation_engine` | M61: automation_rules + notification_queue — محرك الأتمتة |
-| `20260530_behavioral_contracts_counselor_sessions` | M62: behavioral_contracts + counselor_sessions — طبقة المرشد الطلابي |
+| `20260530_behavioral_contracts_counselor_sessions` | M62: behavioral_contracts + counselor_sessions — طبقة الموجه الطلابي |
 | `20260530_quality_layer` | M63: quality_indicators + quality_evidence — طبقة الجودة الأساسية |
 | `20260530_timetable_stage_consistency` | M64: timetable_slots.stage_id NOT NULL + classes.stage_id NOT NULL |
 | `20260531_classroom_exits_student_assets` | M65+M66: classroom_exits (GENERATED duration_minutes) + student_assets |
@@ -96,10 +96,15 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260613_quality_template_settings` (M80) | `school_quality_settings` + `school_quality_template_overrides` + RLS (`school_admin`/`system_owner`). إعدادات جودة قابلة للتحرير لكل مستأجر. |
 | `20260613_seed_quality_readiness` (M81) | seed سنة نشطة `2025-2026` + مؤشّر `ATT-001` (auto_fillable+active) لمدرسة الفلاح فقط (idempotent). |
 | `20260613_security_hardening` (M82) | **Security Hardening Sprint:** فهرس dedup فريد `generated_forms (school_id, form_code, source_table, source_record_id)` + REVOKE EXECUTE من PUBLIC/anon/authenticated عن 12 دالة trigger/أداة + سحب منح الكتابة المباشرة عن `transaction_logs`/`student_wallet` (append-only، الكتابة حصراً عبر `rpc_process_transaction`) + فهارس/تحسينات RLS لجدولي 3E-2. مُتتبَّع حياً. راجع `docs/security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md`. |
+| `20260628_classroom_event_types_expansion` (Sprint 1) | **سجلّ قرار — غير مُطبَّق.** مقترح توسعة enum `event_type` لأنواع المكافآت/الخروج؛ **مرفوض** لصالح `classroom_exits` (الخروج) و`classroom_rewards` (المكافآت). لا تغيير enum. |
+| `20260629_drop_legacy_economy_rpc_overloads` (Sprint 2) | **مُطبَّق + متتبَّع حياً.** DROP التواقيع الأُحاديّة القديمة `rpc_purchase_furniture(uuid)` + `rpc_scan_ar_glyph(text)` (غير مستخدمة + معطوبة: تكتب بـ`auth.uid()` بينما الـFK لـ`student_profiles.id` + سطح هجوم). |
+| `20260629_gate_economy_rpcs_to_operators` (Sprint 2) | **مُطبَّق + متتبَّع حياً.** بوّابة دور المشغّل داخل جسم 4 دوال اقتصاد SECURITY DEFINER (`rpc_scan_ar_glyph`/`rpc_purchase_furniture`/`rpc_process_transaction`/`rpc_complete_quest`) — الطلاب roster بلا ربط `auth.uid()` والاقتصاد مُشغَّل من الطاقم؛ يمنع غير المشغّلين من تعديل أي محفظة/مكافأة، مع فحص نطاق المدرسة. |
+| `20260629_biometric_device_registry` (Sprint 2) | **مُطبَّق + متتبَّع حياً.** جدول `biometric_devices` (`device_id` PK → `school_id`) + RLS — webhook البصمة fail-closed: جهاز غير مسجَّل/غير مطابق لـ`school_id`/غير مُفعَّل → 403 (+ مقارنة سرّ ثابتة الزمن في الكود). |
+| `20260630_classroom_rewards` (Sprint 3) | **مُطبَّق + متتبَّع حياً.** جدول `classroom_rewards` (`reward_type` ∈ star/positive_point/badge · عزل `school_id`+`class_id`+`student_id` · `points` · `created_by` · RLS بأدوار المشغّل teacher/admin/principal/activity_leader) — مكافآت الفصل الإيجابية (نجوم/نقاط/أوسمة). |
 
 Migrations are applied **once, in order**. To fix a mistake: write a new migration. Never edit an already-applied migration.
 
-> **تتبّع الترحيلات (واقع 2026-06-13):** ≈**92** ملف ترحيل محلي مقابل **9** إدخالات متتبَّعة في `supabase_migrations.schema_migrations` — انحراف **bookkeeping تجميلي فقط** (المخطط الحيّ مُجسَّد بالكامل: 114 جدول كلها RLS · 303 سياسة · 32 دالة · 27 trigger). **0 كائن مطلوب مفقود.** المصالحة المُوصى بها: **baseline موثّق (الخيار A) ثم repair محدَّد (الخيار B)** — **ممنوع** `supabase db reset`/`db push` على الحيّة. التفاصيل: `docs/db/MIGRATION_TRACKING_AUDIT.md`.
+> **تتبّع الترحيلات (واقع 2026-06-30):** ≈**97** ملف ترحيل محلي مقابل **13** إدخالاً متتبَّعاً في `supabase_migrations.schema_migrations` (ارتفع التتبّع من 9 لأن ترحيلات Sprint 2–3 طُبِّقت عبر أداة `apply_migration` التي تُسجّلها) — يبقى الانحراف **bookkeeping تجميلياً** للترحيلات التاريخية المُطبَّقة بـSQL مباشر. المخطط الحيّ مُجسَّد بالكامل: **116 جدول** كلها RLS · **306 سياسة**. **0 كائن مطلوب مفقود.** المصالحة المُوصى بها: **baseline موثّق (الخيار A) ثم repair محدَّد (الخيار B)** — **ممنوع** `supabase db reset`/`db push` على الحيّة. التفاصيل: `docs/db/MIGRATION_TRACKING_AUDIT.md`.
 
 ---
 
