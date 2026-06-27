@@ -505,3 +505,14 @@ Do not wait until the end to report everything. After each stage, give the user 
 - **LRC attendance** is filled from real `student_daily_attendance` (absent/excused excluded); explicit fallback when no data. **LRC→quality_evidence is DB-blocked** (`source_module` CHECK + seeded indicator + QF code) — no fake evidence.
 - **Login cards:** never print a hardcoded password; use a masked "issued by admin / reset" placeholder.
 - **Owner-blocked (ops, not code defects):** `CRON_SECRET`+`cron_site_url` (live placeholders) · `ANTHROPIC_API_KEY` · Edge Function deployment (`list_edge_functions=[]`). · **Intentionally `implemented:false`:** 8 LRC templates + `AL_FALAH_PLANNED` + the three AI contexts (no seed) — awaiting official QF codes, **never invent them**.
+
+---
+
+## Sprint 1 — Critical write fixes (2026-06-28) — standing rules
+
+> Fixes for writes that failed / hid failure / faked success. App-code only + one **un-applied** migration. lint 0 · build 63/63 · tsc clean · test 26/26. Details: `docs/audits/REMAINING_ITEMS_CLOSURE_REPORT.md`.
+
+- **Classroom event types:** `events.type` is enum `event_type` with **7 values only** (`غياب·استئذان·تحويل إلى وكيل شؤون الطلاب·مخالفة·تأخر·زيارة عيادة·زيارة مصادر تعلم`). Never insert any other value — map server-side via `mapToDbEventType` in `lib/types/classroom.ts` (single source). Unrepresentable types (rewards/stars/badges/restroom) are **honestly rejected**, not inserted. Never mask a server rejection as an offline save — offline is for network `catch` only.
+- **`student_daily_attendance`:** `term_id` is mandatory — resolve it server-side from the active term; `onConflict:'student_id,attendance_date,school_id'`. Never spread unknown `...metadata` into the insert.
+- **`classroom_metadata`:** `class_id` is UNIQUE and effectively required — use `onConflict:'class_id'` and reject empty `classId`; never write `class_id=NULL`. (`useClassroom` has no `class_id` yet → seating/roles/exit saves are honestly disabled until a class is wired.)
+- **No success-faking buttons:** no `alert('محاكاة')`, no `console.log` of sensitive data; an unready path shows «هذه العملية غير مفعّلة بعد». Destructive actions (class reset) require a typed confirmation + result feedback. Never surface raw `error.message`/`JSON.stringify` to users in the fixed flows — safe Arabic message + server `console.error`.
