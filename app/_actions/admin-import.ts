@@ -112,24 +112,57 @@ const CHUNK_SIZE = 50; // Process imports in batches of 50
 export const validateImportData = createSafeAction({
     schema: validateImportSchema,
     allowedRoles: UPLOAD_ROLES,
-    requiresSchoolContext: false,
+    // عزل المستأجر: نُلزِم سياق المدرسة كي يُحصَر فحص وجود البريد على مدرسة المُستدعي
+    // (school_admin). بدون ذلك يصبح الإجراء أوراكل يكشف وجود أي بريد على المنصّة كلها.
+    requiresSchoolContext: true,
 
-    async handler(input): Promise<ValidationRowResult[]> {
+    async handler(input, ctx): Promise<ValidationRowResult[]> {
         const results: ValidationRowResult[] = [];
 
-        // 1. Batch fetch all existing emails (O(1) lookup setup)
+        // 1. Batch fetch existing emails — scoped to the active school for non-owners.
         const emails = input.entries.map(e => e.row.email).filter(Boolean);
-        const { data: existingProfiles, error: fetchError } = await supabaseAdmin
-            .from('profiles')
-            .select('email')
-            .in('email', emails);
+        const existingEmailSet = new Set<string>();
 
-        if (fetchError) {
-            console.error('[validateImportData] Error fetching profiles:', fetchError);
-            throw new Error('فشل في جلب البيانات من قاعدة البيانات');
+        if (emails.length > 0) {
+            const { data: existingProfiles, error: fetchError } = await supabaseAdmin
+                .from('profiles')
+                .select('id, email')
+                .in('email', emails);
+
+            if (fetchError) {
+                console.error('[validateImportData] Error fetching profiles:', fetchError);
+                throw new Error('فشل في جلب البيانات من قاعدة البيانات');
+            }
+
+            if (ctx.user.isSystemOwner) {
+                // مالك المنصّة: لا حدّ مستأجر — فحص عالمي مسموح صراحةً.
+                existingProfiles?.forEach(p => { if (p.email) existingEmailSet.add(p.email); });
+            } else {
+                // school_admin: يُعدّ البريد «موجوداً» فقط إذا كان للمستخدم persona في مدرسته.
+                // البريد الموجود في مدرسة أخرى يظهر كـ«جديد» (لا تسريب وجود عابر للمستأجر).
+                const idToEmail = new Map<string, string>();
+                existingProfiles?.forEach(p => { if (p.email) idToEmail.set(p.id, p.email); });
+                const ids = [...idToEmail.keys()];
+
+                if (ids.length > 0) {
+                    const { data: personas, error: personaError } = await supabaseAdmin
+                        .from('user_personas')
+                        .select('user_id')
+                        .eq('school_id', ctx.user.schoolId)
+                        .in('user_id', ids);
+
+                    if (personaError) {
+                        console.error('[validateImportData] Error scoping personas:', personaError);
+                        throw new Error('فشل في جلب البيانات من قاعدة البيانات');
+                    }
+
+                    personas?.forEach(pp => {
+                        const email = idToEmail.get(pp.user_id);
+                        if (email) existingEmailSet.add(email);
+                    });
+                }
+            }
         }
-
-        const existingEmailSet = new Set(existingProfiles?.map(p => p.email) || []);
 
         // 2. Validate each entry
         for (const entry of input.entries) {
