@@ -150,3 +150,44 @@
 - الأحداث الإيجابية الصفّية (شارك اليوم…) بلا مسار تخزين → محجوبة بصدق (UNSUPPORTED_EVENT) حتى طبقة gamification.
 - نشر/تسجيل `biometric_devices` + ضبط `BIOMETRIC_WEBHOOK_SECRET` = إجراء مالك (حتى ذلك الحين الـwebhook fail-closed لكل الأجهزة).
 - `rpc_process_transaction`/`rpc_complete_quest` ما زالتا تكتبان `student_wallet`/`transaction_logs` مباشرةً داخل الجسم (SECURITY DEFINER) بدل التوحيد عبر مسار واحد — مقبول معمارياً، توحيد مستقبلي اختياري.
+
+---
+
+# ملحق: Sprint 3 — أخطاء المكوّنات الآمنة + تصميم مكافآت الفصل (2026-06-30)
+
+**الحالة:** نجح. app-code + **1 migration مُطبَّق على DB الحية**. `lint` صفر · `build` 63/63 · `tsc` نظيف · `test` 26/26 · `git diff --check` نظيف.
+
+## (Phase 1) المكوّنات التي كانت تُسرّب `alert()`/أخطاء خام
+| المكوّن | قبل | بعد |
+|---|---|---|
+| `components/coordinator/TimetableEditor.tsx` | `alert(res.serverError)` + `alert('حدث خطأ غير متوقع')` | حالة `statusMsg` inline + رسالة عربية آمنة + `console.error` |
+| `app/principal/analytics/_components/SentinelDashboard.tsx` | `alert(\`خطأ: ${result.error}\`)` + `alert('Circuit Breaker ...')` إنجليزية | حالة `statusMsg` inline عربية + `console.error` |
+| `app/(auth)/join/page.tsx` | `alert(res.error)` + `alert('فشل في إكمال التسجيل')` | حالة `submitError` inline عربية + `console.error` |
+| `app/activity/_components/StudentEngagement.tsx` | `alert("تم نسخ الرابط")` | مؤشّر «تم النسخ» عابر (2 ثانية) |
+
+**النتيجة:** صفر `alert()` مكشوف للمستخدم في app/components/lib؛ صفر `serverError`/`error.message` خام في الواجهة.
+
+## (Phase 2) قرار تصميم النجوم/الأوسمة/النقاط الإيجابية
+- فحص أثبت **عدم وجود** جدول مكافآت/أوسمة/نقاط؛ مكوّنات `components/gamification/**` كلّها اقتصاد metaverse منفصل.
+- **القرار: Option B — جدول مخصّص `classroom_rewards`.** السبب: المكافآت الصفّية الإيجابية نطاق مستقلّ — لا تُحشَر في enum `events` التأديبي (تزوير دلالي) ولا تُقرَن باقتصاد الـmetaverse (قيود/circuit-breaker/salt غير معنيّة).
+
+## (Phase 3) التنفيذ — النجوم/الأوسمة تُحفظ الآن
+- migration: `db/migrations/20260630_classroom_rewards.sql` — **مُطبَّق حياً ومتحقَّق** (جدول + 3 فهارس + RLS: insert/select/delete بأدوار مناسبة).
+  - ماذا يفعل: تخزين مكافأة صفّية (`reward_type` ∈ star/positive_point/badge، `label` نصّ حرّ، `points`، عزل مستأجر كامل `school_id`+`class_id`+`student_id`، `created_by`/`created_by_persona_id`، `reward_date`/`created_at`).
+  - **طُبّق على Supabase الحي؟** نعم — الحلّ المعماري النظيف لتفعيل ميزة محجوبة (PRE-LAUNCH، لا بيانات). **التراجع:** `DROP TABLE public.classroom_rewards CASCADE;`.
+- `awardClassroomRewardsAction` (خادمي): تحقّق persona + schoolId + دور مشغّل + classId-في-المدرسة + كل studentId-في-المدرسة + label؛ رسالة عربية آمنة. UI: StarSelector→star · أزرار السلوك الإيجابي→positive_point · BadgesModal→badge. حُذفت `saveStarsAction` المحجوبة.
+
+## (Phase 4) النقاط اليومية
+- `dailyScores`: الإيجابي = Σ `classroom_rewards.points` (اليوم/الفصل)؛ السلبي = مخالفات `events` عبر `metadata.app_type`. لا اعتماد على enum إيجابي قديم، لا عدّ مزدوج، لا عدّ لمكافآت غير مخزَّنة. أوسمة مخطّط المقاعد تُحمَّل من `classroom_rewards` الحقيقي.
+
+## هل النجوم/الأوسمة تُحفظ أم محجوبة؟
+**تُحفظ فعلاً الآن** عبر `classroom_rewards` — لا حالة محجوبة متبقية، لا ادّعاء نجاح، لا أوسمة وهمية، لا قيمة enum مُختلَقة.
+
+## الملفات المتغيّرة
+**جديد (1):** `db/migrations/20260630_classroom_rewards.sql`.
+**مُعدَّل:** `app/classroom/_actions.ts` · `app/classroom/_hooks/useClassroom.ts` · `app/classroom/[classId]/_components/ClassroomWorkspace.tsx` · `components/coordinator/TimetableEditor.tsx` · `app/principal/analytics/_components/SentinelDashboard.tsx` · `app/(auth)/join/page.tsx` · `app/activity/_components/StudentEngagement.tsx` · `CLAUDE.md` · `CODEX.MD` · هذا التقرير.
+
+## مخاطر متبقية
+- حفظ مخطّط المقاعد يعمل خادمياً لكن بلا زرّ حفظ صريح في الواجهة (السحب محلي فقط) — تعليق `SeatingChart` صادق.
+- `app/layout.tsx` يذكر `Antigravity` كتاريخ داخلي لمكوّنات محذوفة (ليس علامة مرئية).
+- بعض المسارات تُظهر `serverError` inline (رسائل safe-action، قد تكون خاماً لأخطاء handler) — نمط أوسع خارج نطاق Sprint 3.
