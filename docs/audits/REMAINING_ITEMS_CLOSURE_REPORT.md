@@ -310,5 +310,38 @@
 **توثيق:** `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md` (جديد) · `CLAUDE.md` · `CODEX.MD` · `README.md` · `db/README.md` · هذا التقرير.
 
 ## مخاطر متبقية
-- سطح تحليلات المدير القديم (`app/principal/analytics/teachers/*`) يحوي placeholders ميتة (سلاسل ثابتة + spinner دائم) — يُنظَّف/يُربَط مع Sprint 7؛ غير مرئي للمستخدم حالياً.
+- سطح تحليلات المدير القديم (`app/principal/analytics/teachers/*`) يحوي placeholders ميتة (سلاسل ثابتة + spinner دائم) — يُنظَّف/يُربَط مع Sprint 7؛ غير مرئي للمستخدم حالياً. **(تقدّم المنهج نُفِّذ في Sprint 7.)**
 - إجراءات مالك تشغيلية تبقى مفتوحة (لا عيب كود): `CRON_SECRET` · `cron_site_url` · `ANTHROPIC_API_KEY` · نشر Edge Functions · بيانات اختبار للتحقّق الحيّ بالمتصفّح.
+
+---
+
+# Sprint 7 — تقدّم المنهج للمعلّم (2026-06-27)
+
+> تنفيذ ميزة حقيقية لتقدّم المنهج داخل `/classroom/[classId]`. **app-code + 1 migration مُطبَّق حياً** (`20260701_curriculum_progress.sql`). lint صفر · build 63/63 · tsc نظيف · test 26/26 · advisors **0 ERROR**. **بلا** لمس auth/persona/مفاتيح الأدوار/التبعيات/`.env`. التفاصيل: `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md`.
+
+## الجداول (Phase 2 — مُطبَّقة حياً)
+`curriculum_units` · `curriculum_lessons` · `class_curriculum_progress` (UNIQUE(class_id,lesson_id)) + دالة `is_assigned_class_teacher(uuid)` SECURITY DEFINER. كلها tenant-scoped (`school_id NOT NULL`) + RLS مفعّلة + **لا `USING(true)`** (مُتحقَّق حياً). 119 جدول / 318 سياسة / 14 ترحيل متتبَّع.
+
+## RLS وعزل المستأجر (Phase 2)
+`school_id = get_my_school_id()` (تقرأ مدرسة التوكن) على كل صف → عبر-المدارس مستحيل. تأليف المنهج: admin/principal/academic_vp؛ تقدّم الفصل: المعلّم المُسنَد فقط (`is_assigned_class_teacher`) + إدارة المدرسة؛ system_owner قراءة. تحقّق حيّ: helper=false لفصل غير مُسنَد (fail-closed) · `get_my_school_id` تُعيد مدرسة التوكن.
+
+## الإجراءات (Phase 3)
+`app/classroom/[classId]/_actions.ts`: `getClassCurriculumAction` · `setLessonProgressAction` — `school_id` خادمي · تحقّق الفصل/الدرس في المدرسة + صفّ الدرس=صفّ الفصل + تكليف المعلّم (فصل+مادة) · upsert `onConflict:'class_id,lesson_id'` · رسائل عربية آمنة.
+
+## واجهة المعلّم (Phase 4)
+`CurriculumProgress.tsx` في `/classroom/[classId]`: قسم «تقدّم المنهج» · شريط نسبة حقيقي (`completedLessons/totalLessons*100`) · «تم إنجاز X من Y درسًا» · وحدات/دروس بحالة (لم يبدأ/قيد التنفيذ/مكتمل) يُحدّثها المعلّم · حالة فارغة «لم يتم إعداد خطة المنهج لهذا الفصل بعد.» · **لا نسبة وهمية** (`total=0` → 0%).
+
+## تنظيف placeholders المدير (Phase 5)
+حقول المنهج في تحليلات المدير بقيت فارغة (لا تجميع بعد)؛ استُبدلت الملاحظة المضلّلة بحالة فارغة صادقة تشير لميزة الفصل + وُسمت الحقول كغير-مربوطة. لا نسبة مُختلَقة متبقية.
+
+## بيانات التجربة (Phase 6)
+لا seed/demo معتمد · **لم تُزرع بيانات حيّة**. قائمة البيانات المطلوبة (مدرسة·مادة·فصل·تكليف·طلاب·وحدات·دروس·صفوف تقدّم) في `CURRICULUM_PROGRESS_FEATURE_AUDIT.md` (Phase 6).
+
+## الملفات المتغيّرة
+**جديد (3):** `db/migrations/20260701_curriculum_progress.sql` · `app/classroom/[classId]/_actions.ts` · `app/classroom/[classId]/_components/CurriculumProgress.tsx`.
+**مُعدَّل:** `app/classroom/[classId]/_components/ClassroomWorkspace.tsx` · `app/principal/analytics/teachers/[id]/page.tsx` · `app/principal/analytics/_hooks/{useTeacherAnalytics,useAcademicAnalytics}.ts` · `CLAUDE.md` · `CODEX.MD` · `README.md` · `db/README.md` · `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md` · هذا التقرير.
+
+## مخاطر متبقية (Sprint 7)
+- واجهة تأليف المنهج (إضافة/تحرير الوحدات والدروس) لم تُبنَ — الجداول جاهزة وRLS تسمح بالتأليف لـ admin/principal/academic_vp؛ حتى بناء الواجهة تُملأ البيانات يدوياً/لاحقاً، والحالة الفارغة صادقة.
+- التحقّق الحيّ بالمتصفّح محجوب (PRE-LAUNCH: 0 صفوف، لا seed معتمد).
+- تجميع تقدّم المنهج على مستوى المدير/المعلّم في تحليلات المدير = عمل لاحق (الحقول فارغة الآن).

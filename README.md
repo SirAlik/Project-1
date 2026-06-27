@@ -29,9 +29,9 @@
 
 ## 🚀 حالة المشروع الحالية (Current Status)
 
-* **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — لا مستخدمون حقيقيون ولا بيانات إنتاجية. بعد توحيد اللوحات (UI Unification Sprint 1)، نُفِّذت **6 سبرنتات تحصين لما بعد التوحيد (2026-06-27 → 06-30)** — راجع قسم «سبرنتات تحصين ما بعد التوحيد» أدناه.
+* **المرحلة:** ما قبل الإطلاق (**PRE-LAUNCH**) — لا مستخدمون حقيقيون ولا بيانات إنتاجية. بعد توحيد اللوحات (UI Unification Sprint 1)، نُفِّذت **7 سبرنتات تحصين لما بعد التوحيد (2026-06-27 → 06-30)** — راجع قسم «سبرنتات تحصين ما بعد التوحيد» أدناه.
 * **المستخدمون:** لا يوجد مستخدمون حقيقيون حالياً، ولا توجد بيانات إنتاجية (Production Data) نشطة.
-* **قاعدة البيانات:** المصدر الموثوق هو `db/migrations/` (**≈97 ملف ترحيل محلي**). تتبّع Supabase الحيّ = **13 إدخالاً** (ارتفع من 9 لأن ترحيلات Sprint 2–3 طُبِّقت عبر أداة `apply_migration`؛ يبقى الانحراف **bookkeeping تجميلياً** للترحيلات التاريخية المُطبَّقة بـSQL مباشر). المخطط الحيّ **مُجسَّد بالكامل** (**116 جدول** كلها RLS · 306 سياسة) و**لا كائن مطلوب مفقود**. التفاصيل: [تدقيق تتبّع الترحيلات](docs/db/MIGRATION_TRACKING_AUDIT.md).
+* **قاعدة البيانات:** المصدر الموثوق هو `db/migrations/` (**98 ملف ترحيل محلي**). تتبّع Supabase الحيّ = **14 إدخالاً** (ارتفع لأن ترحيلات Sprint 2–3–7 طُبِّقت عبر أداة `apply_migration`؛ يبقى الانحراف **bookkeeping تجميلياً** للترحيلات التاريخية المُطبَّقة بـSQL مباشر). المخطط الحيّ **مُجسَّد بالكامل** (**119 جدول** كلها RLS · 318 سياسة) و**لا كائن مطلوب مفقود**. التفاصيل: [تدقيق تتبّع الترحيلات](docs/db/MIGRATION_TRACKING_AUDIT.md).
 * **الأمان:** الأساس الأمني **مُحصَّن بشكل كبير** بعد **Security Hardening Sprint** (الترحيل `M82`) — عُولِجت أبرز نتائج **High** من التدقيق السابق (عزل مستأجر `generateInvite` · `generate-qms-pdf` fail-closed · QMS PDF عبر bucket خاص + signed URLs · منع الكتابة المباشرة للـ ledger/المحفظة · REVOKE صلاحيات EXECUTE الزائدة · فهرس dedup لـ `generated_forms`). **متبقٍّ (إجراء مالك):** ضبط `CRON_SECRET` وقت التشغيل (Vercel + Supabase Edge + DB) — حتى ذلك تبقى cron و`generate-qms-pdf` **fail-closed (آمنة)**. التفاصيل: [ملخّص الأمن](docs/security/SECURITY_AND_MIGRATION_AUDIT_SUMMARY.md) · [إعداد CRON](docs/security/CRON_SECRET_RUNTIME_SETUP.md).
 * **طبقة الجودة:** **قوالب الجودة لكل مستأجر (3D)** + **أساس التعبئة التلقائية والأدلة (3E)** مُنجزان. القوالب **tenant-specific** — قوالب «الفلاح» ليست افتراضات سِدرة العالمية. مدرسة الفلاح مُسجَّلة في سجلّ المستأجرين (`school_id = bfe99c43-fa5c-46f4-8ad0-05e12184b55e`). التفاصيل: [قوالب المستأجر](docs/quality/TENANT_QUALITY_TEMPLATES.md).
 * **واجهات المستخدم (UI):** الدستور البصري المعتمد (Phase 3B) مُطبَّق + الصفحة الرئيسية العامة مُعاد تصميمها. **UI Unification Sprint 1 مُنجزة** — مجموعة مكوّنات لوحات موحّدة (`components/dashboard/`) + إعداد محتوى الأدوار (`lib/dashboard/role-dashboard.ts`)؛ وُحِّدت **8 لوحات بالكامل** + **جزئياً** `/principal` و`/classroom`. **التالي: UI Unification Sprint 2 — ترحيل صدفة LRC.** التفاصيل: [تقرير توحيد لوحات الأدوار](docs/ui/ROLE_DASHBOARD_UNIFICATION_REPORT.md).
@@ -40,9 +40,9 @@
 
 ---
 
-## 🛡️ سبرنتات تحصين ما بعد التوحيد (Post-Unification Hardening — Sprints 1–6)
+## 🛡️ سبرنتات تحصين ما بعد التوحيد (Post-Unification Hardening — Sprints 1–7)
 
-> بعد UI Unification Sprint 1، نُفِّذت **6 سبرنتات app-code** (2026-06-27 → 06-30). كل سبرنت: `npm run lint` صفر · `npm run build` **63/63** · `tsc` نظيف · `npm test` **26/26**. **بلا** تغيير auth/persona/مفاتيح الأدوار/التبعيات/`.env`. advisors أمنية: **0 ERROR**. التفاصيل الكاملة: [تقرير الإغلاق](docs/audits/REMAINING_ITEMS_CLOSURE_REPORT.md).
+> بعد UI Unification Sprint 1، نُفِّذت **7 سبرنتات app-code** (2026-06-27 → 06-30). كل سبرنت: `npm run lint` صفر · `npm run build` **63/63** · `tsc` نظيف · `npm test` **26/26**. **بلا** تغيير auth/persona/مفاتيح الأدوار/التبعيات/`.env`. advisors أمنية: **0 ERROR**. التفاصيل الكاملة: [تقرير الإغلاق](docs/audits/REMAINING_ITEMS_CLOSURE_REPORT.md).
 
 - **Sprint 1 — كتابات حرجة وقت التشغيل:** تحويل `events.type` خادمياً إلى enum القاعدة (`mapToDbEventType`، 7 قيم فقط) · حضور `student_daily_attendance` بـ`term_id` إلزامي · رفض كتابات `class_id=NULL` · إزالة استيراد منصّة وهمي · تأكيد مكتوب لإعادة تعيين الفصول.
 - **Sprint 2 — أمن/تشغيل High (+3 migrations مُطبَّقة حياً):** بوّابة دور المشغّل داخل RPCs الاقتصاد الأربعة + إسقاط التواقيع الأُحاديّة القديمة · حذف كتابة PII من المتصفّح (`HealthSocialModal`) · حصر تحقّق الاستيراد بالمستأجر · `toSafeError` للكتابات عالية الخطر · webhook بصمة fail-closed عبر `biometric_devices` · مسار **`/classroom/[classId]`** بـ`classId` حقيقي + خروج الفصل عبر `classroom_exits`.
@@ -50,9 +50,10 @@
 - **Sprint 4 — إتمام أسطح الفصل:** زر «حفظ المقاعد» (تبديل حقيقي بلا drag وهمي) + «حفظ الأدوار» + ملخّص مكافآت · إزالة `serverError` خام من `AddStaffForm`/إنشاء الفصل/قائمة الموظفين.
 - **Sprint 5 — رسائل آمنة + سجلّ المكافآت:** `toSafeError` في خدمات `meeting`/`hr-attendance` + `gamification`/`PortalClient` · سطح «سجل المكافآت والأوسمة» للطالب (قراءة فقط من `classroom_rewards`، حالة فارغة صادقة) · إزالة `onUpdateSeating` غير المستخدم. **التحقّق الحيّ بالمتصفّح محجوب** (DB الحية: 0 فصول/طلاب/تكليفات) — [قائمة التحقّق](docs/audits/CLASSROOM_LIVE_VERIFICATION_CHECKLIST.md).
 - **Sprint 6 — كنس `toSafeError` على مستوى المنصّة + تدقيق تقدّم المنهج:** إغلاق `error.message` الخام المتبقي في الخدمات غير المُسمّاة (`wizard`/`student-attendance`/`staff-evaluation`/`period-attendance`/`notification`/`bulk-upload`/`ai-service`) + `useStudentAffairs` + `_actions/{coordinator-classroom,academic-setup}` (37 موضعاً) · **تدقيق ميزة تقدّم المنهج للمعلّم: غير منفّذة** (لا جداول منهج؛ placeholder ميت في تحليلات المدير فقط — بلا نسبة وهمية) → مقترحة كـ Sprint 7. [تدقيق المنهج](docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md).
+- **Sprint 7 — تقدّم المنهج للمعلّم (+1 migration مُطبَّق حياً):** ميزة حقيقية داخل `/classroom/[classId]`: جداول `curriculum_units`/`curriculum_lessons`/`class_curriculum_progress` (RLS · عزل مستأجر · `is_assigned_class_teacher`) + إجراءات `getClassCurriculumAction`/`setLessonProgressAction` + قسم «تقدّم المنهج» بنسبة حقيقية (`completedLessons/totalLessons*100`، «تم إنجاز X من Y درسًا») يُحدّثه المعلّم للفصول المُسنَدة. حالة فارغة صادقة عند غياب الخطة. تنظيف placeholders تحليلات المدير. [تفاصيل](docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md).
 
-**إجراءات مالك متبقية:** ضبط `CRON_SECRET`/`cron_site_url` · `ANTHROPIC_API_KEY` · نشر Edge Functions · توفير بيانات/اعتماد اختبار للتحقّق الحيّ.
-**مخاطر متبقية:** سطح تحليلات المدير القديم (`app/principal/analytics/teachers/*`) فيه placeholders ميتة (غير مرئية للمستخدم) تُنظَّف مع Sprint 7 · ميزة تقدّم المنهج تحتاج migration ولم تُنفَّذ.
+**إجراءات مالك متبقية:** ضبط `CRON_SECRET`/`cron_site_url` · `ANTHROPIC_API_KEY` · نشر Edge Functions · توفير بيانات/اعتماد اختبار للتحقّق الحيّ (يشمل بيانات منهج: مادة + فصل + تكليف + وحدات + دروس).
+**مخاطر متبقية:** واجهة تأليف المنهج (إضافة وحدات/دروس) لم تُبنَ بعد — حتى ذلك الحين الحالة الفارغة صادقة · التحقّق الحيّ بالمتصفّح محجوب (PRE-LAUNCH: 0 صفوف).
 
 ---
 
@@ -345,7 +346,7 @@ lib/
 └── types/                   — ملفات تعريف الأنواع والـ TypeScript (academic · lrc · health · qa · ai ...)
 
 db/
-└── migrations/              — المصدر الموثوق لمخطط قاعدة البيانات (≈97 ملف ترحيل · 13 متتبَّعة حياً · 116 جدول · 0 كائن مطلوب مفقود — راجع docs/db/MIGRATION_TRACKING_AUDIT.md)
+└── migrations/              — المصدر الموثوق لمخطط قاعدة البيانات (98 ملف ترحيل · 14 متتبَّعة حياً · 119 جدول · 0 كائن مطلوب مفقود — راجع docs/db/MIGRATION_TRACKING_AUDIT.md)
 
 ```
 

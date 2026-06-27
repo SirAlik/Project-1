@@ -1,71 +1,69 @@
-# تدقيق ميزة «تقدّم المنهج / الدرس» للمعلّم — Sidra / School OS
+# ميزة «تقدّم المنهج / الدرس» للمعلّم — Sidra / School OS
 
-**التاريخ:** 2026-06-27 · **السبرنت:** Sprint 6 — Phase 2 · **العلامة المرئية:** «سِدرة»
+**آخر تحديث:** 2026-06-27 (Sprint 7) · **الحالة:** **منفّذة (Implemented)** · **العلامة المرئية:** «سِدرة»
 **المشروع:** PRE-LAUNCH — لا مستخدمون حقيقيون · لا بيانات إنتاجية.
 
-> هذا تدقيق فقط. **لم تُنفَّذ الميزة** ولم يُضَف أي جدول/migration ولا أي نسبة تقدّم وهمية.
+> سجلّ Sprint 6 (التدقيق) أدناه يُحفظ كتاريخ؛ القسم العلوي يعكس تنفيذ Sprint 7.
 
 ---
 
-## السؤال
-هل يستطيع المعلّم حالياً فتح درس/عنصر منهج ورؤية شريط تقدّم يبيّن نسبة إنجاز المنهج (مثلاً 20% · 40%)؟
+## الحالة بعد Sprint 7: منفّذة
+المعلّم يرى داخل `/classroom/[classId]` قسم **«تقدّم المنهج»** بنسبة حقيقية لكل مادة يُدرّسها في الفصل، ويُحدّث حالة كل درس.
 
-## الإجابة المختصرة
-**لا — الميزة غير منفّذة (Missing).** لا يوجد سطح معلّم يعرض تقدّم منهج حقيقياً، ولا جدول بيانات للمنهج/الدروس، ولا أي مسار يتيح للمعلّم تحديث التقدّم. ما هو موجود مجرّد **واجهة placeholder ميتة (غير قابلة للوصول)** في تحليلات المدير، تعرض شريط نسبة لو وُجدت بيانات — لكن البيانات لا تُملأ أبداً.
+### أين تظهر
+- المسار: [/classroom/[classId]](app/classroom/[classId]) (Server Component يحرس الفصل + تكليف المعلّم).
+- المكوّن: [CurriculumProgress.tsx](app/classroom/[classId]/_components/CurriculumProgress.tsx)، مركّب في [ClassroomWorkspace.tsx](app/classroom/[classId]/_components/ClassroomWorkspace.tsx).
+- الإجراءات: [_actions.ts](app/classroom/[classId]/_actions.ts) — `getClassCurriculumAction` · `setLessonProgressAction`.
 
----
+### كيف تُحسب النسبة (حقيقية، لا static)
+`progress_percent = completedLessons / totalActiveLessons * 100` — محسوبة في العميل من عدّ الدروس النشطة المكتملة فعلياً لكل (فصل + مادة). إذا `totalActiveLessons = 0` → النسبة 0 وتُعرض حالة فارغة صادقة. **لا أرقام مُثبَّتة (20%/40%) ولا قيمة نسبة مخزَّنة يدوياً.**
 
-## ما هو موجود فعلاً (placeholder غير حقيقي)
-
-| الموقع | الحالة | لماذا ليس ميزة حقيقية |
+### الجداول (migration `20260701_curriculum_progress.sql`، مُطبَّق حياً)
+| الجدول | الغرض | مفاتيح/قيود |
 |---|---|---|
-| [useTeacherAnalytics.ts](app/principal/analytics/_hooks/useTeacherAnalytics.ts) | يُعرّف النوعين `curriculumProgress: number` و`curriculumDetails: {subject, progress}[]` | لكن `teacherList: []` و`individual: null` دائماً — **لا تُملأ من أي مصدر** |
-| [teachers/[id]/page.tsx:106-126](app/principal/analytics/teachers/[id]/page.tsx) | بطاقة «خط سير المنهج» + شريط نسبة (`%{c.progress}`) | تُرسم من `teacher.curriculumDetails`؛ والصفحة **تتوقّف عند spinner التحميل** لأن `!stats.individual` صحيح دائماً → الشريط **غير قابل للوصول** |
-| [teachers/page.tsx](app/principal/analytics/teachers/page.tsx) | عمود مخطّط «إنجاز المنهج» (`dataKey="curriculumProgress"`) | مصدره `teacherList` الفارغ → لا يرسم شيئاً |
-| [useAcademicAnalytics.ts:34](app/principal/analytics/_hooks/useAcademicAnalytics.ts) | `curriculumCompletion: []` | مصفوفة فارغة دائماً — حالة فارغة صادقة |
-| سلاسل ثابتة في [teachers/[id]/page.tsx:163](app/principal/analytics/teachers/[id]/page.tsx) | «تم تحديث خطة الدرس للفصل ٤/أ» · «+%١٢» | **placeholder ثابت ميت** داخل سجلّ أحداث؛ غير قابل للوصول (الصفحة عالقة على spinner) — يجب حذفه/استبداله عند بناء الميزة |
+| `curriculum_units` | وحدات منهج لمادة عند صفّ | `school_id`+`subject_id`+`grade_level`+`title`+`sort_order`+`is_active` · UNIQUE(school_id,subject_id,grade_level,title) |
+| `curriculum_lessons` | دروس داخل الوحدة | `school_id`+`unit_id`+`title`+`estimated_periods`+`is_active` · UNIQUE(unit_id,title) |
+| `class_curriculum_progress` | حالة إنجاز درس لفصل | `school_id`+`class_id`+`lesson_id`+`status`(not_started/in_progress/completed)+`completed_at`+`updated_by` · **UNIQUE(class_id,lesson_id)** |
++ دالة `is_assigned_class_teacher(uuid)` (SECURITY DEFINER · search_path=public · EXECUTE لـ authenticated) للتحقّق من تكليف المعلّم داخل RLS.
 
-**ملاحظات مهمّة:**
-- كل ما سبق **يخصّ المدير (`school_principal`) في تحليلاته**، وليس سطح المعلّم.
-- سطح المعلّم الفعلي [/classroom/[classId]](app/classroom/[classId]) **لا يحوي أي تقدّم منهج إطلاقاً** (مقاعد · أدوار · حضور · مكافآت · أحداث صفّية فقط).
-- صفحة [/educational](app/educational/page.tsx) حالة فارغة صادقة بلا مؤشرات منهج.
+### RLS وعزل المستأجر
+- كل جدول: `school_id NOT NULL` + RLS مفعّلة + **لا `USING(true)`** (مُتحقَّق حياً).
+- `school_id = get_my_school_id()` على كل صف — و`get_my_school_id()` تقرأ `school_id` من **توكن المُستدعي نفسه** (`auth.jwt()->'app_metadata'->>'school_id'`) → القراءة/الكتابة عبر المدارس **مستحيلة بنيوياً**.
+- تأليف المنهج (units/lessons): `school_admin`/`school_principal`/`academic_vp` لمدرستهم.
+- تقدّم الفصل: المعلّم يقرأ/يُحدّث **فقط الفصول المُسنَدة إليه** (`is_assigned_class_teacher` — يطابق `teacher_assignments.teacher_id = auth.uid()`)؛ الإدارة/الإشراف على مستوى المدرسة؛ `system_owner` قراءة فقط.
+- تحقّق حيّ: `is_assigned_class_teacher` تُعيد `false` لفصل غير مُسنَد (fail-closed)، و`get_my_school_id()` تُعيد مدرسة التوكن.
 
-## مصدر البيانات
-**لا يوجد.** فحص قاعدة البيانات الحيّة (`information_schema`) لجداول تطابق `curriculum/lesson/syllabus/unit/chapter/topic/progress/coverage`:
-- النتيجة الوحيدة: **`quest_progress`** — جدول تقدّم مهام الـ gamification (اقتصاد الميتافيرس)، **لا علاقة له بالمنهج الدراسي**.
-- **لا** `curriculum_units` · **لا** `curriculum_lessons` · **لا** `class_curriculum_progress` · **لا** أي جدول دروس/وحدات/مواضيع.
+### هل يُحدّث المعلّم التقدّم؟
+نعم — أزرار حالة لكل درس (لم يبدأ/قيد التنفيذ/مكتمل) → `setLessonProgressAction`. التحقّق الخادمي: persona + `schoolId` + الفصل/الدرس في المدرسة + صفّ الدرس = صفّ الفصل + (للمعلّم) تكليف (فصل+مادة). RLS الحدّ الأخير.
 
-## هل النسبة حقيقية أم static؟
-**لا حقيقية ولا static مرئية** — لا تُحسب من أي مصدر، ولا تُعرض أصلاً (الواجهة عالقة على التحميل لأن `individual = null`). لا توجد في أي مكان معادلة `completed_lessons / total_lessons * 100`.
+### عند غياب خطة المنهج
+حالة فارغة صادقة: **«لم يتم إعداد خطة المنهج لهذا الفصل بعد.»** (تظهر عندما لا توجد وحدات/دروس نشطة لمواد المعلّم عند صفّ الفصل، أو الصفّ غير محدّد). لا نسبة وهمية.
 
-## هل يستطيع المعلّم تحديث التقدّم؟
-**لا** — لا جدول · لا server action · لا مسار · لا UI.
-
-## النطاق (per class/subject/teacher/school)؟
-**غير منطبق** — لا توجد ميزة لتكون لها حُبيبيّة.
+### تنظيف placeholders تحليلات المدير
+حقول `curriculumProgress`/`curriculumDetails`/`curriculumCompletion` (تحليلات المدير) كانت placeholders ميتة. بقيت فارغة (لا تجميع على مستوى المعلّم بعد)، واستُبدلت ملاحظة «تتوافق مع الخطط المسجلة في Classroom» المضلّلة بحالة فارغة صادقة تشير لميزة الفصل، ووُسمت الحقول كغير-مربوطة. **لا نسبة منهج مُختلَقة متبقية.**
 
 ---
 
-## الخلاصة: غير منفّذة (Missing)
-- لا أساس آمن قائم لبناء سريع وصغير. الميزة تتطلب جداول جديدة + RLS + خدمات + UI معلّم → **ليست تغييراً صغيراً**.
-- **لم تُنفَّذ في Sprint 6** عملاً بقاعدة «لا تُنشئ المخطط إلا إذا كان الأساس آمناً والتنفيذ صغيراً».
+## Phase 6 — سياسة بيانات التجربة (لم تُزرع بيانات حيّة)
+لا آلية seed/demo معتمدة (لا `db/seed`، لا `supabase/seed`، لا npm script). إنشاء بيانات في المدرسة الحيّة الوحيدة = بيانات إنتاجية وهمية (ممنوع). **لم تُدرَج أي بيانات.** التحقّق تمّ عبر build/tsc/lint/test + فحص RLS الحيّ.
 
-## التصميم المقترح (Sprint 7 — مقترح، غير منفَّذ)
-multi-tenant صارم · `school_id NOT NULL` · RLS لكل جدول · بلا نسب وهمية:
+### قائمة البيانات المطلوبة للتحقّق الحيّ بالمتصفّح (تُوسَم demo/test)
+1. **مدرسة اختبار** (`schools`) — أو استخدام المدرسة القائمة في بيئة اختبار.
+2. **مادة** (`subjects`: school_id + name_ar).
+3. **فصل** (`classes`: school_id + grade_level + stage_id + section).
+4. **تكليف معلّم** (`teacher_assignments`: teacher_id = `auth.uid()` للمعلّم + subject_id + class_id + academic_year_id + school_id).
+5. **طلاب** (`student_profiles`: class_id + school_id) — اختياري لعرض القسم (التقدّم لا يعتمد على الطلاب).
+6. **وحدات منهج** (`curriculum_units`: school_id + subject_id + grade_level = صفّ الفصل + title + is_active).
+7. **دروس** (`curriculum_lessons`: school_id + unit_id + title + is_active).
+8. **(للتحقّق من التحديث)** جلسة معلّم مُصادَقة (JWT بدور teacher + school_id) → ضغط أزرار الحالة → صفوف `class_curriculum_progress`.
 
-```
-curriculum_units        (id, school_id, subject_id, stage_id?, name, order_index, total_lessons, created_by, created_at)
-curriculum_lessons      (id, school_id, unit_id, title, order_index, created_by, created_at)
-class_curriculum_progress (id, school_id, class_id, subject_id, teacher_persona_id,
-                           unit_id, lesson_id, status['not_started'|'in_progress'|'completed'],
-                           completed_at, created_at, updated_at)
-```
-- **النسبة من إنجاز حقيقي فقط:** `progress_percent = completed_lessons / total_lessons * 100` (محسوبة، لا مخزَّنة كرقم حرّ يُكتب يدوياً).
-- **tenant-scoped:** `school_id` من `getActivePersona()` خادمياً — لا من العميل.
-- **يحدّثه المعلّم** عبر server action مع تحقّق persona + ملكية الفصل (`teacher_assignments`).
-- **حُبيبيّة:** per (class × subject)، مملوكة لـ `teacher_persona_id`، ضمن `school_id`.
-- يدعم تقارير/PDF مستقبلية عبر طبقتي الجودة (6 التعبئة · 7 النماذج).
-- **تنظيف مصاحب:** إزالة placeholder المنهج الميت من تحليلات المدير (`useTeacherAnalytics`/`teachers[/id]`) أو ربطه بالمصدر الحقيقي.
+### النتائج المتوقَّعة عند توفّر البيانات
+- لا وحدات/دروس → «لم يتم إعداد خطة المنهج لهذا الفصل بعد.»
+- N درسًا، 0 مكتمل → 0% · «تم إنجاز 0 من N درسًا».
+- وضع M دروس «مكتمل» → النسبة = round(M/N*100)% وتتحدّث فوراً.
+- معلّم غير مُسنَد للفصل/المادة → رفض «هذا الفصل/المادة غير مُسنَد إليك» (وRLS يمنع).
 
-## التوصية
-**نعم — يُقترح جعلها Sprint 7** (ميزة قائمة بذاتها بمخطط + RLS + خدمات + سطح معلّم)، وليس تعديلاً صغيراً ضمن سبرنت تنظيف. تحتاج **migration**. حتى تنفيذها: لا تُعرض أي نسبة تقدّم منهج (الحفاظ على قاعدة صدق البيانات).
+---
+
+## (تاريخي) تدقيق Sprint 6 — كانت غير منفّذة
+أكّد Sprint 6: لا ميزة حقيقية · لا جداول منهج (فقط `quest_progress` = gamification) · `curriculumProgress`/`curriculumDetails`/`curriculumCompletion` placeholders ميتة في تحليلات المدير (`individual=null`، صفحة عالقة على spinner) · لا نسبة محسوبة. هذا ما عالجه Sprint 7 أعلاه.
