@@ -19,12 +19,12 @@ export default function SchoolStaffPage() {
     const params = useParams();
     const schoolId = params.id as string;
     const [view, setView] = useState<'list' | 'import'>('list');
+    const [notice, setNotice] = useState<string | null>(null);
 
-    const handleImportReady = (data: Record<string, string>[]) => {
-        console.log("Importing Data:", data);
-        // Here calls server action for upsert
-        alert(`جاري استيراد ${data.length} موظف... (محاكاة)`);
-        setView('list');
+    const handleImportReady = () => {
+        // لا حفظ فعلي ولا ادّعاء نجاح ولا تسجيل بيانات حسّاسة: هذا المسار غير مفعّل بعد.
+        // الاستيراد الحقيقي المربوط بسياق المدرسة الخادمي عبر صفحة التهيئة الرسمية (/platform/setup).
+        setNotice('هذه العملية غير مفعّلة بعد. استخدم صفحة التهيئة الرسمية (/platform/setup) للاستيراد.');
     };
 
     return (
@@ -66,7 +66,12 @@ export default function SchoolStaffPage() {
                         </div>
                     </Card>
                 ) : (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-4">
+                        {notice && (
+                            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 text-sm font-bold">
+                                {notice}
+                            </div>
+                        )}
                         <GlobalImportStudio
                             title="استيراد الهيكل الإداري"
                             description="قم برفع ملف CSV يحتوي على بيانات المدير، الوكلاء، والإداريين."

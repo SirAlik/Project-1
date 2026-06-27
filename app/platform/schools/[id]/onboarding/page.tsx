@@ -44,9 +44,11 @@ export default function SchoolOnboardingPage() {
     const params = useParams();
     const schoolId = params.id as string;
     const [activeTab, setActiveTab] = useState<TabKey>('teachers');
+    const [notice, setNotice] = useState<string | null>(null);
 
-    const handleImportReady = (data: Record<string, string>[]) => {
-        alert(`تم جاهزية ${data.length} سجل من نوع ${TAB_CONFIG[activeTab].label} للحفظ (محاكاة)`);
+    const handleImportReady = () => {
+        // لا حفظ فعلي ولا ادّعاء نجاح: هذا المسار غير مفعّل بعد. الاستيراد الحقيقي عبر /platform/setup.
+        setNotice('هذه العملية غير مفعّلة بعد. استخدم صفحة التهيئة الرسمية (/platform/setup) للاستيراد.');
     };
 
     return (
@@ -80,7 +82,12 @@ export default function SchoolOnboardingPage() {
 
                     {/* Content Area */}
                     <div className="lg:col-span-3">
-                        <div key={activeTab} className="animate-in fade-in slide-in-from-right-4 duration-500">
+                        <div key={activeTab} className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-4">
+                            {notice && (
+                                <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-700 text-sm font-bold">
+                                    {notice}
+                                </div>
+                            )}
                             <GlobalImportStudio
                                 title={`استيراد ${TAB_CONFIG[activeTab].label}`}
                                 description={`رفع بيانات ${TAB_CONFIG[activeTab].label} للمدرسة. تأكد من صحة الملف.`}
