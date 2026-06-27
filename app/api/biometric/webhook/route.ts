@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { timingSafeEqual }           from 'crypto';
 import { supabaseAdmin }             from '@/lib/db/supabase-admin';
+
+// مقارنة سرّ ثابتة الزمن — تمنع timing attacks على الـwebhook secret.
+// عدم تطابق الطول يُعيد false مباشرةً (تسريب طول السرّ فقط — مقبول).
+function safeSecretEqual(a: string, b: string): boolean {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return timingSafeEqual(ab, bb);
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Biometric Device Webhook
@@ -51,7 +61,7 @@ export async function POST(request: NextRequest) {
   }
 
   const incoming = request.headers.get('x-webhook-secret');
-  if (incoming !== secret) {
+  if (!incoming || !safeSecretEqual(incoming, secret)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -82,6 +92,26 @@ export async function POST(request: NextRequest) {
 
   if (validPunches.length === 0) {
     return NextResponse.json({ error: 'No valid punches' }, { status: 400 });
+  }
+
+  // ── 3b. ربط الجهاز بالمدرسة (fail-closed) ────────────────────────────────
+  // الجهاز يجب أن يكون مسجَّلاً في biometric_devices ومطابقاً لـ school_id المُدّعى
+  // ومُفعَّلاً — وإلا يُرفض. يمنع جهازاً من حقن حضور لمدرسة أخرى بتغيير school_id.
+  const { data: device, error: deviceErr } = await supabaseAdmin
+    .from('biometric_devices')
+    .select('school_id, is_active')
+    .eq('device_id', device_id)
+    .maybeSingle();
+
+  if (deviceErr) {
+    console.error('[biometric-webhook] device lookup error:', deviceErr.message);
+    return NextResponse.json({ error: 'Storage error' }, { status: 500 });
+  }
+
+  if (!device || device.is_active !== true || device.school_id !== school_id) {
+    // رسالة واحدة لا تكشف سبب الرفض (غير مسجَّل/غير مطابق/غير مُفعَّل)
+    console.error('[biometric-webhook] rejected unregistered or mismatched device');
+    return NextResponse.json({ error: 'Unknown or unauthorized device' }, { status: 403 });
   }
 
   // ── 4. تخزين في biometric_logs (service role — يتجاوز RLS) ──────────────
