@@ -1,69 +1,72 @@
-# ميزة «تقدّم المنهج / الدرس» للمعلّم — Sidra / School OS
+# ميزة المنهج للمعلّم — توزيع المنهج وتقدّمه — Sidra / School OS
 
-**آخر تحديث:** 2026-06-27 (Sprint 7) · **الحالة:** **منفّذة (Implemented)** · **العلامة المرئية:** «سِدرة»
+**آخر تحديث:** 2026-06-27 (Sprint 8) · **الحالة:** **منفّذة — توزيع المنهج يؤلّفه المعلّم** · **العلامة المرئية:** «سِدرة»
 **المشروع:** PRE-LAUNCH — لا مستخدمون حقيقيون · لا بيانات إنتاجية.
 
-> سجلّ Sprint 6 (التدقيق) أدناه يُحفظ كتاريخ؛ القسم العلوي يعكس تنفيذ Sprint 7.
+> **النموذج الميداني الصحيح:** الإدارة **تُسند** المعلّم للمادة/الفصل · المعلّم **يوزّع** المنهج · الإدارة **تتابع** الإنجاز.
 
 ---
 
-## الحالة بعد Sprint 7: منفّذة
-المعلّم يرى داخل `/classroom/[classId]` قسم **«تقدّم المنهج»** بنسبة حقيقية لكل مادة يُدرّسها في الفصل، ويُحدّث حالة كل درس.
+## الحالة بعد Sprint 8
+داخل **`/classroom/[classId]`** يرى المعلّم المُسنَد قسم **«توزيع المنهج»** يؤلّف فيه الوحدات والدروس (عنوان · تاريخ مخطّط · ترتيب · حالة · ملاحظات) لكل مادة يُدرّسها في الفصل، مع شريط **«تقدّم المنهج»** بنسبة حقيقية. **لا تؤلّف الإدارة منهج المعلّم** — قراءة/متابعة فقط.
+
+### التصحيح مقابل Sprint 7 (الخطأ التصميمي)
+| البند | Sprint 7 (خطأ) | Sprint 8 (مصحّح) |
+|---|---|---|
+| نطاق الوحدة | عالمي `(subject_id + grade_level)` — خطة مشتركة لكل فصول الصف | `(class_id + subject_id)` — توزيع خاص بالفصل |
+| المؤلِّف | الإدارة (`school_admin/principal/academic_vp`) فقط | **المعلّم المُسنَد فقط** |
+| القيد الفريد | `UNIQUE(subject_id, grade_level, title)` يمنع توزيعاً خاصاً لكل فصل | `UNIQUE(class_id, subject_id, title)` — لكل فصل توزيعه |
+| حالة الدرس | جدول منفصل `class_curriculum_progress` | على الدرس مباشرةً (`status`) — الجدول المنفصل **حُذف** |
+| دور الإدارة | تؤلّف | **تتابع فقط (قراءة)** |
 
 ### أين تظهر
-- المسار: [/classroom/[classId]](app/classroom/[classId]) (Server Component يحرس الفصل + تكليف المعلّم).
-- المكوّن: [CurriculumProgress.tsx](app/classroom/[classId]/_components/CurriculumProgress.tsx)، مركّب في [ClassroomWorkspace.tsx](app/classroom/[classId]/_components/ClassroomWorkspace.tsx).
-- الإجراءات: [_actions.ts](app/classroom/[classId]/_actions.ts) — `getClassCurriculumAction` · `setLessonProgressAction`.
+- المسار: `/classroom/[classId]` (Server Component يحرس الفصل + تكليف المعلّم).
+- المكوّن: `app/classroom/[classId]/_components/CurriculumProgress.tsx`.
+- الإجراءات: `app/classroom/[classId]/_actions.ts`.
 
 ### كيف تُحسب النسبة (حقيقية، لا static)
-`progress_percent = completedLessons / totalActiveLessons * 100` — محسوبة في العميل من عدّ الدروس النشطة المكتملة فعلياً لكل (فصل + مادة). إذا `totalActiveLessons = 0` → النسبة 0 وتُعرض حالة فارغة صادقة. **لا أرقام مُثبَّتة (20%/40%) ولا قيمة نسبة مخزَّنة يدوياً.**
+`pct = total > 0 ? Math.round(completedLessons / totalActiveLessons * 100) : 0` — من عدّ الدروس النشطة المكتملة (`status='completed'`) لكل (فصل + مادة). `total = 0` → 0% + حالة فارغة. **لا 20%/40% مُثبَّتة ولا نسبة مخزَّنة.**
 
-### الجداول (migration `20260701_curriculum_progress.sql`، مُطبَّق حياً)
+### الجداول (migration `20260702_curriculum_distribution_correction.sql`، مُطبَّق حياً)
 | الجدول | الغرض | مفاتيح/قيود |
 |---|---|---|
-| `curriculum_units` | وحدات منهج لمادة عند صفّ | `school_id`+`subject_id`+`grade_level`+`title`+`sort_order`+`is_active` · UNIQUE(school_id,subject_id,grade_level,title) |
-| `curriculum_lessons` | دروس داخل الوحدة | `school_id`+`unit_id`+`title`+`estimated_periods`+`is_active` · UNIQUE(unit_id,title) |
-| `class_curriculum_progress` | حالة إنجاز درس لفصل | `school_id`+`class_id`+`lesson_id`+`status`(not_started/in_progress/completed)+`completed_at`+`updated_by` · **UNIQUE(class_id,lesson_id)** |
-+ دالة `is_assigned_class_teacher(uuid)` (SECURITY DEFINER · search_path=public · EXECUTE لـ authenticated) للتحقّق من تكليف المعلّم داخل RLS.
+| `curriculum_units` | وحدة توزيع لفصل+مادة | `school_id`+`class_id`+`subject_id`+`title`+`sort_order`+`is_active`+`created_by` · UNIQUE(class_id,subject_id,title) |
+| `curriculum_lessons` | درس داخل وحدة (يحمل حالته) | `school_id`+`unit_id`+`title`+`planned_date`+`estimated_periods`+`status`+`completed_at`+`notes`+`is_active`+`created_by` · UNIQUE(unit_id,title) |
++ دالتان SECURITY DEFINER (search_path=public · EXECUTE لـ authenticated): `is_assigned_subject_teacher(class_id,subject_id)` · `is_unit_owner_teacher(unit_id)`. **حُذف** `class_curriculum_progress` و`is_assigned_class_teacher`.
 
 ### RLS وعزل المستأجر
-- كل جدول: `school_id NOT NULL` + RLS مفعّلة + **لا `USING(true)`** (مُتحقَّق حياً).
-- `school_id = get_my_school_id()` على كل صف — و`get_my_school_id()` تقرأ `school_id` من **توكن المُستدعي نفسه** (`auth.jwt()->'app_metadata'->>'school_id'`) → القراءة/الكتابة عبر المدارس **مستحيلة بنيوياً**.
-- تأليف المنهج (units/lessons): `school_admin`/`school_principal`/`academic_vp` لمدرستهم.
-- تقدّم الفصل: المعلّم يقرأ/يُحدّث **فقط الفصول المُسنَدة إليه** (`is_assigned_class_teacher` — يطابق `teacher_assignments.teacher_id = auth.uid()`)؛ الإدارة/الإشراف على مستوى المدرسة؛ `system_owner` قراءة فقط.
-- تحقّق حيّ: `is_assigned_class_teacher` تُعيد `false` لفصل غير مُسنَد (fail-closed)، و`get_my_school_id()` تُعيد مدرسة التوكن.
+- كل جدول: `school_id NOT NULL` + RLS + **لا `USING(true)`** (مُتحقَّق: `any_permissive_true = null`).
+- `school_id = get_my_school_id()` (تقرأ مدرسة التوكن) → عبر-المدارس مستحيل.
+- **التأليف (INSERT/UPDATE/DELETE):** المعلّم المُسنَد فقط (`is_assigned_subject_teacher` للوحدات · `is_unit_owner_teacher` للدروس) — **لا سياسة كتابة للإدارة** (`admin_write_policies = null`).
+- **القراءة:** system_owner + إدارة/إشراف المدرسة (متابعة) + المعلّم المُسنَد.
+- تحقّق حيّ: `is_assigned_subject_teacher`/`is_unit_owner_teacher` تُعيدان **false** لغير المُسنَد/المالك (fail-closed).
 
-### هل يُحدّث المعلّم التقدّم؟
-نعم — أزرار حالة لكل درس (لم يبدأ/قيد التنفيذ/مكتمل) → `setLessonProgressAction`. التحقّق الخادمي: persona + `schoolId` + الفصل/الدرس في المدرسة + صفّ الدرس = صفّ الفصل + (للمعلّم) تكليف (فصل+مادة). RLS الحدّ الأخير.
+### هل الإدارة تؤلّف أم تتابع؟
+**تتابع فقط.** لا سياسة كتابة للإدارة على الوحدات/الدروس؛ وإجراءات التأليف تَرفض غير `role='teacher'`. الإدارة تُسند عبر `teacher_assignments` (لم يُمَسّ تدفّق الإسناد).
 
-### عند غياب خطة المنهج
-حالة فارغة صادقة: **«لم يتم إعداد خطة المنهج لهذا الفصل بعد.»** (تظهر عندما لا توجد وحدات/دروس نشطة لمواد المعلّم عند صفّ الفصل، أو الصفّ غير محدّد). لا نسبة وهمية.
+### هل المعلّم يضيف الوحدات والدروس؟
+نعم: `addCurriculumUnitAction` · `addCurriculumLessonAction` · `updateCurriculumLessonAction` (عنوان/تاريخ/ملاحظات) · `setLessonStatusAction` · `deleteCurriculumLessonAction` · `deleteCurriculumUnitAction` (حذف الوحدة الفارغة · **تعطيل آمن** إن كانت تحوي دروسًا). كلها تتحقّق persona + `role='teacher'` + تكليف (فصل+مادة) خادمياً، وRLS الحدّ الأخير.
 
-### تنظيف placeholders تحليلات المدير
-حقول `curriculumProgress`/`curriculumDetails`/`curriculumCompletion` (تحليلات المدير) كانت placeholders ميتة. بقيت فارغة (لا تجميع على مستوى المعلّم بعد)، واستُبدلت ملاحظة «تتوافق مع الخطط المسجلة في Classroom» المضلّلة بحالة فارغة صادقة تشير لميزة الفصل، ووُسمت الحقول كغير-مربوطة. **لا نسبة منهج مُختلَقة متبقية.**
+### عند غياب التوزيع
+حالة فارغة صادقة: **«لم يضف المعلم توزيع المنهج لهذا الفصل بعد.»** (مع إتاحة «إضافة وحدة» للبدء). لا مادة مُسنَدة → «لا توجد مادة مُسنَدة إليك في هذا الفصل.»
 
 ---
 
 ## Phase 6 — سياسة بيانات التجربة (لم تُزرع بيانات حيّة)
-لا آلية seed/demo معتمدة (لا `db/seed`، لا `supabase/seed`، لا npm script). إنشاء بيانات في المدرسة الحيّة الوحيدة = بيانات إنتاجية وهمية (ممنوع). **لم تُدرَج أي بيانات.** التحقّق تمّ عبر build/tsc/lint/test + فحص RLS الحيّ.
+لا آلية seed/demo معتمدة. **لم تُدرَج بيانات.** التحقّق عبر build/tsc/lint/test + فحص RLS حيّ.
 
 ### قائمة البيانات المطلوبة للتحقّق الحيّ بالمتصفّح (تُوسَم demo/test)
-1. **مدرسة اختبار** (`schools`) — أو استخدام المدرسة القائمة في بيئة اختبار.
-2. **مادة** (`subjects`: school_id + name_ar).
-3. **فصل** (`classes`: school_id + grade_level + stage_id + section).
-4. **تكليف معلّم** (`teacher_assignments`: teacher_id = `auth.uid()` للمعلّم + subject_id + class_id + academic_year_id + school_id).
-5. **طلاب** (`student_profiles`: class_id + school_id) — اختياري لعرض القسم (التقدّم لا يعتمد على الطلاب).
-6. **وحدات منهج** (`curriculum_units`: school_id + subject_id + grade_level = صفّ الفصل + title + is_active).
-7. **دروس** (`curriculum_lessons`: school_id + unit_id + title + is_active).
-8. **(للتحقّق من التحديث)** جلسة معلّم مُصادَقة (JWT بدور teacher + school_id) → ضغط أزرار الحالة → صفوف `class_curriculum_progress`.
+1. مدرسة اختبار · 2. مادة (`subjects`) · 3. فصل (`classes`) · 4. **تكليف معلّم** (`teacher_assignments`: teacher_id=`auth.uid()` + subject_id + class_id + academic_year_id + school_id) · 5. جلسة معلّم مُصادَقة (JWT role=teacher + school_id) → إضافة وحدات/دروس وتغيير الحالة → صفوف `curriculum_units`/`curriculum_lessons`.
 
-### النتائج المتوقَّعة عند توفّر البيانات
-- لا وحدات/دروس → «لم يتم إعداد خطة المنهج لهذا الفصل بعد.»
-- N درسًا، 0 مكتمل → 0% · «تم إنجاز 0 من N درسًا».
-- وضع M دروس «مكتمل» → النسبة = round(M/N*100)% وتتحدّث فوراً.
-- معلّم غير مُسنَد للفصل/المادة → رفض «هذا الفصل/المادة غير مُسنَد إليك» (وRLS يمنع).
+### النتائج المتوقَّعة
+- لا وحدات → «لم يضف المعلم توزيع المنهج لهذا الفصل بعد.»
+- إضافة وحدة + دروس → تظهر؛ النسبة 0% حتى الإكمال.
+- تعيين M من N دروس «مكتمل» → النسبة round(M/N*100)% وتتحدّث.
+- معلّم غير مُسنَد → «هذا الفصل/المادة غير مُسنَد إليك» (وRLS يمنع).
 
 ---
 
-## (تاريخي) تدقيق Sprint 6 — كانت غير منفّذة
-أكّد Sprint 6: لا ميزة حقيقية · لا جداول منهج (فقط `quest_progress` = gamification) · `curriculumProgress`/`curriculumDetails`/`curriculumCompletion` placeholders ميتة في تحليلات المدير (`individual=null`، صفحة عالقة على spinner) · لا نسبة محسوبة. هذا ما عالجه Sprint 7 أعلاه.
+## (تاريخي) سياق Sprint 6 → 7 → 8
+- **Sprint 6:** الميزة غير منفّذة (لا جداول؛ placeholders ميتة في تحليلات المدير).
+- **Sprint 7:** أُنشئت الجداول لكن بنموذج **خاطئ** (عالمي + admin-authored).
+- **Sprint 8:** تصحيح النموذج إلى **teacher-authored distribution** (هذا المستند).

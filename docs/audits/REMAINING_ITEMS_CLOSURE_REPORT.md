@@ -345,3 +345,37 @@
 - واجهة تأليف المنهج (إضافة/تحرير الوحدات والدروس) لم تُبنَ — الجداول جاهزة وRLS تسمح بالتأليف لـ admin/principal/academic_vp؛ حتى بناء الواجهة تُملأ البيانات يدوياً/لاحقاً، والحالة الفارغة صادقة.
 - التحقّق الحيّ بالمتصفّح محجوب (PRE-LAUNCH: 0 صفوف، لا seed معتمد).
 - تجميع تقدّم المنهج على مستوى المدير/المعلّم في تحليلات المدير = عمل لاحق (الحقول فارغة الآن).
+- **نموذج التأليف صُحِّح في Sprint 8** (كان admin-authored خطأً → صار teacher-authored).
+
+---
+
+# Sprint 8 — توزيع المنهج يؤلّفه المعلّم (2026-06-27)
+
+> تصحيح خطأ تصميمي في Sprint 7 (منهج عالمي يؤلّفه admin). **النموذج الصحيح:** الإدارة تُسند · المعلّم يوزّع · الإدارة تتابع. **app-code + 1 migration تصحيحي مُطبَّق حياً** (`20260702_…`). lint صفر · build 63/63 · tsc نظيف · test 26/26 · advisors 0 ERROR.
+
+## الخطأ في Sprint 7
+وحدات عالمية `(subject_id, grade_level)` يؤلّفها admin/principal/academic_vp؛ `UNIQUE(subject_id,grade_level,title)` يمنع توزيعاً خاصاً لكل فصل؛ المعلّم يُحدّث الإنجاز فقط. لا يطابق ميدان سِدرة (المعلّم يوزّع منهجه).
+
+## التصحيح (Phase 2 — migration مُطبَّق حياً)
+`curriculum_units` → `(class_id, subject_id)` + `created_by` · `curriculum_lessons` + `planned_date`/`status`/`completed_at`/`notes` · **حذف** `class_curriculum_progress` + `is_assigned_class_teacher` · `UNIQUE(class_id,subject_id,title)` · دالتان جديدتان SECURITY DEFINER (`is_assigned_subject_teacher`/`is_unit_owner_teacher`). 118 جدول / 314 سياسة / 15 ترحيل متتبَّع.
+
+## RLS (Phase 2 + 4)
+كتابة units/lessons = المعلّم المُسنَد فقط (`is_assigned_subject_teacher`/`is_unit_owner_teacher`)؛ **لا سياسة كتابة للإدارة** (`admin_write_policies = null`)؛ قراءة = system_owner + إدارة المدرسة (متابعة) + المعلّم المُسنَد؛ `school_id = get_my_school_id()`؛ لا `USING(true)`. تحقّق حيّ: الدالتان false لغير المُسنَد (fail-closed).
+
+## الإجراءات + الواجهة (Phase 3)
+`app/classroom/[classId]/_actions.ts`: `getClassCurriculumAction` · `addCurriculumUnitAction` · `addCurriculumLessonAction` · `updateCurriculumLessonAction` · `setLessonStatusAction` · `deleteCurriculumLessonAction` · `deleteCurriculumUnitAction` (تعطيل آمن إن كانت تحوي دروسًا) — جميعها `role='teacher'` + تكليف + `school_id` خادمي + رسائل آمنة. `CurriculumProgress.tsx`: قسم «توزيع المنهج» (تأليف) + شريط «تقدّم المنهج» الحقيقي.
+
+## الإدارة متابعة فقط (Phase 4)
+الإسناد عبر `teacher_assignments` (لم يُمَسّ)؛ لا تأليف admin (RLS + الإجراءات تَرفض غير teacher). placeholders تحليلات المدير بقيت كما هي (Sprint 7، فارغة صادقة).
+
+## بيانات التجربة (Phase 6)
+لا seed/demo · **لم تُزرع بيانات**. قائمة البيانات في `CURRICULUM_PROGRESS_FEATURE_AUDIT.md` (Phase 6).
+
+## الملفات المتغيّرة
+**جديد (1):** `db/migrations/20260702_curriculum_distribution_correction.sql`.
+**مُعدَّل:** `app/classroom/[classId]/_actions.ts` · `app/classroom/[classId]/_components/CurriculumProgress.tsx` · `CLAUDE.md` · `CODEX.MD` · `README.md` · `db/README.md` · `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md` · هذا التقرير.
+
+## مخاطر متبقية (Sprint 8)
+- واجهة متابعة للإدارة (قراءة توزيع/تقدّم الفصول) لم تُبنَ؛ RLS تسمح بالقراءة، تبقى الواجهة عملاً لاحقاً.
+- التحقّق الحيّ بالمتصفّح محجوب (PRE-LAUNCH: 0 صفوف).
+- ترتيب الوحدات/الدروس (drag) غير مُتاح في الواجهة (sort_order يُضبط تلقائياً عند الإضافة).

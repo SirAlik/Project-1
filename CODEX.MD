@@ -595,4 +595,18 @@ Do not wait until the end to report everything. After each stage, give the user 
 - **Actions in `app/classroom/[classId]/_actions.ts`:** `getClassCurriculumAction` + `setLessonProgressAction` (verifies class/lesson in school + lesson grade == class grade + teacher assignment; upsert `onConflict:'class_id,lesson_id'`; `completed_at` only when completed). Safe Arabic errors + `console.error`.
 - **Standing rule (curriculum):** all reads/writes go through these actions (server-derived `school_id`); the percentage is derived from real counts; never show a percentage without stored lessons. A curriculum-authoring UI (units/lessons) is later work; until then the empty state is honest.
 - **Principal analytics placeholders:** left empty (no teacher-level aggregation), the misleading note replaced with an honest empty state pointing to the per-class feature. No fabricated curriculum percentage remains.
-- **Demo data:** no approved seed/demo; **no live data inserted**. The required-data checklist for live browser verification is documented in `CURRICULUM_PROGRESS_FEATURE_AUDIT.md` (Phase 6).
+- **Demo data:** no approved seed/demo; **no live data inserted**. The required-data checklist for live browser verification is documented in `CURRICULUM_PROGRESS_FEATURE_AUDIT.md` (Phase 6). **(Authoring model corrected in Sprint 8 — admin does not author.)**
+
+---
+
+## Sprint 8 — Teacher-authored curriculum distribution (2026-06-27) — standing rules
+
+> Corrects a Sprint 7 design error: curriculum was global and admin-authored. **Domain correction:** admin **assigns** subject/class · the assigned teacher **distributes** the curriculum · admin **monitors** only. **app-code + 1 corrective migration applied live** (`20260702_curriculum_distribution_correction.sql`). lint 0 · build 63/63 · tsc clean · test 26/26 · advisors **0 ERROR**. No auth/persona/role-keys/dependencies/`.env` changes. Details: `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md`.
+
+- **Schema correction (PRE-LAUNCH · 0 rows · clean drop+recreate):** `curriculum_units` re-scoped from global `(subject_id, grade_level)` to **`(class_id, subject_id)`** + `created_by` · `curriculum_lessons` gain `planned_date`/`status`/`completed_at`/`notes` (status on the lesson) · **dropped** `class_curriculum_progress` (redundant) and `is_assigned_class_teacher` · constraint is now `UNIQUE(class_id, subject_id, title)` (each class owns its distribution).
+- **Authoring = assigned teacher only (standing rule):** every unit/lesson create/edit/delete goes through `app/classroom/[classId]/_actions.ts`, which require `role='teacher'` + a `teacher_assignments` match (class+subject) + server-derived `school_id`. RLS: unit/lesson write policies are assigned-teacher-only via `is_assigned_subject_teacher`/`is_unit_owner_teacher` (SECURITY DEFINER · search_path) — **no admin write policy** (`admin_write_policies = null`, verified live). Never make admin the default curriculum author.
+- **Admin monitors only:** `school_admin/school_principal/academic_vp` get SELECT only on units/lessons; assignment happens via `teacher_assignments` (untouched). system_owner read-only.
+- **Tenant isolation:** `school_id = get_my_school_id()` (token school) → cross-school impossible · live check: both helpers return false for a non-assigned/non-owner caller (fail-closed).
+- **Real percentage:** `completedLessons/totalLessons*100` from `status='completed'`; `total=0` → 0% + honest empty state «لم يضف المعلم توزيع المنهج لهذا الفصل بعد.» No fake percentage.
+- **UI:** `CurriculumProgress.tsx` is now an authoring surface («توزيع المنهج»): add unit/lesson · planned date · edit · status · delete lesson · delete/disable unit (safe-disable when it has lessons) + the «تقدّم المنهج» bar.
+- **Safe delete:** lesson = hard delete (leaf); unit with lessons = disable (`is_active=false`) not a destructive delete.
