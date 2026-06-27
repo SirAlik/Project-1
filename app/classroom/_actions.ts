@@ -21,6 +21,19 @@ type EventPayloadItem = {
 // رسالة عربية آمنة موحّدة؛ التفاصيل التقنية تبقى في سجلّ الخادم فقط (لا تسريب schema/قيود للمستخدم).
 const WRITE_FAILED = 'تعذّر حفظ البيانات، يرجى المحاولة لاحقاً';
 const UNSUPPORTED_EVENT = 'هذا النوع من الأحداث غير مدعوم حالياً في السجل الرسمي';
+const CLASS_NOT_LINKED = 'لا يمكن حفظ هذا الإجراء لأن الفصل غير مرتبط بسجل قاعدة البيانات.';
+
+// يتحقق أن الفصل يتبع مدرسة المُستدعي (دفاع عميق فوق RLS؛ classId يأتي من المسار/العميل).
+async function classBelongsToSchool(
+    supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+    classId: string,
+    schoolId: string,
+): Promise<boolean> {
+    const { data } = await supabase
+        .from('classes').select('id')
+        .eq('id', classId).eq('school_id', schoolId).maybeSingle();
+    return !!data;
+}
 
 // يحوّل صف الحدث إلى صف قابل للإدراج (type صالح في enum)، أو null إذا كان النوع غير قابل للتمثيل.
 function buildEventRow(p: EventPayloadItem): Record<string, unknown> | null {
@@ -50,7 +63,7 @@ export async function saveAttendanceAction(
     classId?: string,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     if (absentOrLate.length === 0) return { ok: true };
 
@@ -78,7 +91,7 @@ export async function addEventAction(
     payload: EventPayloadItem[],
 ): Promise<ARData<{ ids: string[] }>> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const built = payload.map(buildEventRow);
     if (built.some(r => r === null)) {
@@ -102,7 +115,7 @@ export async function addEventAction(
 
 export async function undoEventsAction(ids: string[]): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     let query = supabase.from('events').delete().in('id', ids);
@@ -121,7 +134,7 @@ export async function saveStarsAction(
     _classId?: string,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
     return { ok: false, error: 'تسجيل نجوم الحصة غير مفعّل بعد في السجل الرسمي' };
 }
 
@@ -131,7 +144,7 @@ export async function saveParentNoteAction(
     urgency: 'low' | 'medium' | 'high',
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('parent_notes').insert([{
@@ -152,11 +165,15 @@ export async function saveSeatingMapAction(
     seatingMap: Record<string, { x: number; y: number }>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
     // classroom_metadata.class_id فريد ومطلوب فعلياً — بدونه نكتب صفوف class_id=NULL متكررة.
-    if (!classId || classId.trim() === '') return { ok: false, error: 'لا يمكن حفظ المخطط بدون تحديد الفصل' };
+    if (!classId || classId.trim() === '') return { ok: false, error: CLASS_NOT_LINKED };
 
     const supabase = await createSupabaseServerClient();
+    if (!(await classBelongsToSchool(supabase, classId, persona.schoolId))) {
+        return { ok: false, error: CLASS_NOT_LINKED };
+    }
+
     const { error } = await supabase.from('classroom_metadata').upsert({
         class_id: classId,
         seating_map: seatingMap,
@@ -173,10 +190,14 @@ export async function saveStudentRolesAction(
     studentRoles: Record<string, string>,
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
-    if (!classId || classId.trim() === '') return { ok: false, error: 'لا يمكن حفظ الأدوار بدون تحديد الفصل' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
+    if (!classId || classId.trim() === '') return { ok: false, error: CLASS_NOT_LINKED };
 
     const supabase = await createSupabaseServerClient();
+    if (!(await classBelongsToSchool(supabase, classId, persona.schoolId))) {
+        return { ok: false, error: CLASS_NOT_LINKED };
+    }
+
     const { error } = await supabase.from('classroom_metadata').upsert({
         class_id: classId,
         student_roles: studentRoles,
@@ -192,7 +213,7 @@ export async function syncOfflineQueueAction(
     events: EventPayloadItem[],
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const built = events.map(buildEventRow);
     if (built.some(r => r === null)) {
@@ -209,5 +230,67 @@ export async function syncOfflineQueueAction(
 
     const { error } = await supabase.from('events').insert(rows);
     if (error) { console.error('[classroom] syncOfflineQueue:', error.message); return { ok: false, error: WRITE_FAILED }; }
+    return { ok: true };
+}
+
+// ─── خروج/عودة الطالب من الحصة (classroom_exits) ──────────────────────────────
+// المصدر الصحيح للخروج الصفّي: جدول classroom_exits (exit_type نصّي حرّ — يدعم
+// "دورة مياه"/"عيادة"/"أخرى") مع تتبّع العودة (return_time/duration_minutes).
+// لا يُكتب في enum event_type (خروج دورة المياه غير مُمثَّل فيه).
+
+export async function startClassExitAction(input: {
+    classId: string;
+    studentId: string;
+    exitType: string;
+}): Promise<ARData<{ id: string }>> {
+    const persona = await getActivePersona();
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
+    if (!input.classId || input.classId.trim() === '') return { ok: false, error: CLASS_NOT_LINKED };
+
+    const supabase = await createSupabaseServerClient();
+    if (!(await classBelongsToSchool(supabase, input.classId, persona.schoolId))) {
+        return { ok: false, error: CLASS_NOT_LINKED };
+    }
+    // عزل المستأجر: الطالب يجب أن يتبع مدرسة المُستدعي
+    const { data: stu } = await supabase
+        .from('student_profiles').select('id')
+        .eq('id', input.studentId).eq('school_id', persona.schoolId).maybeSingle();
+    if (!stu) return { ok: false, error: 'الطالب لا ينتمي لهذه المدرسة' };
+
+    const now = new Date();
+    const { data, error } = await supabase.from('classroom_exits').insert({
+        school_id: persona.schoolId,
+        student_id: input.studentId,
+        class_id: input.classId,
+        exit_type: input.exitType,
+        exit_date: now.toISOString().split('T')[0],
+        exit_time: now.toISOString(),
+    }).select('id').single();
+
+    if (error) { console.error('[classroom] startExit:', error.message); return { ok: false, error: WRITE_FAILED }; }
+    return { ok: true, data: { id: (data as { id: string }).id } };
+}
+
+export async function endClassExitAction(exitId: string): Promise<AR> {
+    const persona = await getActivePersona();
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
+
+    const supabase = await createSupabaseServerClient();
+    // نقرأ وقت الخروج (مُقيَّداً بالمدرسة) لحساب المدّة الفعلية — لا قيمة مُختلَقة
+    const { data: exitRow } = await supabase
+        .from('classroom_exits').select('exit_time')
+        .eq('id', exitId).eq('school_id', persona.schoolId).maybeSingle();
+    if (!exitRow) return { ok: false, error: WRITE_FAILED };
+
+    const now = new Date();
+    const startMs = new Date(exitRow.exit_time as string).getTime();
+    const duration = Math.max(0, Math.round((now.getTime() - startMs) / 60000));
+
+    const { error } = await supabase.from('classroom_exits')
+        .update({ return_time: now.toISOString(), duration_minutes: duration })
+        .eq('id', exitId)
+        .eq('school_id', persona.schoolId);
+
+    if (error) { console.error('[classroom] endExit:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }

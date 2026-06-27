@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useParams } from "next/navigation";
 import {
     ChevronRight, Users, AlertCircle, Clock,
     BookOpen, GraduationCap, HeartPulse, Eye, CheckCircle, Play, Save,
@@ -27,13 +26,16 @@ import { SeatingChart } from "../../_components/SeatingChart";
 import { ParentNoteModal } from "../../_components/ParentNoteModal";
 import { BadgesModal } from "../../_components/BadgesModal";
 
-export default function ClassDetailsPage() {
-    const params = useParams();
-    const grade = params?.grade;
-    const section = params?.section;
+interface ClassroomWorkspaceProps {
+    classId: string;
+    className: string;
+    grade: number | null;
+    section: string | null;
+}
 
+export function ClassroomWorkspace({ classId, className, grade, section }: ClassroomWorkspaceProps) {
     const { state: lrcState, actions: lrcActions } = useLRC();
-    const { state, actions } = useClassroom();
+    const { state, actions } = useClassroom(classId);
 
     const [currentLesson, setCurrentLesson] = useState("");
     const [viewMode, setViewMode] = useState<"list" | "map">("list");
@@ -42,7 +44,21 @@ export default function ClassDetailsPage() {
     // Animation triggers
     const [animatingIds, setAnimatingIds] = useState<Record<string, 'reward' | 'penalty' | null>>({});
 
+    const classLabel = className || `فصل ${grade ?? ''}/${section ?? ''}`;
+
     const handleAddEvent = (type: string) => {
+        // الخروج/العودة الصفّي يُسجَّل في classroom_exits (لا في enum events) — تتبّع المدّة والعودة.
+        if (type === "دورة المياه - خرج") {
+            if (state.selectedStudentIds.length === 0) { actions.setMessage("⚠️ اختر طالبًا أولاً."); return; }
+            state.selectedStudentIds.forEach(id => actions.startExit(id, "دورة مياه"));
+            return;
+        }
+        if (type === "دورة المياه - عاد") {
+            if (state.selectedStudentIds.length === 0) { actions.setMessage("⚠️ اختر طالبًا أولاً."); return; }
+            state.selectedStudentIds.forEach(id => actions.endExit(id));
+            return;
+        }
+
         const note = currentLesson ? `[مرتبط بدرس: ${currentLesson}]` : "";
 
         // Trigger animations before/during action
@@ -85,7 +101,7 @@ export default function ClassDetailsPage() {
                                     الفصول
                                 </Link>
                                 <ChevronRight className="w-3 h-3 opacity-20" />
-                                <span className="text-[10px] font-black text-[var(--accent)] uppercase tracking-widest">فصل {grade}/{section}</span>
+                                <span className="text-[10px] font-black text-[var(--accent)] uppercase tracking-widest">{classLabel}</span>
                             </div>
                             <h1 className="text-2xl font-black tracking-tight text-white uppercase">
                                 لوحة التحكم الذكية
@@ -140,7 +156,7 @@ export default function ClassDetailsPage() {
                         )}
 
                         <Link
-                            href={`/classroom/analytics?grade=${grade}&section=${section}`}
+                            href={`/classroom/analytics?classId=${classId}&grade=${grade ?? ''}&section=${section ?? ''}`}
                             className="bg-[var(--primary)]/10 hover:bg-[var(--primary)] border border-[var(--primary)]/20 text-[var(--primary)] hover:text-foreground px-4 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 shadow-lg hover:shadow-[var(--primary)]/20"
                         >
                             <LayoutGrid className="w-4 h-4" /> تحليل أداء الفصل

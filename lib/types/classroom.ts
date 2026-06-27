@@ -86,6 +86,8 @@ export type EventRow = {
     actor_role?: string | null;
     points_delta?: number;
     action_category?: 'reward' | 'penalty' | 'attendance' | 'utility' | 'academic' | 'discipline' | 'exit';
+    // النوع الأصلي للإجراء (app_type) محفوظ هنا لأن type يُخزَّن مُجمَّعاً في enum (مثل "مخالفة").
+    metadata?: Record<string, unknown> | null;
 };
 
 export type StudentOption = {

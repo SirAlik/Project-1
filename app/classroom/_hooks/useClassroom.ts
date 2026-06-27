@@ -11,9 +11,13 @@ import {
     saveSeatingMapAction,
     saveStudentRolesAction,
     syncOfflineQueueAction,
+    startClassExitAction,
+    endClassExitAction,
 } from "@/app/classroom/_actions";
 
-export function useClassroom() {
+const CLASS_NOT_LINKED_MSG = 'لا يمكن حفظ هذا الإجراء لأن الفصل غير مرتبط بسجل قاعدة البيانات.';
+
+export function useClassroom(classId?: string) {
     const { user, role, supabase } = useAuth();
 
     // State
@@ -42,7 +46,8 @@ export function useClassroom() {
     const [savingAttendance, setSavingAttendance] = useState(false);
 
     // --- Phase 2 State ---
-    const [activeExits, setActiveExits] = useState<Record<string, { startTime: string; type: "دورة مياه" | "عيادة" | "أخرى" }>>({});
+    const [activeExits, setActiveExits] = useState<Record<string, { startTime: string; type: "دورة مياه" | "عيادة" | "أخرى"; exitId?: string }>>({});
+    const [todayExits, setTodayExits] = useState<{ student_id: string }[]>([]);
     const [gradebookItems, setGradebookItems] = useState<GradebookItem[]>([]);
     const [studentRoles, setStudentRoles] = useState<Record<string, string>>({});
     const [seatingMap, setSeatingMap] = useState<Record<string, { x: number; y: number }>>({});
@@ -56,20 +61,14 @@ export function useClassroom() {
     const [alreadyPicked, setAlreadyPicked] = useState<string[]>([]);
     const [pickerType, setPickerType] = useState<"standard" | "train">("standard");
 
-    // Today's Exit Frequency
+    // Today's Exit Frequency — يُحسب من classroom_exits (المصدر الصحيح للخروج الصفّي)
     const todayExitCount = useMemo(() => {
         const counts: Record<string, number> = {};
-        const today = new Date().toISOString().split('T')[0];
-
-        events
-            .filter(e => e.action_category === 'exit' && e.created_at?.startsWith(today))
-            .forEach(e => {
-                if (e.student_id) {
-                    counts[e.student_id] = (counts[e.student_id] || 0) + 1;
-                }
-            });
+        for (const ex of todayExits) {
+            if (ex.student_id) counts[ex.student_id] = (counts[ex.student_id] || 0) + 1;
+        }
         return counts;
-    }, [events]);
+    }, [todayExits]);
 
     // Daily Scores
     const dailyScores = useMemo(() => {
@@ -78,7 +77,9 @@ export function useClassroom() {
 
         events.filter(e => e.created_at?.startsWith(today)).forEach(e => {
             if (!e.student_id) return;
-            const type = e.type as string;
+            // المصدر: metadata.app_type (المفهوم الأصلي المحفوظ) لأن type يُخزَّن مُجمَّعاً في enum (مثل "مخالفة").
+            const meta = e.metadata as { app_type?: string } | null | undefined;
+            const type = (meta?.app_type as string) ?? (e.type as string);
 
             // Positive actions
             const positive = ["شارك اليوم", "تفكير إبداعي", "مبادرة/قيادة", "التزام وانضباط", "تميز ملحوظ", "نجم الحصة 1", "نجم الحصة 2", "نجم الحصة 3"];
@@ -122,10 +123,10 @@ export function useClassroom() {
     const loadStudents = useCallback(async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from("student_profiles")
-                .select("id, name")
-                .order("name");
+            // قائمة طلاب الفصل المحدَّد فقط (RLS يحصر المدرسة؛ class_id يحصر الفصل)
+            let q = supabase.from("student_profiles").select("id, name");
+            if (classId) q = q.eq("class_id", classId);
+            const { data, error } = await q.order("name");
 
             if (error) throw error;
 
@@ -141,17 +142,19 @@ export function useClassroom() {
         } finally {
             setLoading(false);
         }
-    }, [supabase]);
+    }, [supabase, classId]);
 
     const loadEvents = useCallback(async () => {
         setLoading(true);
         try {
-            // Load events for today or recent (simplified)
-            const { data, error } = await supabase
+            // سجلّ أحداث الفصل المحدَّد (metadata يحمل النوع الأصلي للنقاط اليومية)
+            let q = supabase
                 .from("events")
-                .select("id, created_at, student_id, student_name_cached, type, note")
+                .select("id, created_at, student_id, student_name_cached, type, note, metadata, action_category, points_delta")
                 .order("created_at", { ascending: false })
                 .limit(200);
+            if (classId) q = q.eq("class_id", classId);
+            const { data, error } = await q;
 
             if (error) throw error;
             setEvents((data || []) as EventRow[]);
@@ -161,7 +164,34 @@ export function useClassroom() {
         } finally {
             setLoading(false);
         }
-    }, [supabase]);
+    }, [supabase, classId]);
+
+    // تحميل خروجات اليوم من classroom_exits: العدّاد + استعادة الخروجات النشطة (بلا عودة)
+    const loadExits = useCallback(async () => {
+        if (!classId) { setTodayExits([]); setActiveExits({}); return; }
+        try {
+            const today = new Date().toISOString().split('T')[0];
+            const { data } = await supabase
+                .from("classroom_exits")
+                .select("id, student_id, exit_type, exit_time, return_time")
+                .eq("class_id", classId)
+                .eq("exit_date", today);
+
+            const rows = (data ?? []) as { id: string; student_id: string; exit_type: string; exit_time: string; return_time: string | null }[];
+            setTodayExits(rows.map(r => ({ student_id: r.student_id })));
+
+            const active: Record<string, { startTime: string; type: "دورة مياه" | "عيادة" | "أخرى"; exitId?: string }> = {};
+            for (const r of rows) {
+                if (!r.return_time) {
+                    const t = (r.exit_type === 'دورة مياه' || r.exit_type === 'عيادة' || r.exit_type === 'أخرى') ? r.exit_type : 'أخرى';
+                    active[r.student_id] = { startTime: r.exit_time, type: t as "دورة مياه" | "عيادة" | "أخرى", exitId: r.id };
+                }
+            }
+            setActiveExits(active);
+        } catch (e) {
+            console.error("Exits load failed", e);
+        }
+    }, [supabase, classId]);
 
     const loadHealthAlerts = useCallback(async () => {
         try {
@@ -236,7 +266,7 @@ export function useClassroom() {
             };
         });
 
-        const result = await saveAttendanceAction(rows);
+        const result = await saveAttendanceAction(rows, classId);
         if (!result.ok) {
             setMsg(`خطأ حفظ الحضور: ${result.error ?? "خطأ"}`);
         } else {
@@ -264,6 +294,7 @@ export function useClassroom() {
             type: label, // قيمة enum صحيحة (كانت "غائب"/"متأخر" مرفوضة)
             note: `تحديث يدوي للحالة إلى ${label} في ${new Date().toLocaleTimeString('ar-SA')}`,
             event_date: new Date().toISOString().split('T')[0],
+            class_id: classId,
         }]);
 
         if (!result.ok) setMsg(`⚠️ ${result.error ?? "تعذّر تحديث الحالة"}`);
@@ -297,6 +328,7 @@ export function useClassroom() {
                 action_category: category,
                 points_delta: pointsDelta || 0,
                 event_date: new Date().toISOString().split('T')[0],
+                class_id: classId,
             };
         });
 
@@ -328,7 +360,7 @@ export function useClassroom() {
 
     async function awardBadge(_studentId: string, _badgeType: string) {
         // الأوسمة مكافأة لا تُمثَّل في enum event_type ولا يوجد جدول مكافآت صفّي — لا ادّعاء نجاح
-        // ولا تخزين محلي وهمي. تفعيلها لاحقاً عبر migration (انظر تقرير الإغلاق).
+        // ولا تخزين محلي وهمي. تفعيلها لاحقاً عبر طبقة gamification (انظر تقرير الإغلاق).
         setMsg("⚠️ منح الأوسمة غير مفعّل بعد في السجل الرسمي.");
     }
 
@@ -351,25 +383,21 @@ export function useClassroom() {
 
     async function startExit(studentId: string, type: "دورة مياه" | "عيادة" | "أخرى") {
         const st = students.find(s => s.id === studentId);
-        const result = await addEventAction([{
-            student_id: studentId,
-            student_name_cached: st?.name,
-            type,
-            action_category: 'exit',
-            event_date: new Date().toISOString().split('T')[0],
-        }]);
+        // الخروج الصفّي يُخزَّن في classroom_exits ويتطلب فصلاً حقيقياً
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
 
-        if (!result.ok) {
-            // لا ادّعاء خروج إذا لم يُسجَّل فعلاً (نوع الخروج غير مدعوم في السجل الرسمي).
+        const result = await startClassExitAction({ classId, studentId, exitType: type });
+        if (!result.ok || !result.data) {
+            // لا ادّعاء خروج إذا لم يُسجَّل فعلاً
             setMsg(`⚠️ ${result.error ?? 'تعذّر تسجيل الخروج'}`);
             return;
         }
 
         setActiveExits(prev => ({
             ...prev,
-            [studentId]: { startTime: new Date().toISOString(), type }
+            [studentId]: { startTime: new Date().toISOString(), type, exitId: result.data!.id }
         }));
-        loadEvents();
+        await loadExits();
         setMsg(`🏃 خرج ${st?.name} (${type})`);
     }
 
@@ -377,15 +405,22 @@ export function useClassroom() {
         const exit = activeExits[studentId];
         if (!exit) return;
 
-        const duration = Math.round((Date.now() - new Date(exit.startTime).getTime()) / 60000);
+        // تسجيل العودة فعلياً في classroom_exits (return_time + duration) — لا قيمة وهمية
+        if (exit.exitId) {
+            const result = await endClassExitAction(exit.exitId);
+            if (!result.ok) {
+                setMsg(`⚠️ ${result.error ?? 'تعذّر تسجيل العودة'}`);
+                return;
+            }
+        }
 
-        // عودة الطالب تتبُّع محلي فقط: لا قيمة enum لحدث "العودة" ولا عمود لمدّتها،
-        // فلا يُدرَج حدث وهمي — يُغلق المؤقّت محلياً بصدق.
+        const duration = Math.round((Date.now() - new Date(exit.startTime).getTime()) / 60000);
         setActiveExits(prev => {
             const updated = { ...prev };
             delete updated[studentId];
             return updated;
         });
+        await loadExits();
         setMsg(`↩️ عاد الطالب بعد ${duration} دقيقة.`);
     }
 
@@ -524,31 +559,36 @@ export function useClassroom() {
             const { data: gbData } = await supabase.from("gradebook_items").select("*");
             if (gbData) setGradebookItems(gbData);
 
-            // Load seating and roles from a metadata table (will provide SQL)
-            const { data: metaData } = await supabase
-                .from("classroom_metadata")
-                .select("seating_map, student_roles")
-                .single();
+            // Load seating and roles for THIS class only (class_id فريد في classroom_metadata)
+            if (classId) {
+                const { data: metaData } = await supabase
+                    .from("classroom_metadata")
+                    .select("seating_map, student_roles")
+                    .eq("class_id", classId)
+                    .maybeSingle();
 
-            if (metaData) {
-                if (metaData.seating_map) setSeatingMap(metaData.seating_map);
-                if (metaData.student_roles) setStudentRoles(metaData.student_roles);
+                if (metaData) {
+                    if (metaData.seating_map) setSeatingMap(metaData.seating_map);
+                    if (metaData.student_roles) setStudentRoles(metaData.student_roles);
+                }
             }
         } catch (e) {
             console.error("Phase 2 data load failed (tables might not exist yet)", e);
         }
-    }, [supabase]);
+    }, [supabase, classId]);
 
     async function saveSeatingMap(newMap: Record<string, { x: number; y: number }>) {
         setSeatingMap(newMap);
-        const result = await saveSeatingMapAction(undefined, newMap);
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
+        const result = await saveSeatingMapAction(classId, newMap);
         if (!result.ok) setMsg(`⚠️ فشل حفظ الخريطة: ${result.error ?? "خطأ"}`);
         else setMsg("✅ تم حفظ مخطط الجلوس.");
     }
 
     async function saveStudentRoles(newRoles: Record<string, string>) {
         setStudentRoles(newRoles);
-        const result = await saveStudentRolesAction(undefined, newRoles);
+        if (!classId) { setMsg(`⚠️ ${CLASS_NOT_LINKED_MSG}`); return; }
+        const result = await saveStudentRolesAction(classId, newRoles);
         if (!result.ok) setMsg(`⚠️ فشل حفظ الأدوار: ${result.error ?? "خطأ"}`);
         else setMsg("✅ تم تحديث أدوار الطلاب.");
     }
@@ -559,9 +599,10 @@ export function useClassroom() {
             await loadStudents();
             await loadHealthAlerts();
             await loadEvents();
+            await loadExits();
             await loadPhase2Data();
         });
-    }, [loadStudents, loadHealthAlerts, loadEvents, loadPhase2Data]);
+    }, [loadStudents, loadHealthAlerts, loadEvents, loadExits, loadPhase2Data]);
 
 
     return {
