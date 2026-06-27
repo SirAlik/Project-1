@@ -1,0 +1,33 @@
+-- ════════════════════════════════════════════════════════════════════════════
+-- Sprint 2 — Phase 1: إسقاط التواقيع القديمة غير الآمنة لـ RPCs اقتصاد الطالب
+-- ════════════════════════════════════════════════════════════════════════════
+--
+-- المشكلة:
+--   كانت نسختان أُحاديّتا الوسيط ما تزالان موجودتين وقابلتين للاستدعاء من
+--   authenticated مباشرةً عبر PostgREST:
+--     • public.rpc_purchase_furniture(p_item_id uuid)
+--     • public.rpc_scan_ar_glyph(glyph_hash text)
+--
+--   هاتان النسختان:
+--     1. غير محصورتين بالمستأجر (لا فحص school_id إطلاقاً).
+--     2. تُسندان هوية الطالب من auth.uid() مباشرةً، بينما جداول الاقتصاد
+--        (student_wallet/inventory/dorm_furniture/transaction_logs) تشير
+--        بمفتاح أجنبي إلى student_profiles.id — وstudent_profiles لا يملك أي
+--        عمود ربط بـ auth.users. لذا أي INSERT بـ student_id = auth.uid()
+--        يكسر قيد المفتاح الأجنبي (الدالة معطوبة فعلياً ولا يستدعيها التطبيق).
+--
+--   التطبيق يستخدم حصراً النسختين ثنائيّتي الوسيط الأحدث:
+--     • rpc_purchase_furniture(uuid, uuid)
+--     • rpc_scan_ar_glyph(text, uuid)   ← المُستدعاة في lib/metaverse/sync-engine.ts
+--
+-- الحل:
+--   إسقاط التوقيعين القديمين نهائياً (غير مستخدمين + معطوبين + سطح هجوم).
+--
+-- أثر التراجع (rollback):
+--   لا بيانات تُفقد (الدالتان لا تكتبان بنجاح أصلاً). لاستعادتهما (غير موصى به)
+--   يُعاد إنشاؤهما من db/migrations/20260120_rpc_functions.sql.
+--   المشروع PRE-LAUNCH: لا مستخدمون ولا بيانات إنتاجية.
+-- ════════════════════════════════════════════════════════════════════════════
+
+DROP FUNCTION IF EXISTS public.rpc_purchase_furniture(uuid);
+DROP FUNCTION IF EXISTS public.rpc_scan_ar_glyph(text);
