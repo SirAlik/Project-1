@@ -228,3 +228,44 @@
 - `error.message` خام في مكوّنات خارج النطاق (`PortalClient` · `components/gamification/*` metaverse · `app/meetings/*` · `secretary/staff-attendance`) — تنظيف لاحق.
 - التحقّق الحيّ بالمتصفّح لأسطح المقاعد/الأدوار يتطلب فصلاً حقيقياً + تكليف معلّم + بيانات طلاب (غير متوفّر في PRE-LAUNCH) — تُحقَّق عبر build/tsc/lint.
 - `prop onUpdateSeating` يبقى ممرَّراً لـ`SeatingChart` لكنه غير مستخدم داخلها (السحب عبر الأب) — غير ضارّ.
+
+---
+
+# ملحق: Sprint 5 — رسائل آمنة على مستوى المنصّة + سجلّ مكافآت الطالب + تنظيف (2026-06-30)
+
+**الحالة:** نجح. **app-code فقط — بلا migration**. `lint` صفر · `build` 63/63 · `tsc` نظيف · `test` 26/26 · `git diff --check` نظيف.
+
+## (Phase 1) رسائل آمنة في المكوّنات/الخدمات المُسمّاة
+| الموضع | قبل | بعد |
+|---|---|---|
+| `lib/services/meeting-service.ts` (5) | `error.message` خام في `.error` | `toSafeError(...)` → رسالة عربية آمنة |
+| `lib/services/hr-attendance-service.ts` (4) | `error.message` خام في `.error` | `toSafeError(...)` |
+| `PortalClient.tsx` | `setError(err.message)` | «تعذّر تفعيل الدور…» + `console.error` |
+| `components/gamification/Locker.tsx` | `setError(err.message)` | «تعذّر تحميل الخزانة…» |
+| `components/gamification/MarketplaceGrid.tsx` | `setError(error.message)` | «تعذّر تحميل المتجر…» |
+| `components/gamification/QuestTree.tsx` | `setError(err.message)` | «تعذّر تحميل المهام…» |
+
+إصلاح الخدمتين يجعل `setError(result.error)` في `app/meetings/*` و`secretary/staff-attendance` آمناً تلقائياً.
+
+## (Phase 2) سجلّ مكافآت/أوسمة الطالب
+- **أين:** لوحة الطالب المختار في `ClassroomWorkspace` (قسم «سجل المكافآت والأوسمة»).
+- **هل بيانات حقيقية؟** نعم — `getStudentRewardsHistoryAction` يقرأ `classroom_rewards` فقط (تاريخ · نوع: نجمة/نقطة إيجابية/وسام · label · نقاط · اسم الفصل عبر embed · اسم المُنشئ best-effort)، بعزل مستأجر (persona+schoolId+الطالب-في-المدرسة) وRLS الحدّ الأخير.
+- **عند عدم وجود مكافآت:** «لا توجد مكافآت أو أوسمة مسجلة لهذا الطالب بعد.» (حالة فارغة صادقة).
+- **لا سجلّ مكافآت وهمي.**
+
+## (Phase 3) تنظيف `onUpdateSeating`
+أُزيل prop غير المستخدم من `SeatingChart` + استيراد `Dispatch/SetStateAction` + موضع الاستدعاء في `ClassroomWorkspace`. `actions.setSeatingMap` يبقى (يستخدمه منطق التبديل).
+
+## (Phase 4) التحقّق الحيّ بالمتصفّح
+**محجوب.** DB الحية = 1 مدرسة · 0 فصول/طلاب/تكليفات · لا آلية seed/demo معتمدة. القائمة الكاملة (بيانات مطلوبة · أدوار · مسارات · نتائج متوقَّعة · كيفية رفع الحجب): `docs/audits/CLASSROOM_LIVE_VERIFICATION_CHECKLIST.md`. التحقّق تمّ عبر build/tsc/lint/test فقط.
+
+## migration
+**لا** — لم يلزم. سجلّ المكافآت يقرأ `classroom_rewards` القائم؛ كل التغييرات app-code.
+
+## الملفات المتغيّرة
+**جديد (2):** `app/classroom/[classId]/_components/StudentRewardsHistory.tsx` · `docs/audits/CLASSROOM_LIVE_VERIFICATION_CHECKLIST.md`.
+**مُعدَّل:** `lib/services/meeting-service.ts` · `lib/services/hr-attendance-service.ts` · `app/(protected)/portal/_components/PortalClient.tsx` · `components/gamification/{Locker,MarketplaceGrid,QuestTree}.tsx` · `app/classroom/_actions.ts` · `app/classroom/_components/SeatingChart.tsx` · `app/classroom/[classId]/_components/ClassroomWorkspace.tsx` · `CLAUDE.md` · `CODEX.MD` · هذا التقرير.
+
+## مخاطر متبقية
+- نمط `error.message` خام أوسع في خدمات غير مُسمّاة (`wizard`/`student-attendance`/`staff-evaluation`/`period-attendance`/`notification`/`bulk-upload`/`ai-service`) + `useStudentAffairs` + `_actions/{coordinator-classroom,academic-setup}` — تنظيف لاحق.
+- التحقّق الحيّ يبقى محجوباً حتى توفّر بيانات اختبار + اعتماد المالك.
