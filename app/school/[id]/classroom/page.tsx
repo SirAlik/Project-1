@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { School, Layers, ChevronLeft, CalendarClock, Upload } from 'lucide-react';
 import { getSchoolClassrooms } from '@/app/_actions/coordinator-classroom';
+import { ResetClassesButton } from './ResetClassesButton';
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -38,15 +39,7 @@ export default async function CoordinatorClassroomPage(props: PageProps) {
                 </header>
 
                 <div className="flex justify-end mb-6">
-                    <form action={async () => {
-                        'use server';
-                        const { resetSchoolClasses } = await import('@/app/_actions/coordinator-classroom');
-                        await resetSchoolClasses({ schoolId });
-                    }}>
-                        <button className="text-xs text-destructive hover:text-destructive/80 underline opacity-50 hover:opacity-100 transition-opacity">
-                            (Danger) إعادة تعيين الفصول
-                        </button>
-                    </form>
+                    <ResetClassesButton schoolId={schoolId} />
                 </div>
 
                 {/* Error Alert */}
@@ -54,7 +47,7 @@ export default async function CoordinatorClassroomPage(props: PageProps) {
                     <div className="mb-8 p-4 bg-destructive/10 border border-destructive/20 rounded-xl text-destructive">
                         <h3 className="font-bold mb-1">حدث خطأ في جلب البيانات</h3>
                         <p className="text-sm opacity-80">
-                            {result.serverError || JSON.stringify(result.validationErrors)}
+                            تعذّر تحميل قائمة الفصول، يرجى تحديث الصفحة أو المحاولة لاحقاً.
                         </p>
                     </div>
                 )}
