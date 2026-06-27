@@ -73,7 +73,7 @@ export function ExecutionEngine({ data, validation, onBack, schoolId }: Executio
             doc.text(`Name: ${student.full_name}`, 20, y + 10);
             doc.setFontSize(10);
             doc.text(`Email: ${student.email}`, 20, y + 20);
-            doc.text(`Temp Password: ChangeMe123!`, 20, y + 25);
+            doc.text("Password: issued by school admin (set via reset link on first sign-in)", 20, y + 25);
             doc.text(`Role: ${student.role}`, 20, y + 30);
 
             y += 50;
