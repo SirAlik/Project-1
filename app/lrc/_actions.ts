@@ -128,13 +128,48 @@ export async function startClassVisitAction(input: {
     const visitId = (visit as { id: string }).id;
 
     if (input.studentIds.length > 0) {
-        const attendanceRows = input.studentIds.map(s => ({
-            visit_id: visitId,
-            student_id: s.id,
-            is_present: true,
-            is_excluded: false,
-            school_id: persona.schoolId,
-        }));
+        // تعبئة الحضور من سجلّ الحضور اليومي الحقيقي بدل افتراض حضور الجميع.
+        // الغائب/المأذون له في ذلك اليوم يُستبعد من الزيارة بسبب صادق؛ المتأخر يُعدّ حاضراً.
+        const { data: daily } = await supabase
+            .from('student_daily_attendance')
+            .select('student_id, status, is_excused, excuse_reason')
+            .eq('school_id', persona.schoolId)
+            .eq('class_id', input.classId)
+            .eq('attendance_date', input.visitDate);
+
+        const dailyMap = new Map<string, { status: string | null; is_excused: boolean | null; excuse_reason: string | null }>();
+        for (const d of daily ?? []) {
+            dailyMap.set(d.student_id as string, {
+                status: (d.status as string | null) ?? null,
+                is_excused: (d.is_excused as boolean | null) ?? null,
+                excuse_reason: (d.excuse_reason as string | null) ?? null,
+            });
+        }
+        // صدق البيانات: إن لم يوجد سجلّ حضور يومي لهذا الفصل في هذا التاريخ، يُفترض حضور الجميع
+        // (لا توجد بيانات لاستبعاد أحد) — fallback صريح لا تخمين.
+        const hasDailyData = dailyMap.size > 0;
+
+        const attendanceRows = input.studentIds.map(s => {
+            const rec = dailyMap.get(s.id);
+            const notAtSchool = !!rec && (rec.status === 'absent' || rec.status === 'excused_exit' || rec.is_excused === true);
+            if (hasDailyData && notAtSchool) {
+                return {
+                    visit_id: visitId,
+                    student_id: s.id,
+                    is_present: false,
+                    is_excluded: true,
+                    exclusion_reason: rec?.excuse_reason || (rec?.status === 'absent' ? 'غائب' : 'مأذون بالمغادرة'),
+                    school_id: persona.schoolId,
+                };
+            }
+            return {
+                visit_id: visitId,
+                student_id: s.id,
+                is_present: true,
+                is_excluded: false,
+                school_id: persona.schoolId,
+            };
+        });
         const { error: aErr } = await supabase.from('lrc_visit_attendance').insert(attendanceRows);
         if (aErr) return { ok: false, error: aErr.message };
     }
@@ -175,7 +210,11 @@ export async function updateLrcBookingStatusAction(
     if (!persona) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
-    let query = supabase.from('lrc_bookings').update({ status }).eq('id', bookingId);
+    // عند الاعتماد: تسجيل وقت الاعتماد (approved_at) لإثبات حدوث الموافقة فعلياً — بيانات حقيقية لا وهمية.
+    const patch: { status: BookingStatus; approved_at?: string } = { status };
+    if (status === 'approved') patch.approved_at = new Date().toISOString();
+
+    let query = supabase.from('lrc_bookings').update(patch).eq('id', bookingId);
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
