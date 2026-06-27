@@ -164,19 +164,63 @@ export async function markAttendanceAction(
     metadata: Record<string, unknown> = {},
 ): Promise<AR> {
     const persona = await getActivePersona();
-    if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!persona?.schoolId) return { ok: false, error: 'غير مصرح' };
 
     const supabase = await createSupabaseServerClient();
+
+    // term_id إلزامي (NOT NULL بلا default) — يُحلّ خادمياً من الفصل الدراسي النشط للمدرسة.
+    const { data: termRow } = await supabase
+        .from('terms')
+        .select('id')
+        .eq('school_id', persona.schoolId)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+    if (!termRow) return { ok: false, error: 'لا يوجد فصل دراسي نشط — يرجى إعداد الفصول الدراسية أولاً' };
+
+    const { data: yearRow } = await supabase
+        .from('academic_years')
+        .select('id')
+        .eq('school_id', persona.schoolId)
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+
+    const { data: personaRow } = await supabase
+        .from('user_personas')
+        .select('id')
+        .eq('user_id', persona.userId)
+        .eq('school_id', persona.schoolId)
+        .eq('role', persona.role)
+        .limit(1)
+        .maybeSingle();
+
+    // حقول اختيارية آمنة فقط من metadata — لا نشر مفاتيح غير معروفة (كانت تُسبّب أعمدة غير موجودة
+    // عند تسجيل المغادرة). معلومات المغادرة (السبب/ولي الأمر) تُدمج في excuse_reason النصّي.
+    const exitReason = typeof metadata.exit_reason === 'string' ? metadata.exit_reason : null;
+    const guardianName = typeof metadata.exit_guardian_name === 'string' ? metadata.exit_guardian_name : null;
+    const excuseReason =
+        (typeof metadata.excuse_reason === 'string' && metadata.excuse_reason) ||
+        [exitReason, guardianName ? `ولي الأمر: ${guardianName}` : null].filter(Boolean).join(' — ') ||
+        null;
+    const isExcused = typeof metadata.is_excused === 'boolean'
+        ? metadata.is_excused
+        : status === 'excused_exit';
+
     const { error } = await supabase.from('student_daily_attendance').upsert({
         student_id: studentId,
         attendance_date: new Date().toISOString().split('T')[0],
         status,
-        ...metadata,
+        term_id: termRow.id,
+        academic_year_id: yearRow?.id ?? null,
+        is_excused: isExcused,
+        excuse_reason: excuseReason,
+        recorded_by_persona_id: personaRow?.id ?? null,
+        recorded_by_name_snapshot: persona.displayName ?? persona.role,
         school_id: persona.schoolId,
-        // recorded_by_persona_id يُضاف عند إعادة تصميم هذه الوظيفة لتمرير personaId
-    });
+    }, { onConflict: 'student_id,attendance_date,school_id' });
 
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[student-affairs] markAttendance:', error.message); return { ok: false, error: 'تعذّر حفظ الحضور، يرجى المحاولة لاحقاً' }; }
     return { ok: true };
 }
 
