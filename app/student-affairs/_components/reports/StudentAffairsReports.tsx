@@ -280,14 +280,14 @@ export const QF71_C_5_3 = ({ referral, schoolName }: { referral: BehavioralRefer
             </View>
 
             <View style={[styles.section, { borderStyle: "dashed", borderColor: "#000" }]}>
-                <Text style={styles.sectionTitle}>خاص بالمرشد الطلابي (الإجراء المتخذ)</Text>
+                <Text style={styles.sectionTitle}>خاص بالموجه الطلابي (الإجراء المتخذ)</Text>
                 <Text style={{ minHeight: 100 }}>{referral.counselor_action || "بانتظار الإجراء..."}</Text>
                 <View style={styles.row}><Text style={styles.label}>حالة الإحالة:</Text><Text style={styles.value}>{referral.status}</Text></View>
             </View>
 
             <View style={styles.signatureBlock}>
                 <View style={styles.signature}><Text>وكيل شؤون الطلاب</Text></View>
-                <View style={styles.signature}><Text>المرشد الطلابي</Text></View>
+                <View style={styles.signature}><Text>الموجه الطلابي</Text></View>
             </View>
             <QFFooter />
         </Page>
@@ -405,7 +405,7 @@ export const QF71_C_6_1 = ({ student, schoolName }: { contract?: BehavioralContr
             </View>
 
             <View style={[styles.signatureBlock, { marginTop: 30 }]}>
-                <View style={styles.signature}><Text>المرشد الطلابي</Text></View>
+                <View style={styles.signature}><Text>الموجه الطلابي</Text></View>
                 <View style={styles.signature}><Text>وكيل شؤون الطلاب</Text></View>
             </View>
             <QFFooter />

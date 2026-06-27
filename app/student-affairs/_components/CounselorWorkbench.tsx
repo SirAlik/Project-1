@@ -31,7 +31,7 @@ export function CounselorWorkbench({ referrals, onResolve }: CounselorWorkbenchP
             </DashboardGrid>
 
             {/* List View */}
-            <DashboardSection title="منصة عمل المرشد الطلابي" icon={ClipboardList}>
+            <DashboardSection title="منصة عمل الموجه الطلابي" icon={ClipboardList}>
                 <ReferralInbox
                     referrals={counselorReferrals}
                     role="counselor"

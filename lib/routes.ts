@@ -193,7 +193,7 @@ export const routeMetadata: RouteMetadata[] = [
     { path: '/student-affairs', label: 'Student Affairs', labelAr: 'شؤون الطلاب', icon: 'Users', roles: ['student_affairs_vp'], keywords: ['student', 'affairs', 'شؤون', 'طلاب'] },
 
     // Counselor Routes
-    { path: '/counselor', label: 'Counselor', labelAr: 'المرشد الطلابي', icon: 'Heart', roles: ['student_counselor'], keywords: ['counselor', 'مرشد', 'طلابي'] },
+    { path: '/counselor', label: 'Counselor', labelAr: 'الموجه الطلابي', icon: 'Heart', roles: ['student_counselor'], keywords: ['counselor', 'موجه', 'طلابي'] },
 
     // Classroom Routes
     { path: '/classroom', label: 'Classroom', labelAr: 'الفصل الدراسي', icon: 'BookOpen', roles: ['teacher'], keywords: ['classroom', 'teacher', 'فصل', 'معلم'] },
