@@ -47,7 +47,7 @@ export function useClassroom() {
     const [studentRoles, setStudentRoles] = useState<Record<string, string>>({});
     const [seatingMap, setSeatingMap] = useState<Record<string, { x: number; y: number }>>({});
     const [parentNotes] = useState<ParentNote[]>([]);
-    const [badges, setBadges] = useState<Record<string, string[]>>({}); // studentId -> badge types
+    const [badges] = useState<Record<string, string[]>>({}); // studentId -> badge types (غير مفعّل بعد)
     const [offlineQueue, setOfflineQueue] = useState<Record<string, unknown>[]>([]);
 
     // Picker State
@@ -251,18 +251,25 @@ export function useClassroom() {
         const student = students.find(s => s.id === studentId);
         if (!student) return;
 
+        // "حاضر" ليست قيمة في enum event_type — تحديث محلي فقط بلا إدراج حدث.
+        if (status === 'present') {
+            setAttendance(prev => ({ ...prev, [studentId]: 'present' }));
+            return;
+        }
+
+        const label = status === 'absent' ? 'غياب' : 'تأخر';
         const result = await addEventAction([{
             student_id: studentId,
             student_name_cached: student.name,
-            type: status === 'absent' ? 'غائب' : (status === 'late' ? 'متأخر' : 'تحويل لحاضر'),
-            note: `تحديث يدوي للحالة إلى ${status} في ${new Date().toLocaleTimeString('ar-SA')}`,
+            type: label, // قيمة enum صحيحة (كانت "غائب"/"متأخر" مرفوضة)
+            note: `تحديث يدوي للحالة إلى ${label} في ${new Date().toLocaleTimeString('ar-SA')}`,
             event_date: new Date().toISOString().split('T')[0],
         }]);
 
-        if (!result.ok) setMsg(`خطأ في التحديث: ${result.error ?? "خطأ"}`);
+        if (!result.ok) setMsg(`⚠️ ${result.error ?? "تعذّر تحديث الحالة"}`);
         else {
             setAttendance(prev => ({ ...prev, [studentId]: status }));
-            setMsg(`✅ تم تحديث حالة ${student.name} إلى ${status === 'late' ? 'متأخر' : status}`);
+            setMsg(`✅ تم تحديث حالة ${student.name} إلى ${label}`);
             loadEvents();
         }
     }
@@ -293,32 +300,36 @@ export function useClassroom() {
             };
         });
 
-        // Offline Resilience: Try Server Action, if fail, queue locally
+        // مرونة الاتصال: فشل الشبكة (throw) → طابور محلي. رفض الخادم (ok:false) → خطأ صادق،
+        // لا يُخفى أبداً كحفظ محلي (كان هذا يُوهم المعلّم بنجاح كتابة فاشلة فعلاً).
+        let result: Awaited<ReturnType<typeof addEventAction>>;
         try {
-            const result = await addEventAction(payload);
-            if (!result.ok) throw new Error(result.error ?? 'خطأ');
-
-            setLastAction({ type: 'batch_event', ids: result.data?.ids ?? [] });
-            await loadEvents();
+            result = await addEventAction(payload);
         } catch {
             setOfflineQueue(prev => [...prev, ...payload]);
-            setMsg("📴 تعذر الاتصال بالسيرفر. تم حفظ الإجراء محلياً وسيتم المزامنة لاحقاً.");
+            setMsg("📴 تعذّر الاتصال بالخادم. حُفظ الإجراء محلياً وستتم المزامنة عند عودة الاتصال.");
+            setSelectedStudentIds([]);
+            setTimeout(() => setMsg(""), 5000);
+            return;
         }
 
+        if (!result.ok) {
+            setMsg(`⚠️ ${result.error ?? 'تعذّر تسجيل الإجراء'}`);
+            setSelectedStudentIds([]);
+            setTimeout(() => setMsg(""), 5000);
+            return;
+        }
+
+        setLastAction({ type: 'batch_event', ids: result.data?.ids ?? [] });
+        await loadEvents();
         setSelectedStudentIds([]);
         setTimeout(() => setMsg(""), 5000);
     }
 
-    async function awardBadge(studentId: string, badgeType: string) {
-        setBadges(prev => {
-            const current = prev[studentId] || [];
-            if (current.includes(badgeType)) return prev;
-            return { ...prev, [studentId]: [...current, badgeType] };
-        });
-
-        const student = students.find(s => s.id === studentId);
-        await addEvent(`وسام: ${badgeType}` as EventType, `تم منح الوسام لـ ${student?.name}`, 5, 'academic');
-        setMsg(`🏅 تم منح وسام (${badgeType}) للطالب ${student?.name}`);
+    async function awardBadge(_studentId: string, _badgeType: string) {
+        // الأوسمة مكافأة لا تُمثَّل في enum event_type ولا يوجد جدول مكافآت صفّي — لا ادّعاء نجاح
+        // ولا تخزين محلي وهمي. تفعيلها لاحقاً عبر migration (انظر تقرير الإغلاق).
+        setMsg("⚠️ منح الأوسمة غير مفعّل بعد في السجل الرسمي.");
     }
 
     async function undoLastAction() {
@@ -339,11 +350,6 @@ export function useClassroom() {
     // --- Phase 2 Actions ---
 
     async function startExit(studentId: string, type: "دورة مياه" | "عيادة" | "أخرى") {
-        setActiveExits(prev => ({
-            ...prev,
-            [studentId]: { startTime: new Date().toISOString(), type }
-        }));
-
         const st = students.find(s => s.id === studentId);
         const result = await addEventAction([{
             student_id: studentId,
@@ -354,11 +360,16 @@ export function useClassroom() {
         }]);
 
         if (!result.ok) {
-            console.error("Exit log failed", result.error);
-        } else {
-            loadEvents();
+            // لا ادّعاء خروج إذا لم يُسجَّل فعلاً (نوع الخروج غير مدعوم في السجل الرسمي).
+            setMsg(`⚠️ ${result.error ?? 'تعذّر تسجيل الخروج'}`);
+            return;
         }
 
+        setActiveExits(prev => ({
+            ...prev,
+            [studentId]: { startTime: new Date().toISOString(), type }
+        }));
+        loadEvents();
         setMsg(`🏃 خرج ${st?.name} (${type})`);
     }
 
@@ -366,29 +377,16 @@ export function useClassroom() {
         const exit = activeExits[studentId];
         if (!exit) return;
 
-        const startTime = new Date(exit.startTime);
-        const endTime = new Date();
-        const duration = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+        const duration = Math.round((Date.now() - new Date(exit.startTime).getTime()) / 60000);
 
-        const result = await addEventAction([{
-            student_id: studentId,
-            student_name_cached: students.find(s => s.id === studentId)?.name,
-            type: exit.type === "دورة مياه" ? "دورة مياه - عاد" : "عودة من العيادة",
-            note: `المدة: ${duration} دقيقة`,
-            action_category: 'utility',
-            event_date: endTime.toISOString().split('T')[0],
-        }]);
-
-        if (!result.ok) setMsg(`خطأ في تسجيل العودة: ${result.error ?? "خطأ"}`);
-        else {
-            setActiveExits(prev => {
-                const updated = { ...prev };
-                delete updated[studentId];
-                return updated;
-            });
-            setMsg(`↩️ عاد الطالب بعد ${duration} دقيقة.`);
-            loadEvents();
-        }
+        // عودة الطالب تتبُّع محلي فقط: لا قيمة enum لحدث "العودة" ولا عمود لمدّتها،
+        // فلا يُدرَج حدث وهمي — يُغلق المؤقّت محلياً بصدق.
+        setActiveExits(prev => {
+            const updated = { ...prev };
+            delete updated[studentId];
+            return updated;
+        });
+        setMsg(`↩️ عاد الطالب بعد ${duration} دقيقة.`);
     }
 
     function pickRandomStudent(noRepeat = true) {

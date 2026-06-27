@@ -1,5 +1,6 @@
 export type Subject = "عام" | "إسلامية";
 
+// مفردات الواجهة (display vocabulary) — أوسع من enum قاعدة البيانات؛ تُحوَّل خادمياً عبر mapToDbEventType.
 export type EventType =
     | "غياب"
     | "تأخر عن دخول الحصة"
@@ -22,6 +23,57 @@ export type EventType =
     | "تميز ملحوظ"
     | "نوم في الحصة"
     | "عرقلة سير الحصة";
+
+// ── مصدر الحقيقة الوحيد لأنواع الأحداث المدعومة في قاعدة البيانات ──
+// enum public.event_type يقبل هذه القيم السبع *فقط* (تحقّق حيّ 2026). أي قيمة أخرى يرفضها Postgres
+// بـ "invalid input value for enum event_type"، فيجب التحويل إليها خادمياً قبل أي إدراج في events.
+export const CLASSROOM_DB_EVENT_TYPES = [
+    "غياب",
+    "استئذان",
+    "تحويل إلى وكيل شؤون الطلاب",
+    "مخالفة",
+    "تأخر",
+    "زيارة عيادة",
+    "زيارة مصادر تعلم",
+] as const;
+
+export type DbEventType = (typeof CLASSROOM_DB_EVENT_TYPES)[number];
+
+const DB_EVENT_TYPE_SET: ReadonlySet<string> = new Set(CLASSROOM_DB_EVENT_TYPES);
+
+// مرادفات مفردات الواجهة → قيمة enum صحيحة (لا تخمين: كل سطر تطابق دلالي مباشر).
+const EVENT_TYPE_ALIASES: Record<string, DbEventType> = {
+    "غائب": "غياب",
+    "متأخر": "تأخر",
+    "تأخر عن دخول الحصة": "تأخر",
+    "عيادة": "زيارة عيادة",
+    "مصادر التعلم": "زيارة مصادر تعلم",
+    "زيارة المكتبة": "زيارة مصادر تعلم",
+};
+
+// مخالفات صفّية متعددة تُمثَّل جميعها بقيمة enum واحدة "مخالفة"؛ التفصيل الأصلي يُحفظ في note/metadata.
+const DISCIPLINE_VIOLATIONS: ReadonlySet<string> = new Set([
+    "حديث جانبي",
+    "مقاطعة",
+    "عدم إحضار واجب",
+    "لم يسمّع القرآن",
+    "عدم إحضار الأدوات",
+    "نوم في الحصة",
+    "عرقلة سير الحصة",
+]);
+
+/**
+ * يحوّل نوع حدث من مفردات الواجهة إلى قيمة enum صالحة في قاعدة البيانات،
+ * أو يُعيد null إذا كان النوع غير قابل للتمثيل (المكافآت/النجوم/الأوسمة/الأحداث الإيجابية
+ * وخروج دورة المياه والعودة) — في هذه الحالة يجب رفض الكتابة بصدق لا اختلاق قيمة خاطئة.
+ */
+export function mapToDbEventType(appType: string): DbEventType | null {
+    const t = (appType ?? "").trim();
+    if (DB_EVENT_TYPE_SET.has(t)) return t as DbEventType;
+    if (EVENT_TYPE_ALIASES[t]) return EVENT_TYPE_ALIASES[t];
+    if (DISCIPLINE_VIOLATIONS.has(t)) return "مخالفة";
+    return null;
+}
 
 export type EventRow = {
     id: string;

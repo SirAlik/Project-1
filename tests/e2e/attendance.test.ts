@@ -66,6 +66,9 @@ describe('E2E: حضور الحصص (saveAttendanceAction)', () => {
         expect(mockFrom).toHaveBeenCalledWith('events');
 
         const insertedRows = mockInsert.mock.calls[0][0] as Array<Record<string, unknown>>;
+        // قيم enum صحيحة: غياب/تأخر (لا "غائب"/"متأخر" التي يرفضها enum القاعدة)
+        expect(insertedRows[0].type).toBe('غياب');
+        expect(insertedRows[1].type).toBe('تأخر');
         // school_id يجب أن يأتي من persona.schoolId دائماً
         for (const row of insertedRows) {
             expect(row.school_id).toBe('school-A');
@@ -95,7 +98,8 @@ describe('E2E: حضور الحصص (saveAttendanceAction)', () => {
         ]);
 
         expect(result.ok).toBe(false);
-        expect(result.error).toBe('DB error');
+        // رسالة عربية آمنة بدل تسريب رسالة Postgres الخام للمستخدم
+        expect(result.error).toBe('تعذّر حفظ البيانات، يرجى المحاولة لاحقاً');
     });
 
 });

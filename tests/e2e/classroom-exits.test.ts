@@ -37,7 +37,8 @@ const mockPersona = {
 const exitEvent = {
     student_id:          'student-1',
     student_name_cached: 'عمر خالد',
-    type:                'خروج دورة مياه',
+    // قيمة enum صالحة (خروج للعيادة)؛ خروج دورة المياه غير مدعوم بعد ويُرفض بصدق (انظر آخر اختبار)
+    type:                'زيارة عيادة',
     note:                null,
     action_category:     'exit',
     event_date:          '2026-06-05',
@@ -111,7 +112,21 @@ describe('E2E: مغادرة الفصل (addEventAction)', () => {
         const result = await addEventAction([exitEvent]);
 
         expect(result.ok).toBe(false);
-        expect(result.error).toBe('RLS violation');
+        // رسالة عربية آمنة بدل تسريب رسالة Postgres الخام
+        expect(result.error).toBe('تعذّر حفظ البيانات، يرجى المحاولة لاحقاً');
+    });
+
+    it('يرفض الأنواع غير المدعومة في enum القاعدة بصدق (بلا إدراج)', async () => {
+        vi.spyOn(contextService, 'getActivePersona').mockResolvedValue(
+            mockPersona as unknown as Awaited<ReturnType<typeof contextService.getActivePersona>>,
+        );
+
+        // نوع غير قابل للتمثيل في enum event_type (مكافأة) → رفض صادق لا قيمة مختلَقة
+        const result = await addEventAction([{ ...exitEvent, type: 'نجم الحصة 1' }]);
+
+        expect(result.ok).toBe(false);
+        expect(result.error).toContain('غير مدعوم');
+        expect(mockInsert).not.toHaveBeenCalled();
     });
 
 });

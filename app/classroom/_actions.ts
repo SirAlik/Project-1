@@ -1,7 +1,7 @@
 'use server';
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 import { getActivePersona } from '@/lib/auth/context-service';
-import type { EventType } from '@/lib/types/classroom';
+import { mapToDbEventType } from '@/lib/types/classroom';
 
 type AR = { ok: boolean; error?: string };
 type ARData<T> = { ok: boolean; error?: string; data?: T };
@@ -18,6 +18,33 @@ type EventPayloadItem = {
     class_id?: string;
 };
 
+// رسالة عربية آمنة موحّدة؛ التفاصيل التقنية تبقى في سجلّ الخادم فقط (لا تسريب schema/قيود للمستخدم).
+const WRITE_FAILED = 'تعذّر حفظ البيانات، يرجى المحاولة لاحقاً';
+const UNSUPPORTED_EVENT = 'هذا النوع من الأحداث غير مدعوم حالياً في السجل الرسمي';
+
+// يحوّل صف الحدث إلى صف قابل للإدراج (type صالح في enum)، أو null إذا كان النوع غير قابل للتمثيل.
+function buildEventRow(p: EventPayloadItem): Record<string, unknown> | null {
+    const dbType = mapToDbEventType(p.type);
+    if (!dbType) return null; // مكافأة/نجمة/وسام/خروج غير قابل للتمثيل → رفض صادق لا قيمة مختلَقة
+
+    // حفظ النوع الأصلي عند اختلافه عن قيمة الـenum (مثل تجميع المخالفات في "مخالفة").
+    const note = dbType !== p.type
+        ? [p.note, `النوع: ${p.type}`].filter(Boolean).join(' — ')
+        : (p.note ?? null);
+
+    return {
+        student_id: p.student_id,
+        student_name_cached: p.student_name_cached,
+        type: dbType,
+        note,
+        action_category: p.action_category,
+        points_delta: p.points_delta,
+        event_date: p.event_date,
+        class_id: p.class_id,
+        metadata: { app_type: p.type },
+    };
+}
+
 export async function saveAttendanceAction(
     absentOrLate: { studentId: string; studentName?: string; status: 'absent' | 'late'; note?: string }[],
     classId?: string,
@@ -32,7 +59,8 @@ export async function saveAttendanceAction(
     const payload = absentOrLate.map(r => ({
         student_id: r.studentId,
         student_name_cached: r.studentName,
-        type: r.status === 'absent' ? 'غائب' : 'متأخر',
+        // قيم enum الصحيحة: غياب/تأخر (كانت "غائب"/"متأخر" مرفوضة من القاعدة).
+        type: r.status === 'absent' ? 'غياب' : 'تأخر',
         actor_role_cached: persona.role,
         created_by: persona.userId,
         note: r.note ?? null,
@@ -42,7 +70,7 @@ export async function saveAttendanceAction(
     }));
 
     const { error } = await supabase.from('events').insert(payload);
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] saveAttendance:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }
 
@@ -52,16 +80,21 @@ export async function addEventAction(
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
 
+    const built = payload.map(buildEventRow);
+    if (built.some(r => r === null)) {
+        return { ok: false, error: UNSUPPORTED_EVENT };
+    }
+
     const supabase = await createSupabaseServerClient();
-    const rows = payload.map(p => ({
-        ...p,
+    const rows = built.map(r => ({
+        ...(r as Record<string, unknown>),
         created_by: persona.userId,
         actor_role_cached: persona.role,
         school_id: persona.schoolId,
     }));
 
     const { data, error } = await supabase.from('events').insert(rows).select('id');
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] addEvent:', error.message); return { ok: false, error: WRITE_FAILED }; }
 
     const ids = (data as { id: string }[]).map(d => d.id);
     return { ok: true, data: { ids } };
@@ -76,33 +109,20 @@ export async function undoEventsAction(ids: string[]): Promise<AR> {
     if (persona.schoolId) query = query.eq('school_id', persona.schoolId);
 
     const { error } = await query;
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] undoEvents:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }
 
+// نجوم الحصة مكافأة لا تُمثَّل في enum event_type الحالي ولا يوجد جدول مكافآت صفّي.
+// رفض صادق بدل كتابة قيمة enum خاطئة أو ادّعاء نجاح. تفعيلها يتطلب migration (انظر
+// db/migrations/20260628_classroom_event_types_expansion.sql — غير مُطبَّق).
 export async function saveStarsAction(
-    stars: { studentId: string; studentName: string }[],
-    classId?: string,
+    _stars: { studentId: string; studentName: string }[],
+    _classId?: string,
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
-
-    const supabase = await createSupabaseServerClient();
-    const today = new Date().toISOString().split('T')[0];
-    const payload = stars.map((s, i) => ({
-        student_id: s.studentId,
-        student_name_cached: s.studentName,
-        type: `نجم الحصة ${i + 1}` as EventType,
-        actor_role_cached: persona.role,
-        created_by: persona.userId,
-        event_date: today,
-        class_id: classId,
-        school_id: persona.schoolId,
-    }));
-
-    const { error } = await supabase.from('events').insert(payload);
-    if (error) return { ok: false, error: error.message };
-    return { ok: true };
+    return { ok: false, error: 'تسجيل نجوم الحصة غير مفعّل بعد في السجل الرسمي' };
 }
 
 export async function saveParentNoteAction(
@@ -123,7 +143,7 @@ export async function saveParentNoteAction(
         created_at: new Date().toISOString(),
     }]);
 
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] saveParentNote:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }
 
@@ -133,6 +153,8 @@ export async function saveSeatingMapAction(
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
+    // classroom_metadata.class_id فريد ومطلوب فعلياً — بدونه نكتب صفوف class_id=NULL متكررة.
+    if (!classId || classId.trim() === '') return { ok: false, error: 'لا يمكن حفظ المخطط بدون تحديد الفصل' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('classroom_metadata').upsert({
@@ -140,9 +162,9 @@ export async function saveSeatingMapAction(
         seating_map: seatingMap,
         school_id: persona.schoolId,
         updated_at: new Date().toISOString(),
-    });
+    }, { onConflict: 'class_id' });
 
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] saveSeatingMap:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }
 
@@ -152,6 +174,7 @@ export async function saveStudentRolesAction(
 ): Promise<AR> {
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
+    if (!classId || classId.trim() === '') return { ok: false, error: 'لا يمكن حفظ الأدوار بدون تحديد الفصل' };
 
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.from('classroom_metadata').upsert({
@@ -159,9 +182,9 @@ export async function saveStudentRolesAction(
         student_roles: studentRoles,
         school_id: persona.schoolId,
         updated_at: new Date().toISOString(),
-    });
+    }, { onConflict: 'class_id' });
 
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] saveStudentRoles:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }
 
@@ -171,15 +194,20 @@ export async function syncOfflineQueueAction(
     const persona = await getActivePersona();
     if (!persona) return { ok: false, error: 'غير مصرح' };
 
+    const built = events.map(buildEventRow);
+    if (built.some(r => r === null)) {
+        return { ok: false, error: UNSUPPORTED_EVENT };
+    }
+
     const supabase = await createSupabaseServerClient();
-    const rows = events.map(e => ({
-        ...e,
+    const rows = built.map(r => ({
+        ...(r as Record<string, unknown>),
         created_by: persona.userId,
         actor_role_cached: persona.role,
         school_id: persona.schoolId,
     }));
 
     const { error } = await supabase.from('events').insert(rows);
-    if (error) return { ok: false, error: error.message };
+    if (error) { console.error('[classroom] syncOfflineQueue:', error.message); return { ok: false, error: WRITE_FAILED }; }
     return { ok: true };
 }

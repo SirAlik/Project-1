@@ -29,11 +29,8 @@ export function SeatingChart({
     const COLS = 6;
     const grid = Array.from({ length: ROWS * COLS }, (_, i) => i);
 
-    const handleDragEnd = () => {
-        // Simple grid snapping logic can be implemented here if needed
-        // For now we just let the parent handle the storage
-    };
-
+    // ملاحظة صدق: السحب كان لا يُخزّن شيئاً (onUpdateSeating لم يُستدعَ، وحفظ الفصل يتطلب class_id
+    // غير متوفّر في هذا التدفّق) — أُزيل لتفادي تفاعل وهمي. يبقى النقر لاختيار الطالب.
     return (
         <div className="relative w-full aspect-[4/3] bg-white/80 rounded-[3rem] border border-stone-200 p-8 overflow-hidden">
             {/* Teacher Desk Area */}
@@ -59,9 +56,6 @@ export function SeatingChart({
                     return (
                         <motion.button
                             key={s.id}
-                            drag
-                            dragMomentum={false}
-                            onDragEnd={() => handleDragEnd()}
                             onClick={() => onStudentClick(s.id)}
                             className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all group ${isSelected
                                 ? "bg-[var(--primary)]/20 border-[var(--primary)] shadow-lg shadow-[var(--primary)]/20"
@@ -106,6 +100,9 @@ export function SeatingChart({
             </div>
 
             {/* Empty Seat Placeholders (Implicit in Grid) */}
+            <p className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] font-bold text-stone-400">
+                ترتيب المقاعد للعرض فقط حالياً (لا يُحفظ بعد)
+            </p>
         </div>
     );
 }
