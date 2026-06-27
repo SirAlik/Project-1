@@ -26,6 +26,7 @@ import { SeatingChart } from "../../_components/SeatingChart";
 import { ParentNoteModal } from "../../_components/ParentNoteModal";
 import { BadgesModal } from "../../_components/BadgesModal";
 import { StudentRewardsHistory } from "./StudentRewardsHistory";
+import { CurriculumProgress } from "./CurriculumProgress";
 
 interface ClassroomWorkspaceProps {
     classId: string;
@@ -526,6 +527,9 @@ export function ClassroomWorkspace({ classId, className, grade, section }: Class
                                 loading={state.loading}
                             />
                         </div>
+
+                        {/* تقدّم المنهج (Sprint 7) — نسبة حقيقية من إنجاز الدروس */}
+                        <CurriculumProgress classId={classId} />
                     </div>
                 </div>
             </div>
