@@ -57,8 +57,11 @@ export function AddStaffForm({ schoolId }: AddStaffFormProps) {
             });
 
             if (result.serverError) {
-                setError(result.serverError);
+                // لا تُعرض رسالة الخادم الخام للمستخدم — رسالة عربية آمنة + سجلّ تقني
+                console.error('[AddStaffForm] createStaff serverError:', result.serverError);
+                setError('تعذّر حفظ بيانات الموظف، يرجى المحاولة لاحقاً.');
             } else if (result.validationErrors) {
+                // رسائل تحقّق الحقول (Zod) آمنة وعربية — تُعرض كما هي
                 const messages = Object.values(result.validationErrors).flat().join(' · ');
                 setError(messages || 'تحقّق من صحة البيانات المدخلة.');
             } else {
@@ -72,7 +75,8 @@ export function AddStaffForm({ schoolId }: AddStaffFormProps) {
                 setTimeout(() => router.push(`/school/${schoolId}/staff`), 900);
             }
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'تعذّر إكمال العملية.');
+            console.error('[AddStaffForm] unexpected error:', err);
+            setError('تعذّر إكمال العملية، يرجى المحاولة لاحقاً.');
         } finally {
             setLoading(false);
         }

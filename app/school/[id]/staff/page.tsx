@@ -43,6 +43,8 @@ export default async function StaffPage({ params }: PageProps) {
 
     const staff: StaffMember[] = staffResult?.data ?? [];
     const serverError: string | undefined = staffResult?.serverError;
+    // التفاصيل التقنية في سجلّ الخادم فقط — لا تُعرض للمستخدم
+    if (serverError) console.error('[StaffPage] getSchoolStaff serverError:', serverError);
 
     const activeCount = staff.filter((m) => m.kind === "active").length;
     const pendingCount = staff.filter((m) => m.kind === "invite" && m.status === "pending").length;
@@ -80,7 +82,7 @@ export default async function StaffPage({ params }: PageProps) {
                         <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600" />
                         <div>
                             <p className="text-sm font-black text-foreground">تعذّر جلب بيانات الموظفين</p>
-                            <p className="mt-0.5 text-xs font-medium text-muted-foreground">{serverError}</p>
+                            <p className="mt-0.5 text-xs font-medium text-muted-foreground">يرجى تحديث الصفحة أو المحاولة لاحقاً.</p>
                         </div>
                     </div>
                 )}

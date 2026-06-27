@@ -82,13 +82,16 @@ export default function NewClassroomPage() {
                 stageId:    formData.stageId,
             });
             if (res.serverError || res.validationErrors) {
-                setError(res.serverError || 'حدث خطأ في البيانات المدخلة');
+                // لا تُعرض رسالة الخادم الخام — رسالة عربية آمنة + سجلّ تقني
+                console.error('[NewClassroom] createClass failed:', res.serverError || res.validationErrors);
+                setError('تعذّر إنشاء الفصل. تأكّد من البيانات وحاول لاحقاً.');
                 return;
             }
             router.push(`/school/${schoolId}/classroom`);
             router.refresh();
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'حدث خطأ غير متوقع');
+            console.error('[NewClassroom] unexpected error:', err);
+            setError('حدث خطأ غير متوقع، يرجى المحاولة لاحقاً.');
         } finally {
             setIsLoading(false);
         }
