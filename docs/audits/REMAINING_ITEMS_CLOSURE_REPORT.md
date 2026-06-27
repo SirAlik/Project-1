@@ -117,3 +117,36 @@
 3. **اعتماد أكواد QF الرسمية** للقوالب `implemented:false` ثم بناء مولّداتها + بذور `ai_prompt_templates` للسياقات الثلاثة.
 4. **migration مُصرَّح به** لتوسيع `source_module` CHECK + زرع مؤشر LRC → تفعيل دليل الجودة من زيارات LRC.
 5. **مصالحة تتبّع الترحيلات** (baseline `db pull` ثم repair محدَّد) — **بلا** `db reset/push` على الحيّة.
+
+---
+
+# ملحق: Sprint 2 — إصلاحات أمن/تشغيل High + استكمال تشغيل الفصل (2026-06-29)
+
+**الحالة:** نجح. app-code + **3 migrations مُطبَّقة على DB الحية** + 1 سجلّ-قرار غير مُطبَّق. `lint` صفر · `build` 63/63 · `tsc` نظيف · `test` 26/26 · `git diff --check` نظيف.
+
+## ما أُغلق (أمنياً)
+1. **RPCs اقتصاد الطالب القديمة:** أُسقطت `rpc_purchase_furniture(uuid)` + `rpc_scan_ar_glyph(text)` (غير مستخدمتين + معطوبتان: تكتبان `student_id=auth.uid()` بينما الـFK يشير إلى `student_profiles.id` بلا ربط). migration: `20260629_drop_legacy_economy_rpc_overloads` (مُطبَّق).
+2. **ربط ملكية RPCs الاقتصاد:** «الربط بـ`auth.uid()`» غير ممكن بنيوياً (لا عمود ربط في `student_profiles`) وغير صحيح دلالياً (الاقتصاد مُشغَّل من الطاقم لا الطالب). الحلّ الصحيح: **بوّابة دور المشغّل داخل** الأربع دوال SECURITY DEFINER (scan/purchase/process_transaction/complete_quest) + فحص نطاق المدرسة القائم → يُمنع student/parent/secretary/health/lab… من استدعائها، ويُحجب التعديل عبر-المستأجر. migration: `20260629_gate_economy_rpcs_to_operators` (مُطبَّق ومُتحقَّق: 4/4 تحمل البوّابة، 0 توقيع أُحادي متبقٍّ).
+3. **كتابة PII من المتصفّح:** حُذف `components/parent/HealthSocialModal.tsx` (يتيم، صفر استيراد، كان يكتب `health_data/social_data` من العميل). الأشقّاء الثلاثة لا يكتبون DB.
+4. **أوراكل بريد عابر للمستأجر:** `validateImportData` → `requiresSchoolContext:true` + حصر الوجود على مدرسة المُستدعي (`user_personas`)؛ `system_owner` فقط عالمي.
+5. **webhook البصمة:** مقارنة سرّ ثابتة الزمن + جدول `biometric_devices` (RLS) + تحقّق device→school (fail-closed 403). migration: `20260629_biometric_device_registry` (مُطبَّق).
+
+## ما أُغلق (Runtime)
+6. **رسائل أخطاء آمنة:** `lib/safe-error.ts::toSafeError` مُطبَّق على activity/health/classroom/student-affairs/secretary/lrc/science/qa — لا `error.message` خام.
+7. **حُرّاس الكتابة:** `if(!persona?.schoolId)` موحّد + تحقّق ملكية `student_id` في activity/health/student-affairs.
+8. **classId حقيقي:** مسار `/classroom/[classId]` (Server Component يحلّ الفصل: UUID + RLS مدرسة + تكليف معلّم → `notFound`). `useClassroom(classId)` يربط الطلاب/الأحداث/المقاعد/الأدوار/الخروج بالفصل الحقيقي. حُذف `[grade]/[section]` المعطوب.
+9. **بقايا Sprint 1:**
+   - **`useClassroom` + `class_id`:** حُلَّ — classId حقيقي يُمرَّر؛ المقاعد/الأدوار تُحفظ فعلاً (تحقّق `class_id` ضمن المدرسة).
+   - **النجوم/الأوسمة:** تبقى **محجوبة بصدق** (مسارها gamification مستقبلاً — لا enum مُختلَق).
+   - **خروج دورة المياه:** **حُلَّ ويُحفظ صحيحاً** عبر `classroom_exits` (`exit_type` نصّي + تتبّع العودة) — أزرار `EventButtons` تُوجَّه لـ`startExit`/`endExit`. **لا توسعة enum.**
+   - **النقاط اليومية:** `dailyScores` يقرأ `metadata.app_type` (لا `e.type` المُجمَّع) — متّسقة مع التخزين النهائي.
+
+## migrations
+- مُطبَّقة حياً (3): `20260629_drop_legacy_economy_rpc_overloads` · `20260629_gate_economy_rpcs_to_operators` · `20260629_biometric_device_registry`.
+- سجلّ-قرار غير مُطبَّق (1): `20260628_classroom_event_types_expansion.sql` (توسعة enum **مرفوضة** — `classroom_exits` أنظف للخروج؛ المكافآت → gamification).
+
+## مخاطر متبقية
+- `alert()`/`error.message` خام في مكوّنات خارج النطاق (`coordinator/TimetableEditor` · `principal/SentinelDashboard` · `(auth)/join`).
+- الأحداث الإيجابية الصفّية (شارك اليوم…) بلا مسار تخزين → محجوبة بصدق (UNSUPPORTED_EVENT) حتى طبقة gamification.
+- نشر/تسجيل `biometric_devices` + ضبط `BIOMETRIC_WEBHOOK_SECRET` = إجراء مالك (حتى ذلك الحين الـwebhook fail-closed لكل الأجهزة).
+- `rpc_process_transaction`/`rpc_complete_quest` ما زالتا تكتبان `student_wallet`/`transaction_logs` مباشرةً داخل الجسم (SECURITY DEFINER) بدل التوحيد عبر مسار واحد — مقبول معمارياً، توحيد مستقبلي اختياري.
