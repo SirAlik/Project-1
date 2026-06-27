@@ -232,7 +232,7 @@ export const checkClassName = createSafeAction({
 
         if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows found"
             console.error('[checkClassName] Error:', error);
-            return { available: false, error: error.message };
+            return { available: false, error: 'تعذّر التحقق من اسم الفصل، يرجى المحاولة لاحقاً' };
         }
 
         return { available: !data };

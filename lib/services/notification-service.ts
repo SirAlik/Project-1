@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
+import { toSafeError }                from '../safe-error';
 import type { WorkflowResult }        from '../workflow-service';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ export async function getMyNotifications(
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[notifications] getMine', error, 'تعذّر تحميل الإشعارات، يرجى المحاولة لاحقاً') };
   return { ok: true, data: (data ?? []) as unknown as NotificationItem[] };
 }
 
@@ -115,7 +116,7 @@ export async function markAsRead(notificationId: string): Promise<WorkflowResult
     .eq('id', notificationId)
     .eq('school_id', persona.schoolId);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[notifications] markAsRead', error, 'تعذّر تحديث حالة الإشعار، يرجى المحاولة لاحقاً') };
   return { ok: true, data: null };
 }
 

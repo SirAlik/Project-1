@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
+import { toSafeError }                from '../safe-error';
 import type { WorkflowResult }        from '../workflow-service';
 import type { StaffEvaluation }       from '../types/layer6';
 
@@ -85,7 +86,7 @@ export async function getStaffForEvaluation(): Promise<WorkflowResult<StaffOptio
     .eq('school_id', persona.schoolId)
     .not('role', 'in', '("student","parent","system_owner")');
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[staff-eval] getStaff', error, 'تعذّر تحميل قائمة الموظفين، يرجى المحاولة لاحقاً') };
   if (!personaRows?.length) return { ok: true, data: [] };
 
   const userIds = personaRows.map((p) => p.user_id);
@@ -174,7 +175,7 @@ export async function createStaffEvaluation(
     .select('id')
     .single();
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[staff-eval] createEvaluation', error, 'تعذّر حفظ التقييم، يرجى المحاولة لاحقاً') };
   return { ok: true, data: data as unknown as Pick<StaffEvaluation, 'id'> };
 }
 
@@ -197,6 +198,6 @@ export async function getEvaluationsList(): Promise<WorkflowResult<EvalListRow[]
     .eq('school_id', persona.schoolId)
     .order('created_at', { ascending: false });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[staff-eval] getList', error, 'تعذّر تحميل قائمة التقييمات، يرجى المحاولة لاحقاً') };
   return { ok: true, data: (data ?? []) as unknown as EvalListRow[] };
 }

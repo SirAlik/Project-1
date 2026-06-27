@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef, startTransition } from "react";
 import { useAuth } from "@/app/_context/AuthContext";
+import { toSafeError } from "@/lib/safe-error";
 
 import {
     StudentProfile,
@@ -63,7 +64,7 @@ export function useStudentAffairs() {
             .select('*, student_id:national_id')
             .order('name', { ascending: true });
 
-        if (error) setMsg({ text: error.message, type: 'error' });
+        if (error) setMsg({ text: toSafeError('[student-affairs] loadStudents', error, 'تعذّر تحميل قائمة الطلاب، يرجى المحاولة لاحقاً'), type: 'error' });
         else setStudents((data ?? []) as unknown as StudentProfile[]);
         setLoading(false);
     }, [supabase]);
@@ -75,7 +76,7 @@ export function useStudentAffairs() {
             .select('*, student:student_profiles(name, student_id:national_id)')
             .eq('attendance_date', date);
 
-        if (error) setMsg({ text: error.message, type: 'error' });
+        if (error) setMsg({ text: toSafeError('[student-affairs] loadAttendance', error, 'تعذّر تحميل سجل الحضور، يرجى المحاولة لاحقاً'), type: 'error' });
         else setAttendance(data || []);
         setLoading(false);
     }, [supabase]);
@@ -90,7 +91,7 @@ export function useStudentAffairs() {
         if (status) query = query.eq('status', status);
 
         const { data, error } = await query;
-        if (error) setMsg({ text: error.message, type: 'error' });
+        if (error) setMsg({ text: toSafeError('[student-affairs] loadReferrals', error, 'تعذّر تحميل الإحالات، يرجى المحاولة لاحقاً'), type: 'error' });
         else setReferrals(data || []);
         setLoading(false);
     }, [supabase]);
@@ -105,7 +106,7 @@ export function useStudentAffairs() {
         if (studentId) query = query.eq('student_id', studentId);
 
         const { data, error } = await query;
-        if (error) setMsg({ text: error.message, type: 'error' });
+        if (error) setMsg({ text: toSafeError('[student-affairs] loadAssets', error, 'تعذّر تحميل العُهد، يرجى المحاولة لاحقاً'), type: 'error' });
         else setAssets(data || []);
         setLoading(false);
     }, [supabase]);

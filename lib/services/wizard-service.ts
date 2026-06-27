@@ -5,6 +5,7 @@ import { getActivePersona }           from '../auth/context-service';
 import { startWorkflow, advanceWorkflow, createApprovalGate } from '../workflow-service';
 import type { WorkflowResult }        from '../workflow-service';
 import { createGeneratedForm }        from '../quality/generated-forms';
+import { toSafeError }                from '../safe-error';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -72,7 +73,7 @@ export async function getReasonCodes(
     .eq('is_active', true)
     .order('code');
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[wizard] getReasonCodes', error, 'تعذّر تحميل أكواد الأسباب، يرجى المحاولة لاحقاً') };
 
   return { ok: true, data: (data ?? []) as ReasonCode[] };
 }
@@ -97,7 +98,7 @@ export async function getEmployeesByRole(
     .eq('school_id', persona.schoolId)
     .eq('role', role);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[wizard] getEmployeesByRole', error, 'تعذّر تحميل قائمة الموظفين، يرجى المحاولة لاحقاً') };
   if (!personaRows?.length) return { ok: true, data: [] };
 
   const userIds = personaRows.map((p) => p.user_id);
@@ -198,7 +199,7 @@ export async function submitCorrectiveActionWizard(
     .single();
 
   if (ncrErr || !ncr) {
-    return { ok: false, error: `فشل إنشاء تقرير عدم المطابقة: ${ncrErr?.message}` };
+    return { ok: false, error: toSafeError('[wizard] submitCorrectiveAction:ncr', ncrErr, 'تعذّر إنشاء تقرير عدم المطابقة، يرجى المحاولة لاحقاً') };
   }
 
   // ── إطلاق الـ workflow (يُنشئ instance بحالة 'draft')
@@ -235,7 +236,8 @@ export async function submitCorrectiveActionWizard(
   });
 
   if (!advResult.ok) {
-    return { ok: false, error: `فشل تقديم الإجراء التصحيحي: ${advResult.error}` };
+    console.error('[wizard] submitCorrectiveAction:advance:', advResult.error);
+    return { ok: false, error: 'تعذّر تقديم الإجراء التصحيحي، يرجى المحاولة لاحقاً' };
   }
 
   // ── بوابة الموافقة: إقرار الموظف المستهدف
@@ -302,7 +304,7 @@ export async function submitCorrectiveActionWizard(
     .single();
 
   if (wizardErr || !wizardSession) {
-    return { ok: false, error: `فشل حفظ جلسة المعالج: ${wizardErr?.message}` };
+    return { ok: false, error: toSafeError('[wizard] submitCorrectiveAction:session', wizardErr, 'تعذّر حفظ جلسة المعالج، يرجى المحاولة لاحقاً') };
   }
 
   // ── ربط الـ NCR بالـ workflow + تحديث الحالة

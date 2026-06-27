@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '@/lib/db/supabase-server';
 import { getActivePersona }           from '@/lib/auth/context-service';
+import { toSafeError }                from '@/lib/safe-error';
 import type { WorkflowResult }        from '@/lib/workflow-service';
 import { revalidatePath }             from 'next/cache';
 
@@ -45,7 +46,7 @@ export async function createStage(data: {
 
   if (error) {
     if (error.code === '23505') return { ok: false, error: 'هذه المرحلة مضافة مسبقاً' };
-    return { ok: false, error: error.message };
+    return { ok: false, error: toSafeError('[academic-setup] createStage', error, 'تعذّر إضافة المرحلة، يرجى المحاولة لاحقاً') };
   }
 
   revalidatePath(`/school/${data.schoolId}/academic-setup`);
@@ -64,7 +65,7 @@ export async function deleteStage(stageId: string, schoolId: string): Promise<Wo
 
   if (error) {
     if (error.code === '23503') return { ok: false, error: 'لا يمكن الحذف — توجد فصول أو حصص مرتبطة بهذه المرحلة' };
-    return { ok: false, error: error.message };
+    return { ok: false, error: toSafeError('[academic-setup] deleteStage', error, 'تعذّر حذف المرحلة، يرجى المحاولة لاحقاً') };
   }
 
   revalidatePath(`/school/${schoolId}/academic-setup`);
@@ -102,7 +103,7 @@ export async function createPeriod(data: {
 
   if (error) {
     if (error.code === '23505') return { ok: false, error: `رقم الحصة ${data.number} مضاف مسبقاً لهذه المرحلة` };
-    return { ok: false, error: error.message };
+    return { ok: false, error: toSafeError('[academic-setup] createPeriod', error, 'تعذّر إضافة الحصة، يرجى المحاولة لاحقاً') };
   }
 
   revalidatePath(`/school/${data.schoolId}/academic-setup`);
@@ -136,7 +137,7 @@ export async function createPeriodsQuick(stageId: string, schoolId: string): Pro
     .upsert(rows, { onConflict: 'school_stage_id,number', ignoreDuplicates: true })
     .select();
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[academic-setup] createPeriodsQuick', error, 'تعذّر إنشاء الحصص الافتراضية، يرجى المحاولة لاحقاً') };
 
   revalidatePath(`/school/${schoolId}/academic-setup`);
   return { ok: true, data: { count: rows.length } };
@@ -154,7 +155,7 @@ export async function deletePeriod(periodId: string, schoolId: string): Promise<
 
   if (error) {
     if (error.code === '23503') return { ok: false, error: 'لا يمكن الحذف — توجد سجلات حضور مرتبطة بهذه الحصة' };
-    return { ok: false, error: error.message };
+    return { ok: false, error: toSafeError('[academic-setup] deletePeriod', error, 'تعذّر حذف الحصة، يرجى المحاولة لاحقاً') };
   }
 
   revalidatePath(`/school/${schoolId}/academic-setup`);
@@ -193,7 +194,7 @@ export async function createTerm(data: {
 
   if (error) {
     if (error.code === '23505') return { ok: false, error: `الفصل الدراسي رقم ${data.number} مضاف مسبقاً` };
-    return { ok: false, error: error.message };
+    return { ok: false, error: toSafeError('[academic-setup] createTerm', error, 'تعذّر إضافة الفصل الدراسي، يرجى المحاولة لاحقاً') };
   }
 
   revalidatePath(`/school/${data.schoolId}/academic-setup`);
@@ -214,14 +215,14 @@ export async function setActiveTerm(termId: string, schoolId: string, academicYe
     .eq('academic_year_id', academicYearId)
     .neq('id', termId);
 
-  if (deactivateErr) return { ok: false, error: deactivateErr.message };
+  if (deactivateErr) return { ok: false, error: toSafeError('[academic-setup] setActiveTerm:deactivate', deactivateErr, 'تعذّر تفعيل الفصل الدراسي، يرجى المحاولة لاحقاً') };
 
   const { error } = await supabase
     .from('terms')
     .update({ is_active: true })
     .eq('id', termId);
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[academic-setup] setActiveTerm:activate', error, 'تعذّر تفعيل الفصل الدراسي، يرجى المحاولة لاحقاً') };
 
   revalidatePath(`/school/${schoolId}/academic-setup`);
   return { ok: true, data: undefined };
@@ -239,7 +240,7 @@ export async function deleteTerm(termId: string, schoolId: string): Promise<Work
 
   if (error) {
     if (error.code === '23503') return { ok: false, error: 'لا يمكن الحذف — توجد سجلات حضور مرتبطة بهذا الفصل' };
-    return { ok: false, error: error.message };
+    return { ok: false, error: toSafeError('[academic-setup] deleteTerm', error, 'تعذّر حذف الفصل الدراسي، يرجى المحاولة لاحقاً') };
   }
 
   revalidatePath(`/school/${schoolId}/academic-setup`);

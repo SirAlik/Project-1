@@ -3,6 +3,7 @@
 import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
 import { supabaseAdmin }              from '../db/supabase-admin';
+import { toSafeError }                from '../safe-error';
 import type { WorkflowResult }        from '../workflow-service';
 import type {
   AIContextType,
@@ -480,7 +481,7 @@ export async function getInsightForRole(
     .limit(1)
     .maybeSingle();
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[ai] getCachedInsight', error, 'تعذّر تحميل الرؤى الذكية، يرجى المحاولة لاحقاً') };
   return { ok: true, data: data as AIInsight | null };
 }
 
@@ -725,6 +726,6 @@ export async function getAllInsightsForRole(): Promise<WorkflowResult<AIInsight[
     .gt('expires_at',  new Date().toISOString())
     .order('generated_at', { ascending: false });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[ai] getActiveInsights', error, 'تعذّر تحميل الرؤى الذكية، يرجى المحاولة لاحقاً') };
   return { ok: true, data: (data ?? []) as AIInsight[] };
 }

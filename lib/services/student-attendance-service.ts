@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
+import { toSafeError }                from '../safe-error';
 import type { WorkflowResult }        from '../workflow-service';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -57,7 +58,7 @@ export async function getClassesForAttendance(): Promise<WorkflowResult<ClassOpt
     .eq('school_id', persona.schoolId)
     .order('grade_level');
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[student-attendance] getClasses', error, 'تعذّر تحميل قائمة الفصول، يرجى المحاولة لاحقاً') };
   if (!data?.length) return { ok: true, data: [] };
 
   // عدد الطلاب المسجّلين في كل فصل
@@ -103,7 +104,7 @@ export async function getStudentsWithAttendance(
     .eq('class_id', classId)
     .eq('is_active', true);
 
-  if (enrollError) return { ok: false, error: enrollError.message };
+  if (enrollError) return { ok: false, error: toSafeError('[student-attendance] getStudents:enroll', enrollError, 'تعذّر تحميل قائمة الطلاب، يرجى المحاولة لاحقاً') };
   if (!enrollments?.length) return { ok: true, data: [] };
 
   const studentIds = enrollments.map(e => e.student_id as string);
@@ -114,7 +115,7 @@ export async function getStudentsWithAttendance(
     .select('id, name, student_id')
     .in('id', studentIds);
 
-  if (profilesError) return { ok: false, error: profilesError.message };
+  if (profilesError) return { ok: false, error: toSafeError('[student-attendance] getStudents:profiles', profilesError, 'تعذّر تحميل بيانات الطلاب، يرجى المحاولة لاحقاً') };
 
   // سجلات الحضور لليوم المحدد
   const { data: attendanceRows } = await supabase
@@ -225,6 +226,6 @@ export async function recordAttendanceBulk(
     .from('student_daily_attendance')
     .upsert(rows, { onConflict: 'student_id,attendance_date,school_id' });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[student-attendance] recordBulk', error, 'تعذّر حفظ الحضور، يرجى المحاولة لاحقاً') };
   return { ok: true, data: { saved: rows.length } };
 }

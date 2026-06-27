@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
 import { hasPermission }              from '../auth/pbac';
 import { getPeriodsForStage }         from './academic-service';
+import { toSafeError }                from '../safe-error';
 import type { WorkflowResult }        from '../workflow-service';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,7 +89,7 @@ export async function getClassesForTeacher(): Promise<WorkflowResult<ClassOption
   }
 
   const { data, error } = await query;
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[period-attendance] getClasses', error, 'تعذّر تحميل قائمة الفصول، يرجى المحاولة لاحقاً') };
 
   const classes: ClassOption[] = (data ?? []).map(c => ({
     id:          c.id,
@@ -121,7 +122,7 @@ export async function getPeriodsForClassAndDay(
     .eq('school_id', persona.schoolId)
     .maybeSingle();
 
-  if (classErr) return { ok: false, error: classErr.message };
+  if (classErr) return { ok: false, error: toSafeError('[period-attendance] getSlots:class', classErr, 'تعذّر تحميل بيانات الفصل، يرجى المحاولة لاحقاً') };
   if (!classRow?.stage_id) {
     return { ok: false, error: 'الفصل غير مرتبط بمرحلة دراسية — يرجى مراجعة الإعدادات' };
   }
@@ -183,7 +184,7 @@ export async function getStudentsWithPeriodAttendance(
     .eq('class_id', classId)
     .eq('is_active', true);
 
-  if (eErr) return { ok: false, error: eErr.message };
+  if (eErr) return { ok: false, error: toSafeError('[period-attendance] getStudents:enroll', eErr, 'تعذّر تحميل قائمة الطلاب، يرجى المحاولة لاحقاً') };
   if (!enrollments?.length) return { ok: true, data: [] };
 
   const studentIds = enrollments.map(e => e.student_id as string);
@@ -193,7 +194,7 @@ export async function getStudentsWithPeriodAttendance(
     .select('id, name, student_id')
     .in('id', studentIds);
 
-  if (pErr) return { ok: false, error: pErr.message };
+  if (pErr) return { ok: false, error: toSafeError('[period-attendance] getStudents:profiles', pErr, 'تعذّر تحميل بيانات الطلاب، يرجى المحاولة لاحقاً') };
 
   const { data: records } = await supabase
     .from('period_attendance')
@@ -290,7 +291,7 @@ export async function recordPeriodAttendanceBulk(
     .from('period_attendance')
     .upsert(rows, { onConflict: 'student_id,period_date,period_id,school_id' });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[period-attendance] recordBulk', error, 'تعذّر حفظ حضور الحصص، يرجى المحاولة لاحقاً') };
   return { ok: true, data: { saved: rows.length } };
 }
 

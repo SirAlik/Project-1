@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from '../db/supabase-server';
 import { getActivePersona }           from '../auth/context-service';
 import { hasPermission }              from '../auth/pbac';
 import { startWorkflow }              from '../workflow-service';
+import { toSafeError }                from '../safe-error';
 import type { WorkflowResult }        from '../workflow-service';
 import type {
   BulkUploadJob,
@@ -45,7 +46,7 @@ export async function getMyJobs(): Promise<WorkflowResult<BulkUploadJob[]>> {
     .eq('school_id', persona.schoolId)
     .order('created_at', { ascending: false });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: toSafeError('[bulk-upload] getMyJobs', error, 'تعذّر تحميل مهام الرفع، يرجى المحاولة لاحقاً') };
 
   return { ok: true, data: (data ?? []) as unknown as BulkUploadJob[] };
 }
@@ -118,7 +119,7 @@ export async function createJob(input: {
     .single();
 
   if (error || !job) {
-    return { ok: false, error: `فشل إنشاء المهمة: ${error?.message}` };
+    return { ok: false, error: toSafeError('[bulk-upload] createJob', error, 'تعذّر إنشاء مهمة الرفع، يرجى المحاولة لاحقاً') };
   }
 
   // إطلاق workflow للمسار الرسمي (اختياري — لأغراض التدقيق)
