@@ -267,5 +267,48 @@
 **مُعدَّل:** `lib/services/meeting-service.ts` · `lib/services/hr-attendance-service.ts` · `app/(protected)/portal/_components/PortalClient.tsx` · `components/gamification/{Locker,MarketplaceGrid,QuestTree}.tsx` · `app/classroom/_actions.ts` · `app/classroom/_components/SeatingChart.tsx` · `app/classroom/[classId]/_components/ClassroomWorkspace.tsx` · `CLAUDE.md` · `CODEX.MD` · هذا التقرير.
 
 ## مخاطر متبقية
-- نمط `error.message` خام أوسع في خدمات غير مُسمّاة (`wizard`/`student-attendance`/`staff-evaluation`/`period-attendance`/`notification`/`bulk-upload`/`ai-service`) + `useStudentAffairs` + `_actions/{coordinator-classroom,academic-setup}` — تنظيف لاحق.
+- نمط `error.message` خام أوسع في خدمات غير مُسمّاة (`wizard`/`student-attendance`/`staff-evaluation`/`period-attendance`/`notification`/`bulk-upload`/`ai-service`) + `useStudentAffairs` + `_actions/{coordinator-classroom,academic-setup}` — تنظيف لاحق. **(أُغلق في Sprint 6.)**
 - التحقّق الحيّ يبقى محجوباً حتى توفّر بيانات اختبار + اعتماد المالك.
+
+---
+
+# Sprint 6 — كنس `toSafeError` على مستوى المنصّة + تدقيق تقدّم المنهج (2026-06-27)
+
+> إغلاق `error.message` الخام المتبقي في الخدمات/الـhooks/الإجراءات غير المُغطّاة سابقاً + تدقيق ميزة تقدّم المنهج. **app-code فقط — بلا migration.** lint صفر · build 63/63 · tsc نظيف · test 26/26. **بلا** لمس DB/RLS/migrations/Edge/auth/persona/مفاتيح الأدوار/التبعيات/`.env`.
+
+## (Phase 1+3) كنس الرسائل الآمنة
+كل `error.message`/`*.message` خام يُعاد للمستخدم في المناطق المُسمّاة استُبدل بـ `toSafeError(context, error, '<عربية آمنة>')` (التفاصيل في `console.error` فقط · شكل `ok`/`error` بلا تغيير · الخطأ لا يُبتلَع):
+
+| المنطقة | عدد المواضع | أمثلة الرسالة الآمنة |
+|---|---|---|
+| `lib/services/wizard-service.ts` | 5 | «تعذّر تحميل أكواد الأسباب…» · «تعذّر إنشاء تقرير عدم المطابقة…» |
+| `lib/services/student-attendance-service.ts` | 4 | «تعذّر تحميل قائمة الفصول…» · «تعذّر حفظ الحضور…» |
+| `lib/services/staff-evaluation-service.ts` | 3 | «تعذّر تحميل قائمة الموظفين…» · «تعذّر حفظ التقييم…» |
+| `lib/services/period-attendance-service.ts` | 5 | «تعذّر تحميل قائمة الفصول…» · «تعذّر حفظ حضور الحصص…» |
+| `lib/services/notification-service.ts` | 2 | «تعذّر تحميل الإشعارات…» · «تعذّر تحديث حالة الإشعار…» |
+| `lib/services/bulk-upload-service.ts` | 2 | «تعذّر تحميل مهام الرفع…» · «تعذّر إنشاء مهمة الرفع…» |
+| `lib/services/ai-service.ts` | 2 | «تعذّر تحميل الرؤى الذكية…» |
+| `app/student-affairs/_hooks/useStudentAffairs.ts` | 4 | «تعذّر تحميل قائمة الطلاب…» · «تعذّر تحميل الإحالات…» |
+| `app/_actions/coordinator-classroom.ts` | 1 | «تعذّر التحقق من اسم الفصل…» |
+| `app/_actions/academic-setup.ts` | 9 | «تعذّر إضافة المرحلة…» · «تعذّر تفعيل الفصل الدراسي…» |
+
+- **يبقى كما هو (مقبول):** فروع `error.code === '23505'/'23503'` العربية الواضحة في `academic-setup` (رسائل مجال آمنة) · `console.error` الخادمي · رسائل التحقّق العربية الثابتة.
+- **بحث ما بعد الإصلاح:** صفر `.message` خام في حقول `error:`/`text:` المُوجَّهة للمستخدم عبر الملفات العشرة.
+
+## (Phase 2) تدقيق ميزة تقدّم المنهج للمعلّم
+**الإجابة: غير منفّذة (Missing).** التفصيل الكامل: `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md`.
+- لا جدول `curriculum_*`/`lesson_*`/`unit` (فحص حيّ: فقط `quest_progress` = gamification).
+- placeholder ميت في تحليلات المدير (`useTeacherAnalytics`/`teachers/[id]`)؛ بياناته لا تُملأ (`individual=null`) → الصفحة عالقة على spinner؛ موجَّه للمدير لا للمعلّم.
+- سطح المعلّم `/classroom/[classId]` بلا تقدّم منهج إطلاقاً.
+- **لا نسبة وهمية في أي مكان.** التصميم النظيف موثَّق كـ **Sprint 7 مقترح** (يحتاج migration).
+
+## migration
+**لا** — لم يلزم. كل التغييرات app-code (رسائل آمنة)؛ تدقيق المنهج لم يُنفِّذ مخططاً.
+
+## الملفات المتغيّرة
+**كود (10):** `lib/services/{wizard,student-attendance,staff-evaluation,period-attendance,notification,bulk-upload,ai}-service.ts` · `app/student-affairs/_hooks/useStudentAffairs.ts` · `app/_actions/{coordinator-classroom,academic-setup}.ts`.
+**توثيق:** `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md` (جديد) · `CLAUDE.md` · `CODEX.MD` · `README.md` · `db/README.md` · هذا التقرير.
+
+## مخاطر متبقية
+- سطح تحليلات المدير القديم (`app/principal/analytics/teachers/*`) يحوي placeholders ميتة (سلاسل ثابتة + spinner دائم) — يُنظَّف/يُربَط مع Sprint 7؛ غير مرئي للمستخدم حالياً.
+- إجراءات مالك تشغيلية تبقى مفتوحة (لا عيب كود): `CRON_SECRET` · `cron_site_url` · `ANTHROPIC_API_KEY` · نشر Edge Functions · بيانات اختبار للتحقّق الحيّ بالمتصفّح.

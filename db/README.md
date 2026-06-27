@@ -101,6 +101,7 @@ There is no production database to protect. If a migration contradicts an older 
 | `20260629_gate_economy_rpcs_to_operators` (Sprint 2) | **مُطبَّق + متتبَّع حياً.** بوّابة دور المشغّل داخل جسم 4 دوال اقتصاد SECURITY DEFINER (`rpc_scan_ar_glyph`/`rpc_purchase_furniture`/`rpc_process_transaction`/`rpc_complete_quest`) — الطلاب roster بلا ربط `auth.uid()` والاقتصاد مُشغَّل من الطاقم؛ يمنع غير المشغّلين من تعديل أي محفظة/مكافأة، مع فحص نطاق المدرسة. |
 | `20260629_biometric_device_registry` (Sprint 2) | **مُطبَّق + متتبَّع حياً.** جدول `biometric_devices` (`device_id` PK → `school_id`) + RLS — webhook البصمة fail-closed: جهاز غير مسجَّل/غير مطابق لـ`school_id`/غير مُفعَّل → 403 (+ مقارنة سرّ ثابتة الزمن في الكود). |
 | `20260630_classroom_rewards` (Sprint 3) | **مُطبَّق + متتبَّع حياً.** جدول `classroom_rewards` (`reward_type` ∈ star/positive_point/badge · عزل `school_id`+`class_id`+`student_id` · `points` · `created_by` · RLS بأدوار المشغّل teacher/admin/principal/activity_leader) — مكافآت الفصل الإيجابية (نجوم/نقاط/أوسمة). |
+| Sprint 6 (2026-06-27) | **بلا migration.** كنس `toSafeError` على مستوى المنصّة (app-code فقط) + تدقيق تقدّم المنهج: الميزة **غير منفّذة** (لا جداول منهج/درس/وحدة؛ فقط `quest_progress` = gamification) — التصميم المقترح (`curriculum_units`/`curriculum_lessons`/`class_curriculum_progress`) = **Sprint 7** ويحتاج migration؛ لم يُنشأ بعد. راجع `docs/audits/CURRICULUM_PROGRESS_FEATURE_AUDIT.md`. |
 
 Migrations are applied **once, in order**. To fix a mistake: write a new migration. Never edit an already-applied migration.
 
