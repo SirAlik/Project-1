@@ -546,3 +546,16 @@ Do not wait until the end to report everything. After each stage, give the user 
 - **Daily score (`dailyScores`):** positive = sum of `classroom_rewards.points` (today/class); negative = `events` violations via `metadata.app_type`. No dependency on old positive enum values, no double-counting, no counting of unstored rewards. Seating-chart badges are loaded from real `classroom_rewards` (no fake map).
 - **No remaining "blocked" reward state** — stars/points/badges actually persist. (Any future disabled reward feature must say in Arabic: «هذه الميزة غير مفعّلة بعد لأنها تحتاج اعتماد مسار النقاط والأوسمة.»)
 - **Known remaining:** seating-map save (`saveSeatingMap`) works server-side but has no explicit save button in the UI (drag updates local state only) — the `SeatingChart` "not saved yet" caption is honest. The `app/layout.tsx` comment mentions `Antigravity` as history of removed components (internal, not a visible brand).
+
+---
+
+## Sprint 4 — Complete classroom surfaces + unified component error display (2026-06-30) — standing rules
+
+> Completes the seating/roles save surfaces in the UI + removes raw `serverError`/`error.message` from staff/class-creation components + surfaces a real rewards summary. **app-code only — no migration** (reused existing `classroom_metadata`/`classroom_rewards`). lint 0 · build 63/63 · tsc clean · test 26/26.
+
+- **Seating save (real, no fake drag):** `SeatingChart` orders students by the real `seatingMap`. UI: an "وضع الترتيب" toggle + clicking two students swaps their seats (no drag library) + a "حفظ المقاعد" button (disabled when no change/no `classId`). Persists to `classroom_metadata.seating_map` via `saveSeatingMapAction(classId, map)`. Never present a drag UI that doesn't persist.
+- **Student roles save (real):** when exactly one student is selected, role chips appear (رئيس الفصل/نائب الرئيس/مسؤول النظام/مسؤول السبورة/مسؤول التواصل/بلا دور) → `setStudentRoles` locally + a "حفظ الأدوار" button (shown when dirty) → `saveStudentRolesAction(classId, roles)` → `classroom_metadata.student_roles`. Roles + badges render in the seating chart.
+- **`saveSeatingMap`/`saveStudentRoles` now return `boolean`** — the dirty state is cleared **only after a successful save** (no faked save).
+- **Daily rewards summary (Phase 5):** compact cards (positive points · badges · rewarded students) from real `classroom_rewards` via the hook's `rewardsSummary`. No fake metrics or invented reward history — only persisted data is shown.
+- **No raw `serverError`/`error.message` in staff/class-creation components:** `AddStaffForm` (serverError + err.message) · `app/school/[id]/classroom/new` (serverError + err.message) · `app/school/[id]/staff/page.tsx` (`{serverError}`) → safe Arabic message + server `console.error`. Zod field `validationErrors` are kept as-is (safe Arabic by design, not raw DB errors).
+- **Known remaining:** raw `error.message` in **out-of-scope** components (`PortalClient` persona switch · `components/gamification/*` metaverse economy · `app/meetings/*` · `secretary/staff-attendance`) — broader later cleanup. Seating/roles save needs a real class + teacher assignment (no PRE-LAUNCH data for live browser verification).

@@ -191,3 +191,40 @@
 - حفظ مخطّط المقاعد يعمل خادمياً لكن بلا زرّ حفظ صريح في الواجهة (السحب محلي فقط) — تعليق `SeatingChart` صادق.
 - `app/layout.tsx` يذكر `Antigravity` كتاريخ داخلي لمكوّنات محذوفة (ليس علامة مرئية).
 - بعض المسارات تُظهر `serverError` inline (رسائل safe-action، قد تكون خاماً لأخطاء handler) — نمط أوسع خارج نطاق Sprint 3.
+
+---
+
+# ملحق: Sprint 4 — إتمام أسطح الفصل + توحيد عرض أخطاء المكوّنات (2026-06-30)
+
+**الحالة:** نجح. **app-code فقط — بلا migration**. `lint` صفر · `build` 63/63 · `tsc` نظيف · `test` 26/26 · `git diff --check` نظيف.
+
+## (Phase 1-2) حفظ مخطّط المقاعد
+- **الواقع المُكتشَف:** `SeatingChart` لم يكن فيه سحب/إفلات إطلاقاً (شبكة CSS ثابتة بترتيب المصفوفة)، و`onUpdateSeating`/`seatingMap` غير مستخدمة، والتعليق «للعرض فقط — لا يُحفظ بعد» كان صادقاً.
+- **الحلّ (real، لا drag وهمي):** `SeatingChart` يرتّب الطلاب حسب `seatingMap`. الواجهة: زرّ «وضع الترتيب» + الضغط على طالبين يبدّل مقعديهما + زرّ «حفظ المقاعد» (dirty-tracked، مُعطَّل بلا تغيير/`classId`). يُخزَّن في `classroom_metadata.seating_map` عبر `saveSeatingMapAction(classId)`.
+
+## (Phase 3) حفظ أدوار الطلاب
+- لم يكن هناك UI لتعيين دور (كان عرضاً فقط). الآن: عند اختيار طالب واحد تظهر رقائق أدوار (5 أدوار + «بلا دور») → `setStudentRoles` محلياً + زرّ «حفظ الأدوار» (يظهر عند dirty) → `saveStudentRolesAction(classId)` → `classroom_metadata.student_roles`.
+- `saveSeatingMap`/`saveStudentRoles` صارا يُعيدان `boolean` — حالة dirty تُمسح **فقط بعد نجاح** الحفظ.
+
+## (Phase 4) إزالة عرض الأخطاء الخام
+| المكوّن | قبل | بعد |
+|---|---|---|
+| `app/school/[id]/staff/new/_components/AddStaffForm.tsx` | `setError(result.serverError)` + `setError(err.message)` | رسالة عربية آمنة + `console.error` |
+| `app/school/[id]/classroom/new/page.tsx` | `setError(res.serverError)` + `setError(err.message)` | رسالة عربية آمنة + `console.error` |
+| `app/school/[id]/staff/page.tsx` | `{serverError}` خام | رسالة آمنة + `console.error` خادمي |
+
+رسائل تحقّق الحقول (Zod `validationErrors`) **أُبقيت** (عربية آمنة بالتصميم، ليست خطأ DB خام).
+
+## (Phase 5) إظهار المكافآت
+- بطاقات ملخّص مدمجة (نقاط إيجابية · أوسمة · طلاب مُكافأون) من `classroom_rewards` الحقيقي عبر `rewardsSummary` في الـhook. الأوسمة + الدور يظهران على بطاقات الطلاب في مخطّط المقاعد. **بلا مقاييس وهمية.**
+
+## (Phase 9 من السؤال) هل تم إنشاء migration؟
+**لا** — لم يلزم. أسطح المقاعد/الأدوار تستخدم `classroom_metadata` القائمة، والمكافآت تستخدم `classroom_rewards` (Sprint 3). لا حاجز DB أُثبت.
+
+## الملفات المتغيّرة
+**مُعدَّل (8):** `app/classroom/_hooks/useClassroom.ts` · `app/classroom/_components/SeatingChart.tsx` · `app/classroom/[classId]/_components/ClassroomWorkspace.tsx` · `app/school/[id]/staff/new/_components/AddStaffForm.tsx` · `app/school/[id]/classroom/new/page.tsx` · `app/school/[id]/staff/page.tsx` · `CLAUDE.md` · `CODEX.MD` · هذا التقرير. **بلا ملفات جديدة، بلا migration.**
+
+## مخاطر متبقية
+- `error.message` خام في مكوّنات خارج النطاق (`PortalClient` · `components/gamification/*` metaverse · `app/meetings/*` · `secretary/staff-attendance`) — تنظيف لاحق.
+- التحقّق الحيّ بالمتصفّح لأسطح المقاعد/الأدوار يتطلب فصلاً حقيقياً + تكليف معلّم + بيانات طلاب (غير متوفّر في PRE-LAUNCH) — تُحقَّق عبر build/tsc/lint.
+- `prop onUpdateSeating` يبقى ممرَّراً لـ`SeatingChart` لكنه غير مستخدم داخلها (السحب عبر الأب) — غير ضارّ.
